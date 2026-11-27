@@ -202,3 +202,30 @@ def test_evaluation_ignores_total_line():
     from syllabus_lib import load_eval_rules, parse_evaluation
     ev = parse_evaluation("参加度 20%\n中間テスト 30%\nレポート 50%\n合計 100%", load_eval_rules())
     assert [p["label"] for p in ev["parts"]] == ["参加度", "中間テスト", "レポート"]
+
+
+def test_scrape_end_to_end_with_fixtures():
+    """scrape() with a fake client: catches wiring bugs the pure parsers cannot (e.g. shadowed names)."""
+    import json
+    from pathlib import Path
+    import scrape_syllabus as ss
+
+    fx = Path(__file__).parent / "fixtures"
+    idx = json.loads((fx / "index_09.json").read_text(encoding="utf-8"))
+    # duplicate one page so the shared-時間割CD merge path runs
+    idx["gakkaData"]["syllabusData"].append(idx["gakkaData"]["syllabusData"][0])
+
+    class Fake:
+        requests = 0
+
+        def get_json(self, path):
+            self.requests += 1
+            if "/Index?" in path:
+                return idx
+            jcd = path.split("jikanwariCD=")[1].split("&")[0]
+            f = fx / f"course_{jcd}.json"
+            return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+    r = ss.scrape("2026", ["09"], None, Fake(), log=lambda *_: None)
+    assert r["departments"][0]["name"] == "電子工学科"
+    assert len(r["courses"]) == len({e["jikanwariCD"][0] for e in idx["gakkaData"]["syllabusData"]})
