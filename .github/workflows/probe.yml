@@ -1,0 +1,9 @@
+name: probe-syllabus-reachability
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -o /dev/null -w "index %{http_code} %{size_download}\n" --max-time 30 "https://www.kyoumu.cst.nihon-u.ac.jp/syllabus/View/Index?setiNendo=2026&gakubu=1&gakka=09" || true
+          curl -sS -o /dev/null -w "pdf %{http_code} %{size_download}\n" --max-time 60 "https://www.cst.nihon-u.ac.jp/about/education/pdf/0_3_1_r7.pdf" || true
