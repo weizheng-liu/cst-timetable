@@ -30,9 +30,11 @@ export function CourseDetail({ c, on, req, clash, status, onToggle }: Props) {
   return (
     <>
       {clash.length > 0 && (
-        <div class="banner coral">
-          <AlertTriangle size={16} />
-          <div>{clash.map((x) => x.name).join("、")} と時間が重なっています。</div>
+        <div class="note" style={{ marginTop: 0, marginBottom: 12 }}>
+          <span class="note-dot" aria-hidden="true" />
+          <span>
+            <b>{clash.map((x) => x.name).join("、")}</b>と時間が重複
+          </span>
         </div>
       )}
       {status === "maybe" && (

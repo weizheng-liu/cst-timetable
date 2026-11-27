@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, CalendarPlus, Clock, Download, GraduationCap, MoreHorizontal, Palette, Settings2, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Upload, RotateCcw } from "lucide-preact";
+import { ConflictResolve } from "./components/ConflictResolve";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
 import { Grid, GridSkeleton, ScopeTrace } from "./components/Grid";
 import { Sheet } from "./components/Sheet";
@@ -7,16 +8,17 @@ import { SlotPicker } from "./components/SlotPicker";
 import { CourseDetail } from "./components/CourseDetail";
 import { Credits } from "./components/Credits";
 import { Setup } from "./components/Setup";
-import { familyOf, loadCommon, loadDept, loadIndex, loadRequirements } from "./lib/data";
+import { categoryOf, loadCommon, loadDept, loadIndex, loadRequirements } from "./lib/data";
 import { eligibleFor, homeCampusOf, type Eligible } from "./lib/eligibility";
-import { normName, reqIndex } from "./lib/credits";
+import { normName, progress, reqIndex } from "./lib/credits";
+import { alternativesFor, resolveOptions, slotText, type ResolveOption } from "./lib/resolve";
 import { buildIcs } from "./lib/ics";
 import { DAYS, resolveTimes } from "./lib/periods";
 import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } from "./lib/schedule";
 import { download, exportJson, loadPhoto, sanitize, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -26,12 +28,13 @@ export function App() {
   const [common, setCommon] = useState<Course[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [stack, setStack] = useState<Panel[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<Toast | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const say = (m: string) => {
-    setToast(m);
-    setTimeout(() => setToast((t) => (t === m ? null : t)), 2400);
+  const say = (msg: string, extra: Omit<Toast, "msg"> = {}) => {
+    const t: Toast = { msg, ...extra };
+    setToast(t);
+    setTimeout(() => setToast((x) => (x === t ? null : x)), extra.undo ? 5000 : 2400);
   };
 
   useEffect(() => {
@@ -69,7 +72,10 @@ export function App() {
   const selected = useMemo(() => st.selected.map((id) => byId.get(id)).filter(Boolean) as Course[], [st.selected, byId]);
   const rIdx = useMemo(() => reqIndex(req), [req]);
   const reqOf = (c: Course) => rIdx.get(normName(c.name));
-  const family = (c: Course) => familyOf(c, (x) => reqOf(x)?.group ?? null);
+  const category = (c: Course) => categoryOf(c, reqOf(c));
+  const isRequired = (c: Course) => !!reqOf(c)?.required;
+  // 「移す」先として勧めるのは履修条件を満たすと判定できたクラスだけ（要確認は勧めない）
+  const canTake = (c: Course) => statusOf(c) === "yes";
 
   const view = st.view;
   const cells = useMemo(() => buildCells(selected, view), [selected, view]);
@@ -84,6 +90,8 @@ export function App() {
   const conflicts = useMemo(() => findConflicts(selected), [selected]);
   const termConflicts = conflicts.filter((c) => c.term === view);
   const termCredits = selected.filter((c) => inTerm(c, view)).reduce((s, c) => s + (c.credits || 0), 0);
+  const plannedYear = selected.reduce((s, c) => s + (c.credits || 0), 0);
+  const pr = req ? progress(req, selected, st.earned) : null;
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
   const days = 6;
@@ -127,14 +135,41 @@ export function App() {
     <div class="app">
       <header class="topbar">
         <div class="brand">
-          時間割
-          <small>
-            {deptName ? `${deptName} · ${profile?.grade}年 · ${index?.year}年度` : "読み込み中…"}
-          </small>
+          <span class="brand-mark" aria-hidden="true" />
+          <span class="brand-ja">日大理工 履修アシスタント</span>
+          <span class="eyebrow" aria-hidden="true">CST · NIHON UNIV.</span>
         </div>
-        <button class="icon-btn" aria-label="学科・学年を変更" onClick={() => push({ kind: "profile" })}>
-          <Settings2 size={20} />
-        </button>
+        <div class="titlerow">
+          <h1 class="title">時間割</h1>
+          <span class="term num">
+            {index?.year ?? "—"} · {view}
+          </span>
+        </div>
+        <div class="selects">
+          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`学科：${deptName}（変更）`}>
+            <small>学科</small>
+            <span class="sel-v">{deptName || "—"}</span>
+            <ChevronDown size={11} class="chev" />
+          </button>
+          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`学年：${profile?.grade}年（変更）`}>
+            <small>学年</small>
+            {profile?.grade ?? "-"}年
+            <ChevronDown size={11} class="chev" />
+          </button>
+          <label class="sel">
+            <small>学期</small>
+            <span class="sel-v">{view}</span>
+            <select class="sel-native" value={view} aria-label="学期" onChange={(e) => setSt((s) => ({ ...s, view: (e.target as HTMLSelectElement).value as "前期" | "後期" }))}>
+              <option value="前期">前期</option>
+              <option value="後期">後期</option>
+            </select>
+            <ChevronDown size={11} class="chev" />
+          </label>
+          <span class="sel-gap" />
+          <button class="icon-btn sm" aria-label="その他" onClick={() => push({ kind: "menu" })}>
+            <MoreHorizontal size={18} />
+          </button>
+        </div>
       </header>
 
       <div class="deco-scope" aria-hidden="true">
@@ -142,39 +177,46 @@ export function App() {
           <span>CH1 {termCredits}単位</span>
           <span>CH2 {selected.filter((c) => inTerm(c, view)).length}科目</span>
           <span>{times[1]?.[0]}–{times[maxPeriod]?.[1] ?? times[6][1]}</span>
-          <span class={termConflicts.length ? "warn" : ""}>{termConflicts.length ? `TRIG ERR ×${groupConflicts(termConflicts).length}` : "TRIG OK"}</span>
+          <span class={termConflicts.length ? "warn" : ""}>{termConflicts.length ? `TRIG ×${groupConflicts(termConflicts).length}` : "TRIG OK"}</span>
         </div>
       </div>
-
-
-      <div class="toolbar">
-        <div class="segmented" role="group" aria-label="学期">
-          {(["前期", "後期"] as const).map((t) => (
-            <button key={t} aria-pressed={view === t} onClick={() => setSt((s) => ({ ...s, view: t }))}>
-              {t}
-            </button>
-          ))}
-        </div>
-        <div class="summary">
-          <b class="num">{termCredits}</b> 単位 · {selected.filter((c) => inTerm(c, view)).length}科目
-        </div>
-      </div>
-
-      {termConflicts.length > 0 && (
-        <div class="banner coral" role="status">
-          <AlertTriangle size={16} />
-          <div>
-            {groupConflicts(termConflicts).join("、")} が重複しています。
-          </div>
-        </div>
-      )}
 
       {dept && <ScopeTrace days={days} cells={cells} />}
       {dept ? (
-        <Grid days={days} periods={maxPeriod} times={times} onPeriod={() => setStack([{ kind: "times" }])} cells={cells} offered={offered} family={family} onCell={(d, p) => setStack([{ kind: "slot", day: d, period: p }])} />
+        <Grid
+          days={days}
+          periods={maxPeriod}
+          times={times}
+          onPeriod={() => setStack([{ kind: "times" }])}
+          cells={cells}
+          offered={offered}
+          category={category}
+          target={top?.kind === "slot" && !(cells.get(cellKey(top.day, top.period)) ?? []).length ? top : null}
+          moved={toast?.moved ?? null}
+          onCell={(d, p) => setStack([(cells.get(cellKey(d, p)) ?? []).length > 1 ? { kind: "resolve", day: d, period: p } : { kind: "slot", day: d, period: p }])}
+        />
       ) : (
         <GridSkeleton days={days} periods={6} />
       )}
+
+      {groupConflicts(termConflicts).map((g) => (
+        <div key={g.key} class="note" role="status">
+          <span class="note-dot" aria-hidden="true" />
+          <span>
+            {DAYS[g.day - 1]}曜 {g.periods.join("・")}限：
+            {g.courses.map((c, i) => (
+              <>
+                {i > 0 && "と"}
+                <b>{c.name}</b>
+              </>
+            ))}
+            が重複
+          </span>
+          <button class="note-act" onClick={() => setStack([{ kind: "resolve", day: g.day, period: g.periods[0] }])}>
+            解決する
+          </button>
+        </div>
+      ))}
 
       {dept && selected.length === 0 && <p class="muted" style={{ textAlign: "center", marginTop: 20 }}>マスをタップすると、その時間に開講される科目が表示されます。</p>}
 
@@ -209,20 +251,7 @@ export function App() {
           <b class="num">1 : 1</b>
         </div>
       </div>
-      <nav class="dock" aria-label="メニュー">
-        <button onClick={() => push({ kind: "credits" })}>
-          <GraduationCap size={20} />
-          <span>単位</span>
-        </button>
-        <button onClick={() => exportIcs()}>
-          <CalendarPlus size={20} />
-          <span>カレンダー</span>
-        </button>
-        <button onClick={() => push({ kind: "menu" })}>
-          <MoreHorizontal size={20} />
-          <span>その他</span>
-        </button>
-      </nav>
+      <CreditBar planned={plannedYear} earned={pr?.earnedTotal ?? 0} total={req?.totalCredits ?? null} onOpen={() => push({ kind: "credits" })} />
 
       <input
         ref={fileRef}
@@ -248,11 +277,36 @@ export function App() {
         {renderPanel()}
       </Sheet>
 
-      <div class={`toast ${toast ? "show" : ""}`} role="status" aria-live="polite">
-        {toast}
+      <div class={`toast ${toast ? "show" : ""} ${toast?.undo ? "has-act" : ""}`} role="status" aria-live="polite">
+        {toast?.undo && <span class="toast-mark" aria-hidden="true" />}
+        <span>{toast?.msg}</span>
+        {toast?.undo && (
+          <button
+            class="toast-act"
+            onClick={() => {
+              toast.undo!();
+              setToast(null);
+            }}
+          >
+            元に戻す
+          </button>
+        )}
       </div>
     </div>
   );
+
+  function applyResolve(o: ResolveOption) {
+    const before = st.selected;
+    const undo = () => setSt((s) => ({ ...s, selected: before }));
+    if (o.kind === "move") {
+      setSt((s) => ({ ...s, selected: s.selected.map((id) => (id === o.from.id ? o.to.id : id)) }));
+      say(`${o.from.name}を${slotText(o.to.slots)}に移しました`, { undo, moved: o.to.id });
+    } else {
+      setSt((s) => ({ ...s, selected: s.selected.filter((id) => id !== o.drop.id) }));
+      say(`${o.drop.name}を外しました`, { undo });
+    }
+    close();
+  }
 
   function exportIcs() {
     if (!selected.length) {
@@ -264,19 +318,21 @@ export function App() {
     say(`${r.events}件の授業を書き出しました${r.skippedCancelled ? `（休講${r.skippedCancelled}件を除外）` : ""}`);
   }
 
-  function sheetProps(): { title: any; sub?: any } {
+  function sheetProps(): { title: any; sub?: any; eyebrow?: string } {
     if (!top) return { title: "" };
     switch (top.kind) {
       case "slot": {
         const n = coursesAt(allCourses, top.day, top.period, view).filter((c) => ["yes", "maybe"].includes(statusOf(c))).length;
-        return { title: `${DAYS[top.day - 1]}曜 ${top.period}限`, sub: `${view} · 開講 ${n} 科目` };
+        return { eyebrow: `SLOT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: `${DAYS[top.day - 1]}曜 ${top.period}限`, sub: `この時限の開講科目 ${n}件 · ${view}` };
       }
+      case "resolve":
+        return { eyebrow: `CONFLICT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: `${DAYS[top.day - 1]}曜 ${top.period}限が重複しています` };
       case "detail": {
         const c = byId.get(top.id);
-        return { title: c?.name, sub: c?.subtitle || (c ? `${c.term} · ${c.credits}単位` : undefined) };
+        return { eyebrow: c?.code ? `COURSE ${c.code}` : undefined, title: c?.name, sub: c?.subtitle || (c ? `${c.term} · ${c.credits}単位` : undefined) };
       }
       case "credits":
-        return { title: "単位と卒業要件", sub: `${deptName} · ${profile?.entryYear}年度入学` };
+        return { eyebrow: "CREDITS", title: "単位と卒業要件", sub: `${deptName} · ${profile?.entryYear}年度入学` };
       case "menu":
         return { title: "その他" };
       case "profile":
@@ -299,10 +355,34 @@ export function App() {
             selected={selected}
             grade={profile?.grade ?? 1}
             reqOf={reqOf}
-            onToggle={toggle}
+            category={category}
+            onToggle={(c) => {
+              const adding = !st.selected.includes(c.id);
+              toggle(c);
+              if (adding) close();
+            }}
             onOpen={(c) => push({ kind: "detail", id: c.id })}
           />
         );
+      case "resolve": {
+        const cs = cells.get(cellKey(top.day, top.period)) ?? [];
+        if (cs.length < 2) return <p class="muted">重複は解消されています。</p>;
+        const [a, b] = cs;
+        const altOf = (x: Course) => alternativesFor(x, allCourses, selected, view, canTake)[0] ?? null;
+        return (
+          <ConflictResolve
+            key={`${a.id}|${b.id}`}
+            a={a}
+            b={b}
+            options={resolveOptions(a, b, allCourses, selected, view, canTake, isRequired)}
+            planned={plannedYear}
+            category={category}
+            isRequired={isRequired}
+            altOf={altOf}
+            onApply={applyResolve}
+          />
+        );
+      }
       case "detail": {
         const c = byId.get(top.id);
         if (!c) return null;
@@ -397,14 +477,14 @@ export function App() {
 
 const THEME_LABEL: Record<Theme, string> = {
   system: "自動（端末の設定）",
-  light: "ライト",
-  dark: "ダーク",
+  light: "方眼紙（ライト）",
+  dark: "墨（ダーク）",
   sepia: "セピア（目にやさしい）",
   blueprint: "設計図",
   scope: "オシロスコープ",
   photo: "写真",
 };
-const THEME_COLOR: Record<string, string> = { light: "#f7f7f8", dark: "#0e0e10", sepia: "#f3ecdc", blueprint: "#0d2b4e", scope: "#050d09", photo: "#0b0d12" };
+const THEME_COLOR: Record<string, string> = { light: "#f8f6f1", dark: "#151412", sepia: "#f3ecdc", blueprint: "#0d2b4e", scope: "#050d09", photo: "#0b0d12" };
 
 /** Resolve the theme (following the OS for "system") and put it on <html data-theme>. */
 function useTheme(theme: Theme, photo: string | null, dim: number) {
@@ -442,14 +522,59 @@ function MenuItem({ icon, title, sub, onClick }: { icon: any; title: string; sub
   );
 }
 
-/** "水1限(A/B)、水2限(A/B)" -> "水1・2限（A / B）" */
-function groupConflicts(cs: { day: number; period: number; courses: Course[] }[]): string[] {
-  const m = new Map<string, { day: number; periods: number[]; names: string[] }>();
+/** 同じ組み合わせで連続する重複を 1 件にまとめる（水 1・2 限 A と B → 1 件） */
+function groupConflicts(cs: { day: number; period: number; courses: Course[] }[]) {
+  const m = new Map<string, { key: string; day: number; periods: number[]; courses: Course[] }>();
   for (const c of cs) {
     const k = `${c.day}|${c.courses.map((x) => x.id).sort().join(",")}`;
-    const g = m.get(k) ?? { day: c.day, periods: [], names: c.courses.map((x) => x.name) };
+    const g = m.get(k) ?? { key: k, day: c.day, periods: [], courses: c.courses };
     g.periods.push(c.period);
     m.set(k, g);
   }
-  return [...m.values()].map((g) => `${DAYS[g.day - 1]}${g.periods.sort((a, b) => a - b).join("・")}限（${g.names.join(" / ")}）`);
+  return [...m.values()].map((g) => ({ ...g, periods: g.periods.sort((a, b) => a - b) }));
+}
+
+type Toast = { msg: string; undo?: () => void; moved?: string };
+const EN_DAY = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+/** 下部の学分栏：1 目盛 = 10 単位の物差し。修得済は墨、今年度の予定は緋 */
+function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned: number; total: number | null; onOpen: () => void }) {
+  const T = total ?? 0;
+  const left = T ? Math.max(0, T - earned - planned) : 0;
+  const pct = (v: number) => (T ? Math.min(100, (v / T) * 100) : 0);
+  const e = pct(earned);
+  const p = Math.min(100 - e, pct(planned));
+  return (
+    <footer class="creditbar">
+      <button class="creditbar-in" onClick={onOpen} aria-label="単位と卒業要件を開く">
+        <span class="cb-line">
+          <span>
+            取得予定 <b class="num is-plan">{planned}</b>
+            {T ? (
+              <>
+                {" "}/ 卒業まで残り <b class="num">{left}</b> 単位
+              </>
+            ) : (
+              " 単位"
+            )}
+          </span>
+          <span class="cb-more">詳細</span>
+        </span>
+        {T > 0 && (
+          <>
+            <span class="ruler" style={{ "--tick": `${(10 / T) * 100}%` }} role="img" aria-label={`修得済${earned}単位、今年度予定${planned}単位、残り${left}単位`}>
+              <i class="ruler-done" style={{ width: `${e}%` }} />
+              <i class="ruler-plan" style={{ width: `${p}%` }} />
+            </span>
+            <span class="scale num" aria-hidden="true">
+              <span style={{ left: 0 }}>0</span>
+              {earned > 0 && <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>修得済 {earned}</span>}
+              <span class="is-plan" style={{ left: `${e}%`, paddingLeft: earned > 0 ? 4 : 0 }}>今年度 {planned}</span>
+              <span style={{ right: 0 }}>卒業 {T}</span>
+            </span>
+          </>
+        )}
+      </button>
+    </footer>
+  );
 }

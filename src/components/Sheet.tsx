@@ -7,13 +7,14 @@ interface Props {
   onClose: () => void;
   title: ComponentChildren;
   sub?: ComponentChildren;
+  eyebrow?: string; // 等幅の英字ラベル（装飾）。例: SLOT TUE-2 · 10:50–12:30
   children: ComponentChildren;
   headExtra?: ComponentChildren;
   onBack?: () => void;
 }
 
 /** Bottom drawer on phones, right-side panel on wide screens. Keeps content mounted while animating out. */
-export function Sheet({ open, onClose, title, sub, children, headExtra, onBack }: Props) {
+export function Sheet({ open, onClose, title, sub, eyebrow, children, headExtra, onBack }: Props) {
   const [mounted, setMounted] = useState(open);
   const [shown, setShown] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -69,12 +70,13 @@ export function Sheet({ open, onClose, title, sub, children, headExtra, onBack }
             </button>
           )}
           <h2>
+            {eyebrow && <span class="eyebrow" aria-hidden="true">{eyebrow}</span>}
             {title}
             {sub && <span class="sub">{sub}</span>}
           </h2>
           {headExtra}
-          <button class="icon-btn" aria-label="閉じる" onClick={onClose}>
-            <X size={20} />
+          <button class="close-btn" aria-label="閉じる" onClick={onClose}>
+            <X size={14} strokeWidth={2.2} />
           </button>
         </div>
         <div class="sheet-body">{children}</div>

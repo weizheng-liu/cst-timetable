@@ -8,6 +8,8 @@ import { eligibleFor } from "./eligibility";
 import { tracePath } from "../components/Grid";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
+import { resolveOptions, slotText } from "./resolve";
+import { categoryOf } from "./data";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
   id, pageId: 1, code: id, name, subtitle: "", teachers: ["教員 太郎"], department: "09", syllabusDepartment: "09", grade: 2,
@@ -180,5 +182,40 @@ describe("scope trace", () => {
     const ys = tracePath(2, 9).split(/[ML]/).filter(Boolean).map((p) => Number(p.trim().split(" ")[1]));
     expect(Math.min(...ys)).toBeCloseTo(11, 0);
     expect(Math.max(...ys)).toBeCloseTo(29, 0);
+  });
+});
+
+describe("conflict resolution (緋と方眼 ConflictResolve)", () => {
+  const thermo = mk("T", "熱力学Ⅰ", "前期", [[3, 2]]);
+  const fluid = mk("F", "流体力学Ⅰ", "前期", [[3, 2]]);
+  const fluidFri = mk("F2", "流体力学Ⅰ", "前期", [[5, 4]]);
+  const fluidBusy = mk("F3", "流体力学Ⅰ", "前期", [[1, 1]]);
+  const mon1 = mk("M", "線形代数", "前期", [[1, 1]]);
+  const all = [thermo, fluid, fluidFri, fluidBusy, mon1];
+  const req = (c: Course) => c.id === "T";
+
+  it("puts a clash-free move first and keeps the required course", () => {
+    const opts = resolveOptions(thermo, fluid, all, [thermo, fluid, mon1], "前期", () => true, req);
+    expect(opts[0]).toMatchObject({ kind: "move", from: fluid, to: fluidFri });
+    expect(opts[1]).toMatchObject({ kind: "keep", keep: thermo, dropRequired: false });
+    expect(opts[2]).toMatchObject({ kind: "keep", keep: fluid, dropRequired: true });
+  });
+
+  it("offers no move when every other section clashes or is not takeable", () => {
+    const opts = resolveOptions(thermo, fluid, all, [thermo, fluid, mon1], "前期", (c) => c.id !== "F2", req);
+    expect(opts.map((o) => o.kind)).toEqual(["keep", "keep"]);
+  });
+
+  it("formats slots in the design's wording", () => {
+    expect(slotText([{ day: 5, period: 4 }])).toBe("金曜 4限");
+    expect(slotText([{ day: 2, period: 3 }, { day: 2, period: 4 }])).toBe("火曜 3・4限");
+  });
+
+  it("categorises courses into the five design categories", () => {
+    expect(categoryOf(mk("x", "英語ⅢA", "前期", []))).toBe("lang");
+    expect(categoryOf(mk("x", "電子工学実験Ⅰ", "前期", []))).toBe("lab");
+    expect(categoryOf(mk("x", "電子回路Ⅰ", "前期", []), { group: "major", required: true })).toBe("core");
+    expect(categoryOf(mk("x", "電子物性", "前期", []), { group: "major", required: false })).toBe("elective");
+    expect(categoryOf(mk("x", "倫理学", "前期", [], { syllabusDepartment: "99" }))).toBe("general");
   });
 });

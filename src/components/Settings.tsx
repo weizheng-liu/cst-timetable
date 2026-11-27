@@ -6,9 +6,9 @@ import type { Theme } from "../lib/store";
 type ThemeOpt = { id: Theme; label: string; sub: string };
 const SIMPLE: ThemeOpt[] = [
   { id: "system", label: "自動", sub: "端末の設定に合わせる" },
-  { id: "light", label: "ライト", sub: "白地・ニュートラル" },
-  { id: "dark", label: "ダーク", sub: "夜・暗い場所で" },
-  { id: "sepia", label: "セピア", sub: "目にやさしい紙色・青色光少なめ" },
+  { id: "light", label: "方眼紙", sub: "緋と方眼・ライト（標準）" },
+  { id: "dark", label: "墨", sub: "緋と方眼・ダーク" },
+  { id: "sepia", label: "セピア", sub: "方眼紙をさらに黄ばませた目にやさしい版" },
 ];
 const ART: ThemeOpt[] = [
   { id: "scope", label: "オシロスコープ", sub: "曜日ごとの負荷を波形で表示・蛍光グリーン" },

@@ -48,12 +48,13 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
       <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
         <div class="big">{pr.total}</div>
         <div class="muted">/ {req.totalCredits} 単位</div>
-        <div class="small" style={{ marginLeft: "auto", color: pr.missingTotal ? "var(--coral-text)" : "var(--c-basic-bar)" }}>
+        <div class="small" style={{ marginLeft: "auto", color: pr.missingTotal ? "var(--ink-2)" : "var(--cat-elective-ink)" }}>
           {pr.missingTotal ? `あと ${pr.missingTotal} 単位` : "合計は充足"}
         </div>
       </div>
       <div class="meter">
-        <i class={pr.missingTotal ? "" : "done"} style={{ width: `${Math.min(100, (pr.total / req.totalCredits) * 100)}%` }} />
+        <i style={{ width: `${Math.min(100, (pr.earnedTotal / req.totalCredits) * 100)}%` }} />
+        <i class="plan" style={{ width: `${Math.min(100, (pr.plannedTotal / req.totalCredits) * 100)}%` }} />
       </div>
       <p class="small muted" style={{ margin: "8px 0 4px" }}>
         今年度の選択 {pr.plannedTotal} 単位 + 修得済み {pr.earnedTotal} 単位。修得済み単位は区分ごとに入力できます（この端末にのみ保存）。
@@ -80,7 +81,7 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
           </div>
           {g.group.note && <div class="small muted" style={{ marginTop: 2 }}>{g.group.note}</div>}
           {g.requiredLeft.length > 0 && leaves.has(g.group.id) && (
-            <div class="small" style={{ marginTop: 4, color: "var(--text-2)" }}>
+            <div class="small" style={{ marginTop: 4, color: "var(--ink-2)" }}>
               未選択の必修：{g.requiredLeft.map((r) => r.name).join("、")}
             </div>
           )}

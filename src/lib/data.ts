@@ -45,26 +45,31 @@ export async function loadRequirements(entryYear: number, dept: string): Promise
 }
 
 /** Colour family for a course card: from the requirement group if known, else a heuristic. */
-export type Family = "major" | "basic" | "liberal" | "other";
+/** デザインシステム「緋と方眼」の 5 類別。色は --cat-<id>-bg / --cat-<id>-ink */
+export type Category = "core" | "elective" | "general" | "lang" | "lab";
 
-export function familyOf(c: Course, groupOf: (c: Course) => string | null): Family {
-  const g = groupOf(c);
-  if (g) {
-    if (g.startsWith("major")) return "major";
-    if (g.startsWith("basic")) return "basic";
-    if (g.startsWith("liberal") || g.startsWith("common")) return "liberal";
-  }
-  if (c.syllabusDepartment === "99") return "basic";
-  if (c.syllabusDepartment && c.syllabusDepartment === c.department) return "major";
-  return "other";
-}
-
-export const FAMILY_VARS: Record<Family, { tint: string; bar: string; label: string }> = {
-  major: { tint: "var(--c-major)", bar: "var(--c-major-bar)", label: "専門" },
-  basic: { tint: "var(--c-basic)", bar: "var(--c-basic-bar)", label: "基礎" },
-  liberal: { tint: "var(--c-liberal)", bar: "var(--c-liberal-bar)", label: "教養" },
-  other: { tint: "var(--c-other)", bar: "var(--c-other-bar)", label: "その他" },
+export const CATEGORY_LABEL: Record<Category, string> = {
+  core: "専門必修",
+  elective: "専門選択",
+  general: "共通教育",
+  lang: "外国語",
+  lab: "実験・演習",
 };
+
+const LANG_RE = /英語|English|ドイツ語|フランス語|中国語|スペイン語|韓国語|朝鮮語|ロシア語|イタリア語|日本語|TOEIC/i;
+const LAB_RE = /実験|演習|実習|製図|卒業研究/;
+
+/** 科目名と卒業要件の区分から類別を決める。名前による判定（外国語・実験演習）を優先する */
+export function categoryOf(c: Course, req?: { group: string; required: boolean } | null): Category {
+  if (LANG_RE.test(c.name)) return "lang";
+  if (LAB_RE.test(c.name)) return "lab";
+  if (req) {
+    if (req.group.startsWith("major") || req.group.startsWith("basic")) return req.required ? "core" : "elective";
+    return "general";
+  }
+  if (c.syllabusDepartment && c.syllabusDepartment !== "99" && c.syllabusDepartment === c.department) return "elective";
+  return "general";
+}
 
 export const EVAL_TAGS: { id: string; label: string }[] = [
   { id: "no-exam", label: "試験なし" },
@@ -74,10 +79,10 @@ export const EVAL_TAGS: { id: string; label: string }[] = [
 ];
 
 export const EVAL_CATEGORY: Record<string, { label: string; color: string }> = {
-  exam: { label: "試験", color: "var(--c-major-bar)" },
-  quiz: { label: "小テスト", color: "#9c8fe0" },
-  report: { label: "レポート・課題", color: "var(--c-basic-bar)" },
-  attendance: { label: "出席・平常点", color: "var(--c-liberal-bar)" },
-  presentation: { label: "発表", color: "#d48aa6" },
-  other: { label: "その他", color: "var(--c-other-bar)" },
+  exam: { label: "試験", color: "var(--cat-core-ink)" },
+  quiz: { label: "小テスト", color: "var(--cat-lang-ink)" },
+  report: { label: "レポート・課題", color: "var(--cat-elective-ink)" },
+  attendance: { label: "出席・平常点", color: "var(--cat-general-ink)" },
+  presentation: { label: "発表", color: "var(--ink-3)" },
+  other: { label: "その他", color: "var(--cat-lab-ink)" },
 };
