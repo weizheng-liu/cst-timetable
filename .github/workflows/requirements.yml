@@ -1,0 +1,55 @@
+name: Extract graduation requirements
+
+on:
+  workflow_dispatch:
+    inputs:
+      entry_year:
+        description: "入学年度"
+        default: "2025"
+      dept:
+        description: "学科コード"
+        default: "09"
+      pdf_url:
+        description: "学部要覧 PDF の URL"
+        default: "https://www.cst.nihon-u.ac.jp/about/education/pdf/0_3_1_r7.pdf"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q pdfplumber pypdf jsonschema
+      - name: Download PDF
+        run: |
+          mkdir -p .cache
+          curl -sSfL --retry 3 -A "cst-timetable-bot/1.0" -o .cache/youran.pdf "${{ inputs.pdf_url }}"
+      - name: Extract
+        run: |
+          if [ -f scripts/extract_requirements.py ]; then
+            python scripts/extract_requirements.py --pdf .cache/youran.pdf --pdf-url "${{ inputs.pdf_url }}" \
+              --entry-year ${{ inputs.entry_year }} --dept ${{ inputs.dept }} --save-fixture
+            python scripts/validate_data.py
+          else
+            python - <<'PY'
+          from pypdf import PdfReader, PdfWriter
+          r = PdfReader(".cache/youran.pdf"); w = PdfWriter()
+          for i in (73, 74): w.add_page(r.pages[i])
+          import os; os.makedirs("tests/fixtures", exist_ok=True)
+          w.write("tests/fixtures/youran_2025_09.pdf")
+          PY
+          fi
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "data: extract requirements ${{ inputs.entry_year }} ${{ inputs.dept }}"
+          git pull --rebase origin ${{ github.ref_name }}
+          git push
