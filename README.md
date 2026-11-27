@@ -1,3 +1,73 @@
-# cst-timetable
+# 理工 時間割プランナー（cst-timetable）
 
-WIP
+日本大学理工学部の **公開シラバス** をもとに、自分の時間割を組み立てるための非公式 Web アプリです。
+
+**https://weizheng-liu.github.io/cst-timetable/**
+
+> **非公式ツールです。実際の履修登録は大学のシステムで行ってください。**
+> 掲載内容は取得時点のシラバスの写しです。最新・正確な情報は必ず公式シラバスと学部要覧で確認してください。
+
+## できること / 功能
+
+- 学科・学年・入学年度を選ぶ → 月〜土 × 時限の時間割
+- マスをタップ → その時間に開講される科目の一覧 → タップで追加・削除
+- 時間の重複を検出して表示
+- 科目詳細: 各回の授業内容と日付、オンライン/オンデマンド回、成績評価の内訳、教員、単位、教科書
+- 成績評価で絞り込み（試験なし / レポート中心 / 出席重視 / 試験重視）
+- 単位集計と卒業要件の比較（区分ごとの不足単位、未選択の必修）※現在は電子工学科 2025年度入学のみ
+- カレンダー書き出し (.ics): 各回を予定として出力、休講回は除外、オンライン回は件名に【オンライン】
+- 選択内容の JSON 保存 / 読み込み（端末の移行用）
+
+选学科/学年/入学年度 → 周课表 → 点格子选课 → 冲突提示 → 课程详情 → 按评分方式筛选 → 学分与毕业要求对比 → 导出 .ics 到手机日历。
+
+## データ / 数据来源
+
+| データ | 出典 | 更新 |
+|---|---|---|
+| 科目・授業計画・成績評価 | [日本大学理工学部 シラバス](https://www.kyoumu.cst.nihon-u.ac.jp/syllabus/page/)（公開 JSON API） | GitHub Actions が毎年 4/1・9/15 に自動取得 |
+| 卒業要件（電子工学科 2025年度入学） | [令和7年度 理工学部 学部要覧](https://www.cst.nihon-u.ac.jp/about/education/pdf/0_3_1_r7.pdf) p.74–75 | 手動（Actions の *Extract graduation requirements*） |
+
+**卒業要件データは未確認（`verified: false`）です。** 確認シート: [docs/REQUIREMENTS_REVIEW.md](docs/REQUIREMENTS_REVIEW.md)
+
+利用者の選択内容はブラウザの localStorage にだけ保存され、どこにも送信されません。個人情報は収集しません。
+学内ポータルや履修登録システムには一切アクセスしません。
+
+## 更新方法 / 更新方式
+
+- **シラバス**: GitHub の *Actions → Update syllabus data → Run workflow*（学科コード `all` または `09` など）。
+  取得 → 検証 → `data/` をコミット → サイトを自動再デプロイ。
+- **卒業要件の追加**: *Actions → Extract graduation requirements* に入学年度・学科コード・要覧 PDF の URL を入れて実行。
+  `data/requirements/{年度}_{学科}.json` と確認シートが生成されます。内容を確認したら `verified` を `true` に。
+- **評価分類ルール**: `data/config/evaluation_rules.json`（説明: [docs/EVALUATION_RULES.md](docs/EVALUATION_RULES.md)）
+
+## 開発
+
+```bash
+npm ci
+npm run dev                      # http://localhost:5173/cst-timetable/
+npm test                         # フロントのロジックテスト (vitest)
+python -m pytest tests           # 爬虫・要件抽出・検証のテスト
+python scripts/validate_data.py  # データ検証 (CI でも実行)
+python scripts/scrape_syllabus.py --dept 09   # 電子工学科だけ取得（1 秒間隔・キャッシュあり）
+```
+
+構成:
+
+```
+scripts/scrape_syllabus.py      シラバス取得（JSON API, 1req/s 以下, キャッシュ, 再試行上限）
+scripts/syllabus_lib.py         解析ロジック（テスト対象）
+scripts/extract_requirements.py 学部要覧 PDF → 卒業要件 JSON + 確認シート
+scripts/validate_data.py        データ検証（時限・単位・重複など）
+data/courses.json               全科目（スキーマ: data/schema/courses.schema.json）
+data/requirements/              卒業要件（スキーマ: data/schema/requirements.schema.json）
+public/data/                    Web 用に学科ごとに分割したデータ
+src/                            Web アプリ（Vite + Preact + TypeScript）
+docs/                           調査メモ・判断記録・確認シート・スクリーンショット
+```
+
+## 免責 / 免责声明
+
+本ツールは日本大学とは無関係の非公式ツールです。データの正確性は保証しません。
+実際の履修登録は大学のシステムで行ってください。シラバスの著作権は日本大学および各担当教員に帰属します。
+
+本工具为非官方工具，与日本大学无关，不保证数据准确。实际选课请在学校系统中完成。
