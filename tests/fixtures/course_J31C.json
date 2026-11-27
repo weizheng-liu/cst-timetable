@@ -1,0 +1,1039 @@
+{
+ "dataType": "CourseView",
+ "courseViewData": {
+  "viewFlag": null,
+  "gakkaCD": "09",
+  "syllabusData": {
+   "kamokuGaiyou": null,
+   "classScheduleData": [
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 0,
+      "content": "グループワーク演習課題の解説\n（第１回から第７回までの内容）",
+      "studies": "【事前学修】第１回から第７回の内容について復習しておくこと。\n【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。",
+      "benchmark": "【事前学修】45分\n【事後学修】60分",
+      "startDate": "20260603",
+      "endDate": "20260715",
+      "category": 2,
+      "isOnline": 2,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 1,
+      "content": "グループワーク演習課題の解説\n（第１回から第１２回までの内容）",
+      "studies": "【事前学修】第１回から第１２回の内容について復習しておくこと。\n【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。",
+      "benchmark": "【事前学修】45分\n【事後学修】60分",
+      "startDate": "20260603",
+      "endDate": "20260715",
+      "category": 2,
+      "isOnline": 2,
+      "displayIndex": 1,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 2,
+      "content": "真空中の静電界(1)：2.1 静電気、2.2 クーロンの法則と静電界、2.3 遠隔作用と場の作用、2.4 電界と電気力線\n",
+      "studies": "【事前学修】電磁気学のための基礎数学の内容について復習しておくこと。2.1 静電気、2.2 クーロンの法則と静電界、2.3 遠隔作用と場の作用、2.4 電界と電気力線について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260415",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 3,
+      "content": "真空中の静電界(1)：2.1 静電気、2.2 クーロンの法則と静電界、2.3 遠隔作用と場の作用、2.4 電界と電気力線\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260415",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 1,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 4,
+      "content": "真空中の静電界(2)： 2.5 電位、2.6 等電位面と電位の傾き",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。2.5 電位、2.6 等電位面と電位の傾きについて、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260422",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 2,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 5,
+      "content": "真空中の静電界(2)： 2.5 電位、2.6 等電位面と電位の傾き",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260422",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 2,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 6,
+      "content": "真空中の静電界(3)：3.1 ガウスの定理\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。3.1 ガウスの定理について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260429",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 3,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 7,
+      "content": "真空中の静電界(3)：3.1 ガウスの定理\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260429",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 3,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 8,
+      "content": "真空中の静電界(４)： 3.2 静電界中の導体、3.3 電気力線の発散\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。 3.2 静電界中の導体、3.3 電気力線の発散について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260513",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 4,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 9,
+      "content": "真空中の静電界(４)： 3.2 静電界中の導体、3.3 電気力線の発散\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260513",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 4,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 10,
+      "content": "誘電体内の静電界(1)： 4.1 分極現象、4.2 分極率と分極電荷、4.4 電気二重層\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。4.1 分極現象、4.2 分極率と分極電荷、4.4 電気二重層について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260520",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 5,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 11,
+      "content": "誘電体内の静電界(1)： 4.1 分極現象、4.2 分極率と分極電荷、4.4 電気二重層\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260520",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 5,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 12,
+      "content": "誘電体内の静電界(2)：4.4 電束密度、5.1 境界条件、5.2 誘電体があるときのガウスの定理、5.3 分極の種類\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。4.4 電束密度、5.1 境界条件、5.2 誘電体があるときのガウスの定理、5.3 分極の種類について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260527",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 6,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 13,
+      "content": "誘電体内の静電界(2)：4.4 電束密度、5.1 境界条件、5.2 誘電体があるときのガウスの定理、5.3 分極の種類\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260527",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 6,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 14,
+      "content": "誘電体内の静電界(3)：6.1 静電容量とコンデンサー\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。6.1 静電容量とコンデンサーについて、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260603",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 7,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 15,
+      "content": "誘電体内の静電界(3)：6.1 静電容量とコンデンサー\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260603",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 7,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 16,
+      "content": "グループワーク演習\n（第１回から第７回までの内容）",
+      "studies": "【事前学修】第１回から第７回の内容について復習しておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260610",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 8,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 17,
+      "content": "中間テスト及び解説\n（第１回から第７回までの内容）",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260610",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 8,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 18,
+      "content": "静電界のエネルギー(1)： 6.2 多導体系の電位、6.3 帯電している系のエネルギー、6.4 電界中のエネルギー密度\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。6.2 多導体系の電位、6.3 帯電している系のエネルギー、6.4 電界中のエネルギー密度について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260617",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 9,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 19,
+      "content": "静電界のエネルギー(1)： 6.2 多導体系の電位、6.3 帯電している系のエネルギー、6.4 電界中のエネルギー密度\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260617",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 9,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 20,
+      "content": "静電界のエネルギー(2)：6.5 静電力のエネルギーによる記述\n\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。6.5 静電力のエネルギーによる記述について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260624",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 10,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 21,
+      "content": "静電界のエネルギー(2)：6.5 静電力のエネルギーによる記述\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260624",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 10,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 22,
+      "content": "11.1 ラプラス・ポアソンの方程式の適用、11.2 ポアソンの方程式の解法、11.3 ポアソンあるいはラプラスの方程式の解の唯一性、11.4 影像法\n",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。11.1 ラプラス・ポアソンの方程式の適用、11.2 ポアソンの方程式の解法、11.3 ポアソンあるいはラプラスの方程式の解の唯一性、11.4 影像法について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260701",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 11,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 23,
+      "content": "11.1 ラプラス・ポアソンの方程式の適用、11.2 ポアソンの方程式の解法、11.3 ポアソンあるいはラプラスの方程式の解の唯一性、11.4 影像法\n",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260701",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 11,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 24,
+      "content": "7.2 電流と電流密度、7.3 オームの法則、7.4 導電率と固有抵抗（抵抗率）、7.5 抵抗、7.6 電流の連続性、7.7 導体内での電力損失とジュールの法則、7.8 電流の境界条件、7.9 定常電流の場、7.10 静電界と定常電流の場の類似性",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。7.2 電流と電流密度、7.3 オームの法則、7.4 導電率と固有抵抗（抵抗率）、7.5 抵抗、7.6 電流の連続性、7.7 導体内での電力損失とジュールの法則、7.8 電流の境界条件、7.9 定常電流の場、7.10 静電界と定常電流の場の類似性について、テキストを読んで予習し、理解できない箇所を明確にしておくこと。\n",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260708",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 12,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 25,
+      "content": "7.2 電流と電流密度、7.3 オームの法則、7.4 導電率と固有抵抗（抵抗率）、7.5 抵抗、7.6 電流の連続性、7.7 導体内での電力損失とジュールの法則、7.8 電流の境界条件、7.9 定常電流の場、7.10 静電界と定常電流の場の類似性",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260708",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 12,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 26,
+      "content": "グループワーク演習\n（第１回から第１２回までの内容）",
+      "studies": "【事前学修】前回までの内容について復習しておくこと。理解できていない箇所を明確にしておくこと。\n",
+      "benchmark": "【事前学修】150分",
+      "startDate": "20260715",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 13,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5163,
+      "pageSeqNo": 5,
+      "seqNo": 27,
+      "content": "理解度確認試験テスト及び解説\n（第１回から第１２回までの内容）",
+      "studies": "【事後学修】講義で行った内容を復習し、理解を深めること。演習、試験内容を復習し、演習課題をすべて解いて理解を深めること。課題は期限までに提出すること。",
+      "benchmark": "【事後学修】180分",
+      "startDate": "20260715",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 13,
+      "displaySubIndex": 2
+     },
+     "tantouKyouin": {
+      "J31C": [
+       {
+        "kyouinCD": "072593",
+        "kyouinMei": "岩田　展幸",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    }
+   ],
+   "texts": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5163,
+     "pageSeqNo": 5,
+     "seqNo": 0,
+     "name": "図でよくわかる電磁気学",
+     "seriesName": "伊藤 彰義, 中川 活二, 細野 裕行, 塚本 新",
+     "author": "",
+     "publisher": "コロナ社",
+     "publicationYear": "2014",
+     "revision": "1",
+     "isJapaneseBook": 1
+    }
+   ],
+   "supplies": [],
+   "officeHours": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5163,
+     "pageSeqNo": 5,
+     "seqNo": 0,
+     "youbi": "2",
+     "kosya": "F",
+     "hourFrom": "09:00",
+     "hourTo": "12:30",
+     "remark": "412室"
+    }
+   ],
+   "pageItemData": [],
+   "formatData": {
+    "renzokujigen": 2,
+    "ondemandCount": 1,
+    "regularCount": 13
+   },
+   "allMemberAssigned": true,
+   "page": {
+    "setiNendo": "2026",
+    "pageID": 5163,
+    "seqNo": 5,
+    "setiGakubuKbn": "1",
+    "setiGakkaCD": "09",
+    "syllabusSetiGakubuKbn": "1",
+    "syllabusSetiGakkaCD": "09",
+    "syllabusGroup": 745,
+    "formatType": 1,
+    "class": "",
+    "subtitle": "",
+    "examination": 0,
+    "prerequisiteType": 1,
+    "researchSubject": "",
+    "courseObjectives": "身近な電子機器の動作原理の根底にある電磁気現象の基礎を理解できる。\r\n真空中及び誘電体中でのクーロン力・電界・電位・電流について理解を深めることができる。\r\n関連する基礎的な問題を解くことができる。\r\n※本科目は未来博士工房対応科目である。\r\n",
+    "lectureForm": "「対面授業」\r\n適宜演習・宿題を課す。\r\n講義内容の理解を深めるため、内容毎に小試験や課題での演習を行う。\r\n解説により、理解不足の部分を自分で把握し確かな実力に結びつける。\r\n数名のグループに分かれてグループワーク教室での演習も行う。",
+    "prerequisite": "「電磁気学のための基礎数学」の内容を修得していることが望ましい",
+    "outOfClassWork": "",
+    "textsRemarks": "",
+    "suppliesRemarks": "いくつかある電磁気学の参考書から各自選択して所有することを推奨する。\r\n例）「電磁気学」　兵頭俊夫　著，裳華房社　など",
+    "evaluation": "課題　10％\n中間テスト　30％\n理解度確認テスト　60％\n※理解度確認テストを未受験の場合は”Ｅ”となる",
+    "respondingToQuestions": "随時、研究室にて対応",
+    "contactInformation": "4号館1階412室\niwata.nobuyuki[[at]]nihon-u.ac.jp\n[[at]]を半角にしてください",
+    "messageToStutdents": "丸暗記すると難しいが、自分で考えれば決して難しい内容ではありません。\r\n質問はいつでも大歓迎です。\r\n積極的に授業に参加してください。",
+    "enabled": 1,
+    "initPage": 0,
+    "finalDraft": 1,
+    "jitumuKeiken": 0,
+    "classFormat": 1,
+    "onlineMethod": 1,
+    "dpCpNote": "本授業科目はDP3及びCP3に該当している。",
+    "comprehensionTest": 1,
+    "reExamType": 1,
+    "isOnlineRegularMix": 0
+   },
+   "jikwanaris": [
+    {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "jikanwariCD": "J31C",
+     "setiNgkNendo": "2025",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiKamokuCD": "5121",
+     "gakunen": "2",
+     "kousyaCD": "F",
+     "kyouinCD": "072593",
+     "youbiKbn": "4",
+     "jigen": "1",
+     "risyukiKbn": "21",
+     "bikou": "{1}{未来}",
+     "renzokuJigen": "2",
+     "kyousituNo": "9533"
+    }
+   ],
+   "kamou": {
+    "ngkNendo": "2025",
+    "gakubuKbn": "1",
+    "gakkaCD": "09",
+    "kamokuCD": "5121",
+    "kamokuMei": "電磁気学Ⅰ及び演習",
+    "taniSu": 3.0,
+    "taniSyutokuFlag": "-",
+    "jugyouKbn": "Z"
+   },
+   "kyouins": [
+    {
+     "kyouinCD": "072593",
+     "kyouinMei": "岩田　展幸",
+     "renmeiFlag": "-"
+    }
+   ],
+   "authors": [
+    {
+     "kyouinCD": "072593",
+     "kyouinMei": "岩田　展幸",
+     "renmeiFlag": "-"
+    }
+   ],
+   "jikanwariCD": [
+    "J31C"
+   ]
+  },
+  "diagramData": [
+   {
+    "item1": {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "imageWidth": 2339,
+     "imageHeight": 1654,
+     "fileName": "2026_1_09_0_20260224120329.png"
+    },
+    "item2": {
+     "diagramNendo": "2026",
+     "diagramGakubuKbn": "1",
+     "diagramGakkaCD": "09",
+     "diagramCourseCD": "0",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiGakunen": "2",
+     "setiKamokuCD": "5121",
+     "itemCD": 0,
+     "subCD": "",
+     "diagramData": "{ \"Points\": [{ \"Color\": \"red\", \"X\": 413, \"Y\": 133 }] }"
+    }
+   }
+  ],
+  "gakuiProgram": {
+   "setiNendo": "2026",
+   "gakubuKbn": "1",
+   "gakkaCD": "09",
+   "diplomaPolicy": "",
+   "curriculumPolicy": "",
+   "enabled": 0
+  },
+  "defaultScheduledDates": [
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 0,
+    "category": 2,
+    "displayIndex": 1,
+    "scheduledDate1": "20260402"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 1,
+    "category": 1,
+    "displayIndex": 1,
+    "scheduledDate1": "20260415"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 2,
+    "category": 1,
+    "displayIndex": 2,
+    "scheduledDate1": "20260422"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 3,
+    "category": 1,
+    "displayIndex": 3,
+    "scheduledDate1": "20260429"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 4,
+    "category": 1,
+    "displayIndex": 4,
+    "scheduledDate1": "20260513"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 5,
+    "category": 1,
+    "displayIndex": 5,
+    "scheduledDate1": "20260520"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 6,
+    "category": 1,
+    "displayIndex": 6,
+    "scheduledDate1": "20260527"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 7,
+    "category": 1,
+    "displayIndex": 7,
+    "scheduledDate1": "20260603"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 8,
+    "category": 1,
+    "displayIndex": 8,
+    "scheduledDate1": "20260610"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 9,
+    "category": 1,
+    "displayIndex": 9,
+    "scheduledDate1": "20260617"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 10,
+    "category": 1,
+    "displayIndex": 10,
+    "scheduledDate1": "20260624"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 11,
+    "category": 1,
+    "displayIndex": 11,
+    "scheduledDate1": "20260701"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 12,
+    "category": 1,
+    "displayIndex": 12,
+    "scheduledDate1": "20260708"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 13,
+    "category": 1,
+    "displayIndex": 13,
+    "scheduledDate1": "20260715"
+   }
+  ],
+  "syllabus": {
+   "setiNendo": "2026",
+   "registerationPeriodStart": "2026-08-06T00:00:00",
+   "registerationPeriodEnd": "2026-09-15T00:00:00",
+   "tempPasswordPeriodStart": "2026-02-01T00:00:00",
+   "tempPasswordPeriodEnd": "2026-03-23T00:00:00",
+   "displayed": 1,
+   "sampleData": 0,
+   "notification": "修正期間：８月６日（木）～９月１５日（火）\r\n",
+   "cHSSyllabusUrl": "https://syllabus.chs.nihon-u.ac.jp/",
+   "canUpdateTantou": 0
+  },
+  "gakubuKbn": "1",
+  "onWebConext": false,
+  "navigateUrlConverter": null
+ },
+ "courseSelectorData": null,
+ "result": "success",
+ "errorMessage": null
+}

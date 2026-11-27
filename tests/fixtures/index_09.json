@@ -1,0 +1,500 @@
+{
+ "gakkaData": {
+  "gakkaCD": "09",
+  "syllabusData": [
+   {
+    "page": {
+     "setiNendo": "2026",
+     "pageID": 5129,
+     "seqNo": 4,
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "syllabusSetiGakubuKbn": "1",
+     "syllabusSetiGakkaCD": "99",
+     "syllabusGroup": 734,
+     "formatType": 1,
+     "class": "1",
+     "subtitle": "",
+     "examination": 0,
+     "prerequisiteType": 3,
+     "researchSubject": "",
+     "courseObjectives": "英文の読解力と語彙力を向上させ、英語の語感を養いつつ、いろいろな英語構文について修飾関係を正しく把握できる。また、英語で書かれた文章の内容を文法に基づいて理解でき、その内容を論理的に説明できる。",
+     "lectureForm": "この授業は「対面授業」の形態で行う。\nフィードバックは、次回の授業の中で問題の内容を改めて確認しながら解説を加えていく形式で行う。13回目の課題のフィードバックは授業内で行う。\n授業では、社会や文化、環境などをテーマにした英文を講読することにより読解力を高めると同時に、文章を細部に至るまで深く読み進んでいく。その過程においては、一つ一つの語句の意味を慎重に捉えた上で、文章全体の内容を多角的に読み取っていく。また、練習問題をとおして内容の理解度を確認する。",
+     "prerequisite": "文法と語彙についての基本的な知識",
+     "outOfClassWork": "",
+     "textsRemarks": "",
+     "suppliesRemarks": "",
+     "evaluation": "授業参加度・発表　60%\nオンデマンド課題　10%\n授業内容確認課題（第13週）30%",
+     "respondingToQuestions": "　質問等があれば授業時に教室にて対応する。",
+     "contactInformation": "kameoka.koichi20@nihon-u.ac.jp",
+     "messageToStutdents": "初回の授業時に座席を指定する。\n私語は授業妨害とみなし減点する。\n再履修の場合は履修登録前に英語研究室で「受講許可」を得ること。\n\n",
+     "enabled": 1,
+     "initPage": 0,
+     "finalDraft": 1,
+     "jitumuKeiken": 0,
+     "classFormat": 1,
+     "onlineMethod": 1,
+     "dpCpNote": "本授業科目はDP1・2及びCP1・2に該当しています。",
+     "comprehensionTest": 2,
+     "reExamType": 1,
+     "isOnlineRegularMix": 0
+    },
+    "jikwanaris": [
+     {
+      "setiNendo": "2026",
+      "setiGakubuKbn": "1",
+      "jikanwariCD": "J14A",
+      "setiNgkNendo": "2026",
+      "setiGakkaCD": "09",
+      "setiCourseCD": "0",
+      "setiKamokuCD": "2021",
+      "gakunen": "1",
+      "kousyaCD": "F",
+      "kyouinCD": "072441",
+      "youbiKbn": "2",
+      "jigen": "4",
+      "risyukiKbn": "21",
+      "bikou": "",
+      "renzokuJigen": "1",
+      "kyousituNo": "1231"
+     }
+    ],
+    "kamou": {
+     "ngkNendo": "2025",
+     "gakubuKbn": "1",
+     "gakkaCD": "09",
+     "kamokuCD": "2021",
+     "kamokuMei": "英語ⅠA",
+     "taniSu": 1.0,
+     "taniSyutokuFlag": "-",
+     "jugyouKbn": "K"
+    },
+    "kyouins": [
+     {
+      "kyouinCD": "072441",
+      "kyouinMei": "亀岡　浩一",
+      "renmeiFlag": "-"
+     }
+    ],
+    "authors": [
+     {
+      "kyouinCD": "072441",
+      "kyouinMei": "亀岡　浩一",
+      "renmeiFlag": "-"
+     }
+    ],
+    "jikanwariCD": [
+     "J14A"
+    ]
+   },
+   {
+    "page": {
+     "setiNendo": "2026",
+     "pageID": 5152,
+     "seqNo": 16,
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "syllabusSetiGakubuKbn": "1",
+     "syllabusSetiGakkaCD": "09",
+     "syllabusGroup": 745,
+     "formatType": 2,
+     "class": "",
+     "subtitle": "",
+     "examination": 0,
+     "prerequisiteType": 1,
+     "researchSubject": "",
+     "courseObjectives": "前期は課題実験を通して，各種の機能を有する素子や回路等の動作原理，諸特性について理解を深めると共に，さらに進んで素子や回路の設計・製作能力を修得することができる． 後期はグループによるPBL型実験を通して，グループ内で自身の果たすべき役割を自ら創意工夫しつつ見出し，目的を達成する能力を修得できる．(PBL:Project Based Learning)",
+     "lectureForm": "「対面授業」 \r\n前期：各実験をグループまたは個人で行う．実験の順番はグループにより異なることに留意． \r\n後期：ものづくりを主体とした開発的実験を行う．各グループで課題達成に向けて計画的にものづくりを進める．実務経験として, 電器メーカーで学んだ開発技術および，管理職経験を活かし，電子部品の特性や利用方法の指導や問題点の捉え方と解決プロセスを指導する．一方，報告の重要性や報告技術を指導し, 社会で生かせる技術を習得してもらう. また医療機器メーカーにて研究・開発経験を持つ教員が，実践から得られたものづくり，および問題解決方法を，学生実験の課題実験やPBL型実験にて，PDCAサイクルの重要性を常に意識しながら指導を行う．",
+     "prerequisite": "電子工学実験Ⅰおよび電子工学実験Ⅱを修得している事が望ましい．",
+     "outOfClassWork": "",
+     "textsRemarks": "ガイダンス時に配布する．参考書については教科書に記載する．",
+     "suppliesRemarks": "必要に応じて各自で調べる．",
+     "evaluation": "前期：各実験題目における実験実施度 (15%)，各週報告およびレポート (35%)\n後期：各競技会での達成度評価 (20%)，各週報告および成果報告会の発表評価 (15%)，製作物の工学的・技術的評価 (15%)\n※ 未来博士工房対応評価は別途行う",
+     "respondingToQuestions": "実験中はTA（ティーチングアシスタント）及び担当教員が指導に当たり，質問に対しては適宜対応する．\r\n",
+     "contactInformation": "吉川大貴（411室,  yoshikawa.hiroki@nihon-u.ac.jp）・佐伯勝敏（432室）・三枝健二（435室）・永田知子（434室）",
+     "messageToStutdents": "実験実習課目であることに留意し, 遅刻・無断退席は絶対にしないこと．課題実験ではそれぞれ何を目的として実験を行っているのか理解して取り組むことで適切な受講が可能となります．PBL型実験では提示課題に対してグループでまとめた考えを実験を通して形にしていきます．グループによるものづくりの大変さ面白さを体感し，挑戦してください．両実験とも積極的に取り組み，実験を通じて現実化することを楽しんでください．",
+     "enabled": 1,
+     "initPage": 0,
+     "finalDraft": 1,
+     "jitumuKeiken": 1,
+     "classFormat": 1,
+     "onlineMethod": 1,
+     "dpCpNote": "本授業科目はDP4・5・6・7及びCP4・5・6・7に該当しています．※本科目は{未来}対応科目である．\r\n",
+     "comprehensionTest": 2,
+     "reExamType": 2,
+     "isOnlineRegularMix": 0
+    },
+    "jikwanaris": [
+     {
+      "setiNendo": "2026",
+      "setiGakubuKbn": "1",
+      "jikanwariCD": "J23B",
+      "setiNgkNendo": "2024",
+      "setiGakkaCD": "09",
+      "setiCourseCD": "0",
+      "setiKamokuCD": "5108",
+      "gakunen": "3",
+      "kousyaCD": "F",
+      "kyouinCD": "916182",
+      "youbiKbn": "3",
+      "jigen": "3",
+      "risyukiKbn": "11",
+      "bikou": "{未来}",
+      "renzokuJigen": "2",
+      "kyousituNo": "1103"
+     }
+    ],
+    "kamou": {
+     "ngkNendo": "2022",
+     "gakubuKbn": "1",
+     "gakkaCD": "09",
+     "kamokuCD": "5108",
+     "kamokuMei": "電子工学実験Ⅲ",
+     "taniSu": 4.0,
+     "taniSyutokuFlag": "-",
+     "jugyouKbn": "J"
+    },
+    "kyouins": [
+     {
+      "kyouinCD": "916182",
+      "kyouinMei": "三枝・佐伯　他",
+      "renmeiFlag": "Y"
+     },
+     {
+      "kyouinCD": "071573",
+      "kyouinMei": "三枝　健二",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "071572",
+      "kyouinMei": "佐伯　勝敏",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "073893",
+      "kyouinMei": "永田　知子",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "074316",
+      "kyouinMei": "吉川　大貴",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "074573",
+      "kyouinMei": "鈴木 敏夫",
+      "renmeiFlag": "-"
+     }
+    ],
+    "authors": [
+     {
+      "kyouinCD": "071572",
+      "kyouinMei": "佐伯　勝敏",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "071573",
+      "kyouinMei": "三枝　健二",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "073893",
+      "kyouinMei": "永田　知子",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "074316",
+      "kyouinMei": "吉川　大貴",
+      "renmeiFlag": "-"
+     },
+     {
+      "kyouinCD": "074573",
+      "kyouinMei": "鈴木 敏夫",
+      "renmeiFlag": "-"
+     }
+    ],
+    "jikanwariCD": [
+     "J23B"
+    ]
+   },
+   {
+    "page": {
+     "setiNendo": "2026",
+     "pageID": 5169,
+     "seqNo": 18,
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "syllabusSetiGakubuKbn": "1",
+     "syllabusSetiGakkaCD": "09",
+     "syllabusGroup": 745,
+     "formatType": 1,
+     "class": "",
+     "subtitle": "",
+     "examination": 0,
+     "prerequisiteType": 1,
+     "researchSubject": "",
+     "courseObjectives": "直流回路・交流回路の受動回路解析の基礎力が身につく。\r\n",
+     "lectureForm": "「対面授業」\r\n講義形式で、演習を行いながら進める。\r\n実際に計測器開発をしてきたエンジニア経験を持つ講師が、実例や経験とともに理論に関する講義を実施する。",
+     "prerequisite": "微分積分、複素数の知識を持っていることが望ましい。",
+     "outOfClassWork": "",
+     "textsRemarks": "",
+     "suppliesRemarks": "",
+     "evaluation": "理解度確認テスト(45％)、中間試験(25％)、宿題(20％)、取り組み(10％)\n成績評価において、理解度確認テストの受験を単位修得の必須要件とする。",
+     "respondingToQuestions": "講義に関する質問は随時、授業後や研究室、またはメールで受け付けます。",
+     "contactInformation": "4号館431室（fuse.masaaki@nihon-u.ac.jp）",
+     "messageToStutdents": "",
+     "enabled": 1,
+     "initPage": 0,
+     "finalDraft": 1,
+     "jitumuKeiken": 1,
+     "classFormat": 1,
+     "onlineMethod": 1,
+     "dpCpNote": "本授業科目はDP1及びCP1に該当しています。",
+     "comprehensionTest": 1,
+     "reExamType": 1,
+     "isOnlineRegularMix": 0
+    },
+    "jikwanaris": [
+     {
+      "setiNendo": "2026",
+      "setiGakubuKbn": "1",
+      "jikanwariCD": "J51A",
+      "setiNgkNendo": "2026",
+      "setiGakkaCD": "09",
+      "setiCourseCD": "0",
+      "setiKamokuCD": "5109",
+      "gakunen": "1",
+      "kousyaCD": "F",
+      "kyouinCD": "074534",
+      "youbiKbn": "6",
+      "jigen": "1",
+      "risyukiKbn": "21",
+      "bikou": "{1}{未来}",
+      "renzokuJigen": "1",
+      "kyousituNo": "1431"
+     }
+    ],
+    "kamou": {
+     "ngkNendo": "2025",
+     "gakubuKbn": "1",
+     "gakkaCD": "09",
+     "kamokuCD": "5109",
+     "kamokuMei": "回路理論Ⅰ",
+     "taniSu": 2.0,
+     "taniSyutokuFlag": "-",
+     "jugyouKbn": "K"
+    },
+    "kyouins": [
+     {
+      "kyouinCD": "074534",
+      "kyouinMei": "布施　匡章",
+      "renmeiFlag": "-"
+     }
+    ],
+    "authors": [
+     {
+      "kyouinCD": "074534",
+      "kyouinMei": "布施　匡章",
+      "renmeiFlag": "-"
+     }
+    ],
+    "jikanwariCD": [
+     "J51A"
+    ]
+   },
+   {
+    "page": {
+     "setiNendo": "2026",
+     "pageID": 5163,
+     "seqNo": 5,
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "syllabusSetiGakubuKbn": "1",
+     "syllabusSetiGakkaCD": "09",
+     "syllabusGroup": 745,
+     "formatType": 1,
+     "class": "",
+     "subtitle": "",
+     "examination": 0,
+     "prerequisiteType": 1,
+     "researchSubject": "",
+     "courseObjectives": "身近な電子機器の動作原理の根底にある電磁気現象の基礎を理解できる。\r\n真空中及び誘電体中でのクーロン力・電界・電位・電流について理解を深めることができる。\r\n関連する基礎的な問題を解くことができる。\r\n※本科目は未来博士工房対応科目である。\r\n",
+     "lectureForm": "「対面授業」\r\n適宜演習・宿題を課す。\r\n講義内容の理解を深めるため、内容毎に小試験や課題での演習を行う。\r\n解説により、理解不足の部分を自分で把握し確かな実力に結びつける。\r\n数名のグループに分かれてグループワーク教室での演習も行う。",
+     "prerequisite": "「電磁気学のための基礎数学」の内容を修得していることが望ましい",
+     "outOfClassWork": "",
+     "textsRemarks": "",
+     "suppliesRemarks": "いくつかある電磁気学の参考書から各自選択して所有することを推奨する。\r\n例）「電磁気学」　兵頭俊夫　著，裳華房社　など",
+     "evaluation": "課題　10％\n中間テスト　30％\n理解度確認テスト　60％\n※理解度確認テストを未受験の場合は”Ｅ”となる",
+     "respondingToQuestions": "随時、研究室にて対応",
+     "contactInformation": "4号館1階412室\niwata.nobuyuki[[at]]nihon-u.ac.jp\n[[at]]を半角にしてください",
+     "messageToStutdents": "丸暗記すると難しいが、自分で考えれば決して難しい内容ではありません。\r\n質問はいつでも大歓迎です。\r\n積極的に授業に参加してください。",
+     "enabled": 1,
+     "initPage": 0,
+     "finalDraft": 1,
+     "jitumuKeiken": 0,
+     "classFormat": 1,
+     "onlineMethod": 1,
+     "dpCpNote": "本授業科目はDP3及びCP3に該当している。",
+     "comprehensionTest": 1,
+     "reExamType": 1,
+     "isOnlineRegularMix": 0
+    },
+    "jikwanaris": [
+     {
+      "setiNendo": "2026",
+      "setiGakubuKbn": "1",
+      "jikanwariCD": "J31C",
+      "setiNgkNendo": "2025",
+      "setiGakkaCD": "09",
+      "setiCourseCD": "0",
+      "setiKamokuCD": "5121",
+      "gakunen": "2",
+      "kousyaCD": "F",
+      "kyouinCD": "072593",
+      "youbiKbn": "4",
+      "jigen": "1",
+      "risyukiKbn": "21",
+      "bikou": "{1}{未来}",
+      "renzokuJigen": "2",
+      "kyousituNo": "9533"
+     }
+    ],
+    "kamou": {
+     "ngkNendo": "2025",
+     "gakubuKbn": "1",
+     "gakkaCD": "09",
+     "kamokuCD": "5121",
+     "kamokuMei": "電磁気学Ⅰ及び演習",
+     "taniSu": 3.0,
+     "taniSyutokuFlag": "-",
+     "jugyouKbn": "Z"
+    },
+    "kyouins": [
+     {
+      "kyouinCD": "072593",
+      "kyouinMei": "岩田　展幸",
+      "renmeiFlag": "-"
+     }
+    ],
+    "authors": [
+     {
+      "kyouinCD": "072593",
+      "kyouinMei": "岩田　展幸",
+      "renmeiFlag": "-"
+     }
+    ],
+    "jikanwariCD": [
+     "J31C"
+    ]
+   },
+   {
+    "page": {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "seqNo": 6,
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "syllabusSetiGakubuKbn": "1",
+     "syllabusSetiGakkaCD": "09",
+     "syllabusGroup": 745,
+     "formatType": 1,
+     "class": "",
+     "subtitle": "",
+     "examination": 0,
+     "prerequisiteType": 3,
+     "researchSubject": "",
+     "courseObjectives": "本講義では、ロボットに関する技術について極力広範囲に学習し、ロボットの意味、造り方、動かし方、応用方法、将来像について考え、ロボット（工学）全体像を理解できる。ロボット(工学）の学習には実物に触れる事が重要で、各種展示場等での実物体験をする。ロボットを構成する個々の技術課題とロボットのシステムについて学習する。また演習室でシミュレーションプログラム等を用いて演習を行う予定です。",
+     "lectureForm": "教科書とCST VOICEに公開された資料を利用しパワーポイントと板書を用いて講義する。",
+     "prerequisite": "基礎数学（行列、微分方程式、ラプラス変換等）、物理学（運動方程式）、制御工学（サーボ制御）を事前に履修或いは勉強しておくことを推奨する。",
+     "outOfClassWork": "",
+     "textsRemarks": "CST Voiceからパワーポイント教材の閲覧可能だが要点が記載されているだけなので教科書は購入する事を推奨する。\r\n",
+     "suppliesRemarks": "上記参考書以外にも下記URLを参照することを推奨する\nRobert F. Stengel \"Robotics and Intelligent Systems\" MAE 345, Fall 2017　\n講義録（NetからDownLoad　可、Prinston　Univ.公開講座）\nhttp://www.princeton.edu/~stengel/MAE345Lectures.html",
+     "evaluation": "レポート（20%)と演習(20%)、理解度確認試験の成績（60%)で総合的に評価する。",
+     "respondingToQuestions": "授業時間内に判らない事が有れば積極的に質問のこと。\r\nその他　Mailでの質問も受け付ける。",
+     "contactInformation": "E-mail: irie.toshihiro@nihon-u.ac.jp\r\n研究室 TEL：047-469-8792",
+     "messageToStutdents": "各種メディア（雑誌、新聞、映画、テレビ等）でロボットに関する話題には事欠かない環境にあるので、\r\n受講生が興味を持つものについて自分なりにその内容を咀嚼の上、問題点の整理を行い、　授業内容をより深めて頂ければ幸い。授業内容以外の質問もOKです。",
+     "enabled": 1,
+     "initPage": 0,
+     "finalDraft": 1,
+     "jitumuKeiken": 0,
+     "classFormat": 1,
+     "onlineMethod": 1,
+     "dpCpNote": "本授業科目はDP1・2・3・5及びCP1・2・3・5に該当しています。",
+     "comprehensionTest": 1,
+     "reExamType": 1,
+     "isOnlineRegularMix": 0
+    },
+    "jikwanaris": [
+     {
+      "setiNendo": "2026",
+      "setiGakubuKbn": "1",
+      "jikanwariCD": "J33F",
+      "setiNgkNendo": "2024",
+      "setiGakkaCD": "09",
+      "setiCourseCD": "0",
+      "setiKamokuCD": "5243",
+      "gakunen": "3",
+      "kousyaCD": "F",
+      "kyouinCD": "071498",
+      "youbiKbn": "4",
+      "jigen": "3",
+      "risyukiKbn": "31",
+      "bikou": "{共同開講}",
+      "renzokuJigen": "1",
+      "kyousituNo": "1444"
+     }
+    ],
+    "kamou": {
+     "ngkNendo": "2022",
+     "gakubuKbn": "1",
+     "gakkaCD": "09",
+     "kamokuCD": "5243",
+     "kamokuMei": "ロボット工学",
+     "taniSu": 2.0,
+     "taniSyutokuFlag": "-",
+     "jugyouKbn": "K"
+    },
+    "kyouins": [
+     {
+      "kyouinCD": "071498",
+      "kyouinMei": "入江　寿弘",
+      "renmeiFlag": "-"
+     }
+    ],
+    "authors": [
+     {
+      "kyouinCD": "071498",
+      "kyouinMei": "入江　寿弘",
+      "renmeiFlag": "-"
+     }
+    ],
+    "jikanwariCD": [
+     "J33F"
+    ]
+   }
+  ],
+  "overView": {
+   "setiNendo": "2026",
+   "gakubuKbn": "1",
+   "gakkaCD": "09",
+   "overview": "電子工学分野の豊富な知識と技術を有し，広い視野に立って科学と自然を理解し，意欲的に課題を発見して解決する能力，並びにコミュニケーション能力や応用力を備え，日々進展する最先端電子工学をリードできる高度な専門性をもつ人材を養成する。"
+  },
+  "syllabus": {
+   "setiNendo": "2026",
+   "registerationPeriodStart": "2026-08-06T00:00:00",
+   "registerationPeriodEnd": "2026-09-15T00:00:00",
+   "tempPasswordPeriodStart": "2026-02-01T00:00:00",
+   "tempPasswordPeriodEnd": "2026-03-23T00:00:00",
+   "displayed": 1,
+   "sampleData": 0,
+   "notification": "修正期間：８月６日（木）～９月１５日（火）\r\n",
+   "cHSSyllabusUrl": "https://syllabus.chs.nihon-u.ac.jp/",
+   "canUpdateTantou": 0
+  },
+  "gakubuKbn": "1",
+  "onWebConext": false,
+  "navigateUrlConverter": null
+ },
+ "result": "success",
+ "errorMessage": null
+}

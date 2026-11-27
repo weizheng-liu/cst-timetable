@@ -1,0 +1,675 @@
+{
+ "dataType": "CourseView",
+ "courseViewData": {
+  "viewFlag": null,
+  "gakkaCD": "09",
+  "syllabusData": {
+   "kamokuGaiyou": null,
+   "classScheduleData": [
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 0,
+      "content": "理解度確認テストの解説",
+      "studies": "【事前学修】第1回～第12回までの授業内容や演習、中間試験問題を復習しておく。\n【事後学修】オンデマンド授業の内容を振り返り、回路理論Ⅰの範囲の理解を深めること。",
+      "benchmark": "事前学修：30分\n事後学修：60分",
+      "startDate": "20260718",
+      "endDate": "20260724",
+      "category": 2,
+      "isOnline": 2,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 1,
+      "content": "オームの法則、逆起電力、合成抵抗、分流・分圧（教科書1.1～1.3）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260417",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 2,
+      "content": "理想電源、内部抵抗を持つ電源、電源の等価変換（教科書1.4）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。第1章章末問題を解いておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260424",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 2,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 3,
+      "content": "キルヒホッフの法則、閉電流解析（教科書2.1～2.2）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260508",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 3,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 4,
+      "content": "電力の定義、電力最大の条件（教科書2.3）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。第2章章末問題を解いておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260515",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 4,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 5,
+      "content": "第１回中間試験及びその解説\n（直流回路（教科書1～2章）についての理解度を確認する。）\n",
+      "studies": "【事前学修】第1章～第2章の範囲を復習しておく。\r\n【事後学修】中間試験で解けなかった問題について、理解できない箇所を質問できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260522",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 5,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 6,
+      "content": "正弦波電源、実効値、交流波形、交流電源、複数電源の合成（教科書3.1～3.3）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260529",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 6,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 7,
+      "content": "回路素子の働き、回路解析の例（教科書3.4～3.5）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。第３章章末問題を解いておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260605",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 7,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 8,
+      "content": "ガウス平面、電源・回路素子の複素数表現（教科書4.1～4.2）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260612",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 8,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 9,
+      "content": "インピーダンスZとアドミタンスY、ベクトル図（教科書4.3～4.4）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。第４章章末問題を解いておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260619",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 9,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 10,
+      "content": "第２回中間試験及びその解説\n（交流回路（教科書3～4章）についての理解度を確認する。）\n",
+      "studies": "【事前学修】第3章～第4章の範囲を復習しておく。\r\n【事後学修】中間試験で解けなかった問題について、理解できない箇所を質問できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260626",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 10,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 11,
+      "content": "RL、RC回路の解析（Z, Yの軌跡）（教科書5.1）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260703",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 11,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 12,
+      "content": "R-L回路、R-C回路の伝達特性、実際のコイル・コンデンサ（教科書5.3.1～5.3.3）\r\n",
+      "studies": "【事前学修】教科書の該当箇所を読み、理解できない箇所を質問できるようにしておく。\r\n【事後学修】教科書の該当箇所を理解できるようにしておく。",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260710",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 12,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5169,
+      "pageSeqNo": 18,
+      "seqNo": 13,
+      "content": "理解度確認テスト",
+      "studies": "【事前学修】第1回～第12回までの授業内容や演習、中間試験問題を復習し、試験に臨むこと。\n【事後学修】理解度確認テストの内容を振り返り、回路理論Ⅰの範囲の理解を深めること。\n",
+      "benchmark": "事前学修：150分\n事後学修：120分",
+      "startDate": "20260717",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 13,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J51A": [
+       {
+        "kyouinCD": "074534",
+        "kyouinMei": "布施　匡章",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    }
+   ],
+   "texts": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5169,
+     "pageSeqNo": 18,
+     "seqNo": 0,
+     "name": "エレクトロニクスのための回路理論[978-4-339-00897-5]",
+     "seriesName": "",
+     "author": "作田幸憲、今池健、永田知子",
+     "publisher": "コロナ社",
+     "publicationYear": "2017",
+     "revision": "3",
+     "isJapaneseBook": 1
+    }
+   ],
+   "supplies": [],
+   "officeHours": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5169,
+     "pageSeqNo": 18,
+     "seqNo": 0,
+     "youbi": "5",
+     "kosya": "F",
+     "hourFrom": "12:30",
+     "hourTo": "13:20",
+     "remark": "4号館431室"
+    }
+   ],
+   "pageItemData": [],
+   "formatData": {
+    "renzokujigen": 1,
+    "ondemandCount": 1,
+    "regularCount": 13
+   },
+   "allMemberAssigned": true,
+   "page": {
+    "setiNendo": "2026",
+    "pageID": 5169,
+    "seqNo": 18,
+    "setiGakubuKbn": "1",
+    "setiGakkaCD": "09",
+    "syllabusSetiGakubuKbn": "1",
+    "syllabusSetiGakkaCD": "09",
+    "syllabusGroup": 745,
+    "formatType": 1,
+    "class": "",
+    "subtitle": "",
+    "examination": 0,
+    "prerequisiteType": 1,
+    "researchSubject": "",
+    "courseObjectives": "直流回路・交流回路の受動回路解析の基礎力が身につく。\r\n",
+    "lectureForm": "「対面授業」\r\n講義形式で、演習を行いながら進める。\r\n実際に計測器開発をしてきたエンジニア経験を持つ講師が、実例や経験とともに理論に関する講義を実施する。",
+    "prerequisite": "微分積分、複素数の知識を持っていることが望ましい。",
+    "outOfClassWork": "",
+    "textsRemarks": "",
+    "suppliesRemarks": "",
+    "evaluation": "理解度確認テスト(45％)、中間試験(25％)、宿題(20％)、取り組み(10％)\n成績評価において、理解度確認テストの受験を単位修得の必須要件とする。",
+    "respondingToQuestions": "講義に関する質問は随時、授業後や研究室、またはメールで受け付けます。",
+    "contactInformation": "4号館431室（fuse.masaaki@nihon-u.ac.jp）",
+    "messageToStutdents": "",
+    "enabled": 1,
+    "initPage": 0,
+    "finalDraft": 1,
+    "jitumuKeiken": 1,
+    "classFormat": 1,
+    "onlineMethod": 1,
+    "dpCpNote": "本授業科目はDP1及びCP1に該当しています。",
+    "comprehensionTest": 1,
+    "reExamType": 1,
+    "isOnlineRegularMix": 0
+   },
+   "jikwanaris": [
+    {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "jikanwariCD": "J51A",
+     "setiNgkNendo": "2026",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiKamokuCD": "5109",
+     "gakunen": "1",
+     "kousyaCD": "F",
+     "kyouinCD": "074534",
+     "youbiKbn": "6",
+     "jigen": "1",
+     "risyukiKbn": "21",
+     "bikou": "{1}{未来}",
+     "renzokuJigen": "1",
+     "kyousituNo": "1431"
+    }
+   ],
+   "kamou": {
+    "ngkNendo": "2025",
+    "gakubuKbn": "1",
+    "gakkaCD": "09",
+    "kamokuCD": "5109",
+    "kamokuMei": "回路理論Ⅰ",
+    "taniSu": 2.0,
+    "taniSyutokuFlag": "-",
+    "jugyouKbn": "K"
+   },
+   "kyouins": [
+    {
+     "kyouinCD": "074534",
+     "kyouinMei": "布施　匡章",
+     "renmeiFlag": "-"
+    }
+   ],
+   "authors": [
+    {
+     "kyouinCD": "074534",
+     "kyouinMei": "布施　匡章",
+     "renmeiFlag": "-"
+    }
+   ],
+   "jikanwariCD": [
+    "J51A"
+   ]
+  },
+  "diagramData": [
+   {
+    "item1": {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "imageWidth": 2339,
+     "imageHeight": 1654,
+     "fileName": "2026_1_09_0_20260224120329.png"
+    },
+    "item2": {
+     "diagramNendo": "2026",
+     "diagramGakubuKbn": "1",
+     "diagramGakkaCD": "09",
+     "diagramCourseCD": "0",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiGakunen": "1",
+     "setiKamokuCD": "5109",
+     "itemCD": 0,
+     "subCD": "",
+     "diagramData": "{ \"Points\": [{ \"Color\": \"red\", \"X\": 207, \"Y\": 116 }] }"
+    }
+   }
+  ],
+  "gakuiProgram": {
+   "setiNendo": "2026",
+   "gakubuKbn": "1",
+   "gakkaCD": "09",
+   "diplomaPolicy": "",
+   "curriculumPolicy": "",
+   "enabled": 0
+  },
+  "defaultScheduledDates": [
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 0,
+    "category": 2,
+    "displayIndex": 1,
+    "scheduledDate1": "20260402"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 1,
+    "category": 1,
+    "displayIndex": 1,
+    "scheduledDate1": "20260417"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 2,
+    "category": 1,
+    "displayIndex": 2,
+    "scheduledDate1": "20260424"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 3,
+    "category": 1,
+    "displayIndex": 3,
+    "scheduledDate1": "20260508"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 4,
+    "category": 1,
+    "displayIndex": 4,
+    "scheduledDate1": "20260515"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 5,
+    "category": 1,
+    "displayIndex": 5,
+    "scheduledDate1": "20260522"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 6,
+    "category": 1,
+    "displayIndex": 6,
+    "scheduledDate1": "20260529"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 7,
+    "category": 1,
+    "displayIndex": 7,
+    "scheduledDate1": "20260605"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 8,
+    "category": 1,
+    "displayIndex": 8,
+    "scheduledDate1": "20260612"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 9,
+    "category": 1,
+    "displayIndex": 9,
+    "scheduledDate1": "20260619"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 10,
+    "category": 1,
+    "displayIndex": 10,
+    "scheduledDate1": "20260626"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 11,
+    "category": 1,
+    "displayIndex": 11,
+    "scheduledDate1": "20260703"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 12,
+    "category": 1,
+    "displayIndex": 12,
+    "scheduledDate1": "20260710"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 13,
+    "category": 1,
+    "displayIndex": 13,
+    "scheduledDate1": "20260717"
+   }
+  ],
+  "syllabus": {
+   "setiNendo": "2026",
+   "registerationPeriodStart": "2026-08-06T00:00:00",
+   "registerationPeriodEnd": "2026-09-15T00:00:00",
+   "tempPasswordPeriodStart": "2026-02-01T00:00:00",
+   "tempPasswordPeriodEnd": "2026-03-23T00:00:00",
+   "displayed": 1,
+   "sampleData": 0,
+   "notification": "修正期間：８月６日（木）～９月１５日（火）\r\n",
+   "cHSSyllabusUrl": "https://syllabus.chs.nihon-u.ac.jp/",
+   "canUpdateTantou": 0
+  },
+  "gakubuKbn": "1",
+  "onWebConext": false,
+  "navigateUrlConverter": null
+ },
+ "courseSelectorData": null,
+ "result": "success",
+ "errorMessage": null
+}

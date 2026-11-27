@@ -1,0 +1,715 @@
+{
+ "dataType": "CourseView",
+ "courseViewData": {
+  "viewFlag": null,
+  "gakkaCD": "09",
+  "syllabusData": {
+   "kamokuGaiyou": null,
+   "classScheduleData": [
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 0,
+      "content": "事前学習としてロボットの最新動向やロボットの利用分野などロボットに関して興味を持ったことを各自で調査を行いＡ４レポート用紙に４ページ程度の内容で報告書を作成して提出を行う。\n",
+      "studies": "ロボットに関して雑誌やメディア等で取り上げられている内容を調査してレポートにまとめる。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20260916",
+      "endDate": "20260924",
+      "category": 2,
+      "isOnline": 2,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 1,
+      "content": "ロボット工学の概要\r\n　近年ロボットを取り巻く環境が大きく変化している。これらの環境（ロボット事情）について、国内外の最新技術動向について触れ、ロボットの定義・歴史・市場等について概説する。最後に成績評価（レポートと試験等）について説明する。\r\n\r\n",
+      "studies": "　授業前に予めロボットを取り巻く環境や国内外の最新技術動向について調査し（１２０分）、わからない箇所があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取りレポートに纏めて授業後に自分の考えを書きCST VOICEで提出する。\r\n",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20260930",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 2,
+      "content": "ロボットとメカトロニクス\r\n　　ロボットとメカトロニクスの関係について解説し、ロボットの定義、システム構成、適用分野、現状などについて概説する。",
+      "studies": "　授業前に予めロボットを取り巻く環境や国内外の最新技術動向について調査し、わからない箇所があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。\r\n",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261007",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 2,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 3,
+      "content": "ロボットの形とメカニズム\r\n　ロボットはどんな形をしていて、どの様な構造になっているか、関節の構成、動力伝達の方法、減速機の役割や性能、減速機を使わないロボットについて学習する　",
+      "studies": "　授業前に予めロボットの構造やモータや減速機について調査し、わからない箇所があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261014",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 3,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 4,
+      "content": "ロボットのセンサ\r\n　　ロボットを動かすためにはロボットの関節の角度や位置、速度、力などを計測する必要が有る。また、ロボットが移動するにはその周辺の壁や家具、障害物などの情報が必要\r\n　　となる。そのためのセンサ技術について学習する。\r\n　",
+      "studies": "　授業前に予めロボットのセンサーについて調査し、わからない箇所があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取りレポートに纏めて授業後に自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261021",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 4,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 5,
+      "content": "ロボットのアクチュエータ\r\n　アクチュエータの種類、電磁力モータのモデル化、サーボモータの特徴、\r\n　モータ駆動部の設計、モータの制御等\r\n　　",
+      "studies": "　授業前に予めロボットで用いられるアクチュエータについて調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261028",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 5,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 6,
+      "content": "ロボット関節のフィードバック制御Ⅰ\r\n　関節のモデル化とダイナミックス、運動方程式のパラメータ同定、位置・速度制御系の設計、機械共振を考慮したモデル化と制御ゲイン\r\n　　",
+      "studies": "　授業前までに予め運動方程式について調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261104",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 6,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 7,
+      "content": "　ロボット関節のフィードバック制御Ⅱ\r\n　　目標軌道生成とフィードフォワードの効果、外乱オブザーバ\r\n　　",
+      "studies": "　授業前までに予め制御理論について調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST　VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261111",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 7,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 8,
+      "content": "　ロボットの運動学Ⅰ\r\n　　位置と姿勢の表現方法、関節リンクパラメータ、ピューマ型ロボットの順運動学、\r\n　　逆運動学で先端位置から関節角の求め方\r\n",
+      "studies": "　授業前までに予め関節のリンクパラメータについて調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261118",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 8,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 9,
+      "content": "ロボットの運動学Ⅱ\r\n　ピューマ型ロボットの順運動学、逆運動学で先端位置から関節角を求める\r\n　　ヤコビ行列の基礎\r\n　　\r\n",
+      "studies": "　授業前までに予め順運動学について調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261125",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 9,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 10,
+      "content": "ロボットの運動制御Ⅰ\n　ロボットの位置制御、ヤコビ行列を用いた逆運動学の解法について学ぶ\n　",
+      "studies": "　授業前までに予め逆運動学について調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取り、授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261202",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 10,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 11,
+      "content": "ロボットの運動制御Ⅱ\n　ロボットの動的な位置制御、ロボットの力制御（インピーダンス制御・力制御・力センサを用いないスティフネス制御）\n\n　　",
+      "studies": "　授業前までに予め位置決め制御系について調査し、わからない事があれば質問できるようにしておくこと。\r\n　授業中に解説した内容はメモに取りレポートに纏めて自分の考えを書きCST VOICEで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261209",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 11,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 12,
+      "content": "　コンピュータ演習室のPCを使用してロボットのシミュレーションやマルチメディアプログラミングを用いたロボットの設計と制御に関する演習を予定\n　ロボットシミュレーションをMATLABを用いて行う。\nまた音声信号の信号処理手法と分析方法なども取り上げて解説する。などについて解説する。",
+      "studies": "　授業前までに予めロボットの知能化や最近のAI技術について調査し、わからない事があれば質問でくきるようにしておくこと。授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。\n授業前までに予めROS（ロボットオ・ペレーション・システム）やMATLABについて調査し、わからない事があれば質問できるようにしておくこと。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261216",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 12,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5186,
+      "pageSeqNo": 6,
+      "seqNo": 13,
+      "content": "\n理解度確認課題\n理解度確認課題の\n回答例の説明と自己採点を実施予定",
+      "studies": "　授業中に解説した内容はメモに取り授業後レポートに纏めて自分の考えを書きCST VOICEで提出する。\n　授業前までに授業で解説した内容について復習しておくこと。\n\n　授業後、解答できなかった問題が半数以上あった場合、途中経過の計算を含めてレポートを作成しCST Voiceで提出する。",
+      "benchmark": "事前学習60分\n事後学習30分",
+      "startDate": "20261223",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 13,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J33F": [
+       {
+        "kyouinCD": "071498",
+        "kyouinMei": "入江　寿弘",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    }
+   ],
+   "texts": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "pageSeqNo": 6,
+     "seqNo": 0,
+     "name": "わかりやすいロボットシステム入門 [ISBN978-4-274-20894-2]",
+     "seriesName": "",
+     "author": "松日楽信人、大明準治",
+     "publisher": "オーム社",
+     "publicationYear": "２０２０",
+     "revision": "改訂３",
+     "isJapaneseBook": 1
+    }
+   ],
+   "supplies": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "pageSeqNo": 6,
+     "seqNo": 0,
+     "name": "イラストで学ぶ　ロボット工学 [ISBN978-4-06-153834-4]",
+     "seriesName": "",
+     "author": "木野仁（著）、谷口忠大（監修）",
+     "publisher": "講談社",
+     "publicationYear": "2017年",
+     "revision": "3",
+     "isJapaneseBook": 1
+    },
+    {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "pageSeqNo": 6,
+     "seqNo": 1,
+     "name": "ロボット工学",
+     "seriesName": "",
+     "author": "岩波講座",
+     "publisher": "",
+     "publicationYear": "",
+     "revision": "",
+     "isJapaneseBook": 1
+    },
+    {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "pageSeqNo": 6,
+     "seqNo": 2,
+     "name": "ロボット工学ハンドブック",
+     "seriesName": "日本ロボット学会",
+     "author": "",
+     "publisher": "コロナ社",
+     "publicationYear": "",
+     "revision": "",
+     "isJapaneseBook": 1
+    }
+   ],
+   "officeHours": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5186,
+     "pageSeqNo": 6,
+     "seqNo": 0,
+     "youbi": "4",
+     "kosya": "F",
+     "hourFrom": "16:00",
+     "hourTo": "18:30",
+     "remark": ""
+    }
+   ],
+   "pageItemData": [],
+   "formatData": {
+    "renzokujigen": 1,
+    "ondemandCount": 1,
+    "regularCount": 13
+   },
+   "allMemberAssigned": true,
+   "page": {
+    "setiNendo": "2026",
+    "pageID": 5186,
+    "seqNo": 6,
+    "setiGakubuKbn": "1",
+    "setiGakkaCD": "09",
+    "syllabusSetiGakubuKbn": "1",
+    "syllabusSetiGakkaCD": "09",
+    "syllabusGroup": 745,
+    "formatType": 1,
+    "class": "",
+    "subtitle": "",
+    "examination": 0,
+    "prerequisiteType": 3,
+    "researchSubject": "",
+    "courseObjectives": "本講義では、ロボットに関する技術について極力広範囲に学習し、ロボットの意味、造り方、動かし方、応用方法、将来像について考え、ロボット（工学）全体像を理解できる。ロボット(工学）の学習には実物に触れる事が重要で、各種展示場等での実物体験をする。ロボットを構成する個々の技術課題とロボットのシステムについて学習する。また演習室でシミュレーションプログラム等を用いて演習を行う予定です。",
+    "lectureForm": "教科書とCST VOICEに公開された資料を利用しパワーポイントと板書を用いて講義する。",
+    "prerequisite": "基礎数学（行列、微分方程式、ラプラス変換等）、物理学（運動方程式）、制御工学（サーボ制御）を事前に履修或いは勉強しておくことを推奨する。",
+    "outOfClassWork": "",
+    "textsRemarks": "CST Voiceからパワーポイント教材の閲覧可能だが要点が記載されているだけなので教科書は購入する事を推奨する。\r\n",
+    "suppliesRemarks": "上記参考書以外にも下記URLを参照することを推奨する\nRobert F. Stengel \"Robotics and Intelligent Systems\" MAE 345, Fall 2017　\n講義録（NetからDownLoad　可、Prinston　Univ.公開講座）\nhttp://www.princeton.edu/~stengel/MAE345Lectures.html",
+    "evaluation": "レポート（20%)と演習(20%)、理解度確認試験の成績（60%)で総合的に評価する。",
+    "respondingToQuestions": "授業時間内に判らない事が有れば積極的に質問のこと。\r\nその他　Mailでの質問も受け付ける。",
+    "contactInformation": "E-mail: irie.toshihiro@nihon-u.ac.jp\r\n研究室 TEL：047-469-8792",
+    "messageToStutdents": "各種メディア（雑誌、新聞、映画、テレビ等）でロボットに関する話題には事欠かない環境にあるので、\r\n受講生が興味を持つものについて自分なりにその内容を咀嚼の上、問題点の整理を行い、　授業内容をより深めて頂ければ幸い。授業内容以外の質問もOKです。",
+    "enabled": 1,
+    "initPage": 0,
+    "finalDraft": 1,
+    "jitumuKeiken": 0,
+    "classFormat": 1,
+    "onlineMethod": 1,
+    "dpCpNote": "本授業科目はDP1・2・3・5及びCP1・2・3・5に該当しています。",
+    "comprehensionTest": 1,
+    "reExamType": 1,
+    "isOnlineRegularMix": 0
+   },
+   "jikwanaris": [
+    {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "jikanwariCD": "J33F",
+     "setiNgkNendo": "2024",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiKamokuCD": "5243",
+     "gakunen": "3",
+     "kousyaCD": "F",
+     "kyouinCD": "071498",
+     "youbiKbn": "4",
+     "jigen": "3",
+     "risyukiKbn": "31",
+     "bikou": "{共同開講}",
+     "renzokuJigen": "1",
+     "kyousituNo": "1444"
+    }
+   ],
+   "kamou": {
+    "ngkNendo": "2022",
+    "gakubuKbn": "1",
+    "gakkaCD": "09",
+    "kamokuCD": "5243",
+    "kamokuMei": "ロボット工学",
+    "taniSu": 2.0,
+    "taniSyutokuFlag": "-",
+    "jugyouKbn": "K"
+   },
+   "kyouins": [
+    {
+     "kyouinCD": "071498",
+     "kyouinMei": "入江　寿弘",
+     "renmeiFlag": "-"
+    }
+   ],
+   "authors": [
+    {
+     "kyouinCD": "071498",
+     "kyouinMei": "入江　寿弘",
+     "renmeiFlag": "-"
+    }
+   ],
+   "jikanwariCD": [
+    "J33F"
+   ]
+  },
+  "diagramData": [
+   {
+    "item1": {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "imageWidth": 2339,
+     "imageHeight": 1654,
+     "fileName": "2026_1_09_0_20260224120329.png"
+    },
+    "item2": {
+     "diagramNendo": "2026",
+     "diagramGakubuKbn": "1",
+     "diagramGakkaCD": "09",
+     "diagramCourseCD": "0",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiGakunen": "3",
+     "setiKamokuCD": "5243",
+     "itemCD": 0,
+     "subCD": "",
+     "diagramData": "{ \"Points\": [{ \"Color\": \"red\", \"X\": 686, \"Y\": 229 }] }"
+    }
+   }
+  ],
+  "gakuiProgram": {
+   "setiNendo": "2026",
+   "gakubuKbn": "1",
+   "gakkaCD": "09",
+   "diplomaPolicy": "",
+   "curriculumPolicy": "",
+   "enabled": 0
+  },
+  "defaultScheduledDates": [
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 0,
+    "category": 2,
+    "displayIndex": 1,
+    "scheduledDate1": "20260916"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 1,
+    "category": 1,
+    "displayIndex": 1,
+    "scheduledDate1": "20260930"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 2,
+    "category": 1,
+    "displayIndex": 2,
+    "scheduledDate1": "20261007"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 3,
+    "category": 1,
+    "displayIndex": 3,
+    "scheduledDate1": "20261014"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 4,
+    "category": 1,
+    "displayIndex": 4,
+    "scheduledDate1": "20261021"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 5,
+    "category": 1,
+    "displayIndex": 5,
+    "scheduledDate1": "20261028"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 6,
+    "category": 1,
+    "displayIndex": 6,
+    "scheduledDate1": "20261104"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 7,
+    "category": 1,
+    "displayIndex": 7,
+    "scheduledDate1": "20261111"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 8,
+    "category": 1,
+    "displayIndex": 8,
+    "scheduledDate1": "20261118"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 9,
+    "category": 1,
+    "displayIndex": 9,
+    "scheduledDate1": "20261125"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 10,
+    "category": 1,
+    "displayIndex": 10,
+    "scheduledDate1": "20261202"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 11,
+    "category": 1,
+    "displayIndex": 11,
+    "scheduledDate1": "20261209"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 12,
+    "category": 1,
+    "displayIndex": 12,
+    "scheduledDate1": "20261216"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "3",
+    "seqNo": 13,
+    "category": 1,
+    "displayIndex": 13,
+    "scheduledDate1": "20261223"
+   }
+  ],
+  "syllabus": {
+   "setiNendo": "2026",
+   "registerationPeriodStart": "2026-08-06T00:00:00",
+   "registerationPeriodEnd": "2026-09-15T00:00:00",
+   "tempPasswordPeriodStart": "2026-02-01T00:00:00",
+   "tempPasswordPeriodEnd": "2026-03-23T00:00:00",
+   "displayed": 1,
+   "sampleData": 0,
+   "notification": "修正期間：８月６日（木）～９月１５日（火）\r\n",
+   "cHSSyllabusUrl": "https://syllabus.chs.nihon-u.ac.jp/",
+   "canUpdateTantou": 0
+  },
+  "gakubuKbn": "1",
+  "onWebConext": false,
+  "navigateUrlConverter": null
+ },
+ "courseSelectorData": null,
+ "result": "success",
+ "errorMessage": null
+}

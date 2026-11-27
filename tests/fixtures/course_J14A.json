@@ -1,0 +1,638 @@
+{
+ "dataType": "CourseView",
+ "courseViewData": {
+  "viewFlag": null,
+  "gakkaCD": "09",
+  "syllabusData": {
+   "kamokuGaiyou": null,
+   "classScheduleData": [
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 0,
+      "content": "第1週授業開始前までに、50分相当のオンデマンド教材を配信します。成績評価等重要な内容が含まれる授業ガイダンス動画となりますので、授業開始までに必ず閲覧してください。",
+      "studies": "【事前学修】基本5文型について復習し文の構造を確認する。\n【事後学修】動画で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修25分\n事後学修30分",
+      "startDate": "20260402",
+      "endDate": "20260411",
+      "category": 2,
+      "isOnline": 2,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 1,
+      "content": "座席の指定\r\n授業の進め方や成績評価についての説明および使用するテキストの紹介をおこなった後、Unit 1に入る\r\n",
+      "studies": "【事前学修】シラバスの内容を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260413",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 1,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 2,
+      "content": "Unit 1　日本の女性小説家、男性中心のメディアへの反発から執筆 -前半\n",
+      "studies": "【事前学修】テキストの2ページを読んでメディアにおける差別問題等について考える。\n【事後学習】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260420",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 2,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 3,
+      "content": "Unit 1　日本の女性小説家、男性中心のメディアへの反発から執筆 -後半\n",
+      "studies": "【事前学修】テキストの4ページの内容を見直して単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260427",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 3,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 4,
+      "content": "Unit 2　 グリーンランドの支配権は誰に? -前半\n",
+      "studies": "【事前学修】テキストの8ページを読んで領土問題について考える。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260511",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 4,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 5,
+      "content": "Unit 2　グリーンランドの支配権は誰に? -後半\n",
+      "studies": "【事前学修】テキストの10ページの内容を見直して単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260518",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 5,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 6,
+      "content": "Unit 3　中南米諸国は米国からの強制送還要求を受け入れるが、社会不安化を懸念 -前半\n",
+      "studies": "【事前学修】テキストの14ページを読んで不法移民対策と人権問題について考える。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260525",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 6,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 7,
+      "content": "Unit 3　中南米諸国は米国からの強制送還要求を受け入れるが、社会不安化を懸念 -後半\n",
+      "studies": "【事前学修】テキストの16ページの内容を見直して単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260601",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 7,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 8,
+      "content": "Unit 4　「メキシコ湾」の呼称を「アメリカ湾」に変えるぞとトランプ大統領・「アメリカ湾」を巡り、AP通信記者の入室禁止 -前半\n",
+      "studies": "【事前学修】テキストの20ページを読んで湾の名称変更や取材規制につて考える。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260608",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 8,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 9,
+      "content": "Unit 4　「メキシコ湾」の呼称を「アメリカ湾」に変えるぞとトランプ大統領・「アメリカ湾」を巡り、AP通信記者の入室禁止 -後半\n",
+      "studies": "【事前学修】テキストの22ページの内容を見直して単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260615",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 9,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 10,
+      "content": "Unit 5　マクロン大統領、欧州軍のウクライナ派遣に言及 -前半\n",
+      "studies": "【事前学修】テキストの26ページを読んでロシアとウクライナの領土問題について考える。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260622",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 10,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 11,
+      "content": "Unit 5　マクロン大統領、欧州軍のウクライナ派遣に言及 -後半\n",
+      "studies": "【事前学修】テキストの28ページの内容を見直して単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260629",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 11,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 12,
+      "content": "Unit 6　アサド政権崩壊後のシリアを巡りトルコとイスラエルの緊張高まる -前半\n",
+      "studies": "【事前学修】テキストの32ページを読んで独裁政権とその崩壊後について考える。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260706",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 12,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    },
+    {
+     "classSchedule": {
+      "setiNendo": "2026",
+      "pageID": 5129,
+      "pageSeqNo": 4,
+      "seqNo": 13,
+      "content": "Unit 6　アサド政権崩壊後のシリアを巡りトルコとイスラエルの緊張高まる -後半\n授業内容確認課題（筆記形式による持ち込み不可の英文和訳等）およびそのフィードバック",
+      "studies": "【事前学修】テキストの2ページから35ページまでに扱った単語や熟語の意味と用例を確認する。\n【事後学修】授業で扱った内容を見直し、練習問題等で間違えた個所があれば解きなおす。",
+      "benchmark": "事前学修30分\n事後学修35分",
+      "startDate": "20260713",
+      "endDate": "",
+      "category": 1,
+      "isOnline": 1,
+      "displayIndex": 13,
+      "displaySubIndex": 1
+     },
+     "tantouKyouin": {
+      "J14A": [
+       {
+        "kyouinCD": "072441",
+        "kyouinMei": "亀岡　浩一",
+        "renmeiFlag": "-"
+       }
+      ]
+     }
+    }
+   ],
+   "texts": [
+    {
+     "setiNendo": "2026",
+     "pageID": 5129,
+     "pageSeqNo": 4,
+     "seqNo": 0,
+     "name": "15 Selected Units of English through the News Media -2026-",
+     "seriesName": "",
+     "author": "高橋優身・伊藤典子・Richard Powell",
+     "publisher": "朝日出版社",
+     "publicationYear": "2026",
+     "revision": "",
+     "isJapaneseBook": 1
+    }
+   ],
+   "supplies": [],
+   "officeHours": [],
+   "pageItemData": [],
+   "formatData": {
+    "renzokujigen": 1,
+    "ondemandCount": 1,
+    "regularCount": 13
+   },
+   "allMemberAssigned": true,
+   "page": {
+    "setiNendo": "2026",
+    "pageID": 5129,
+    "seqNo": 4,
+    "setiGakubuKbn": "1",
+    "setiGakkaCD": "09",
+    "syllabusSetiGakubuKbn": "1",
+    "syllabusSetiGakkaCD": "99",
+    "syllabusGroup": 734,
+    "formatType": 1,
+    "class": "1",
+    "subtitle": "",
+    "examination": 0,
+    "prerequisiteType": 3,
+    "researchSubject": "",
+    "courseObjectives": "英文の読解力と語彙力を向上させ、英語の語感を養いつつ、いろいろな英語構文について修飾関係を正しく把握できる。また、英語で書かれた文章の内容を文法に基づいて理解でき、その内容を論理的に説明できる。",
+    "lectureForm": "この授業は「対面授業」の形態で行う。\nフィードバックは、次回の授業の中で問題の内容を改めて確認しながら解説を加えていく形式で行う。13回目の課題のフィードバックは授業内で行う。\n授業では、社会や文化、環境などをテーマにした英文を講読することにより読解力を高めると同時に、文章を細部に至るまで深く読み進んでいく。その過程においては、一つ一つの語句の意味を慎重に捉えた上で、文章全体の内容を多角的に読み取っていく。また、練習問題をとおして内容の理解度を確認する。",
+    "prerequisite": "文法と語彙についての基本的な知識",
+    "outOfClassWork": "",
+    "textsRemarks": "",
+    "suppliesRemarks": "",
+    "evaluation": "授業参加度・発表　60%\nオンデマンド課題　10%\n授業内容確認課題（第13週）30%",
+    "respondingToQuestions": "　質問等があれば授業時に教室にて対応する。",
+    "contactInformation": "kameoka.koichi20@nihon-u.ac.jp",
+    "messageToStutdents": "初回の授業時に座席を指定する。\n私語は授業妨害とみなし減点する。\n再履修の場合は履修登録前に英語研究室で「受講許可」を得ること。\n\n",
+    "enabled": 1,
+    "initPage": 0,
+    "finalDraft": 1,
+    "jitumuKeiken": 0,
+    "classFormat": 1,
+    "onlineMethod": 1,
+    "dpCpNote": "本授業科目はDP1・2及びCP1・2に該当しています。",
+    "comprehensionTest": 2,
+    "reExamType": 1,
+    "isOnlineRegularMix": 0
+   },
+   "jikwanaris": [
+    {
+     "setiNendo": "2026",
+     "setiGakubuKbn": "1",
+     "jikanwariCD": "J14A",
+     "setiNgkNendo": "2026",
+     "setiGakkaCD": "09",
+     "setiCourseCD": "0",
+     "setiKamokuCD": "2021",
+     "gakunen": "1",
+     "kousyaCD": "F",
+     "kyouinCD": "072441",
+     "youbiKbn": "2",
+     "jigen": "4",
+     "risyukiKbn": "21",
+     "bikou": "",
+     "renzokuJigen": "1",
+     "kyousituNo": "1231"
+    }
+   ],
+   "kamou": {
+    "ngkNendo": "2025",
+    "gakubuKbn": "1",
+    "gakkaCD": "09",
+    "kamokuCD": "2021",
+    "kamokuMei": "英語ⅠA",
+    "taniSu": 1.0,
+    "taniSyutokuFlag": "-",
+    "jugyouKbn": "K"
+   },
+   "kyouins": [
+    {
+     "kyouinCD": "072441",
+     "kyouinMei": "亀岡　浩一",
+     "renmeiFlag": "-"
+    }
+   ],
+   "authors": [
+    {
+     "kyouinCD": "072441",
+     "kyouinMei": "亀岡　浩一",
+     "renmeiFlag": "-"
+    }
+   ],
+   "jikanwariCD": [
+    "J14A"
+   ]
+  },
+  "diagramData": [],
+  "gakuiProgram": {
+   "setiNendo": "2026",
+   "gakubuKbn": "1",
+   "gakkaCD": "09",
+   "diplomaPolicy": "",
+   "curriculumPolicy": "",
+   "enabled": 0
+  },
+  "defaultScheduledDates": [
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 0,
+    "category": 2,
+    "displayIndex": 1,
+    "scheduledDate1": "20260402"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 1,
+    "category": 1,
+    "displayIndex": 1,
+    "scheduledDate1": "20260413"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 2,
+    "category": 1,
+    "displayIndex": 2,
+    "scheduledDate1": "20260420"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 3,
+    "category": 1,
+    "displayIndex": 3,
+    "scheduledDate1": "20260427"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 4,
+    "category": 1,
+    "displayIndex": 4,
+    "scheduledDate1": "20260511"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 5,
+    "category": 1,
+    "displayIndex": 5,
+    "scheduledDate1": "20260518"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 6,
+    "category": 1,
+    "displayIndex": 6,
+    "scheduledDate1": "20260525"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 7,
+    "category": 1,
+    "displayIndex": 7,
+    "scheduledDate1": "20260601"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 8,
+    "category": 1,
+    "displayIndex": 8,
+    "scheduledDate1": "20260608"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 9,
+    "category": 1,
+    "displayIndex": 9,
+    "scheduledDate1": "20260615"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 10,
+    "category": 1,
+    "displayIndex": 10,
+    "scheduledDate1": "20260622"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 11,
+    "category": 1,
+    "displayIndex": 11,
+    "scheduledDate1": "20260629"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 12,
+    "category": 1,
+    "displayIndex": 12,
+    "scheduledDate1": "20260706"
+   },
+   {
+    "setiNendo": "2026",
+    "gakubuKbn": "1",
+    "zenKoukiKbn": "2",
+    "seqNo": 13,
+    "category": 1,
+    "displayIndex": 13,
+    "scheduledDate1": "20260713"
+   }
+  ],
+  "syllabus": {
+   "setiNendo": "2026",
+   "registerationPeriodStart": "2026-08-06T00:00:00",
+   "registerationPeriodEnd": "2026-09-15T00:00:00",
+   "tempPasswordPeriodStart": "2026-02-01T00:00:00",
+   "tempPasswordPeriodEnd": "2026-03-23T00:00:00",
+   "displayed": 1,
+   "sampleData": 0,
+   "notification": "修正期間：８月６日（木）～９月１５日（火）\r\n",
+   "cHSSyllabusUrl": "https://syllabus.chs.nihon-u.ac.jp/",
+   "canUpdateTantou": 0
+  },
+  "gakubuKbn": "1",
+  "onWebConext": false,
+  "navigateUrlConverter": null
+ },
+ "courseSelectorData": null,
+ "result": "success",
+ "errorMessage": null
+}
