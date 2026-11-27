@@ -73,7 +73,8 @@ function Cell({ d, p, cs, cells, offered, family, onCell }: { d: number; p: numb
       {conflict && (
         <span class="badge-conflict">
           <AlertTriangle size={11} />
-          {cs.length}件重複
+          <span class="wide-only">{cs.length}件重複</span>
+          <span class="narrow-only">{cs.length}</span>
         </span>
       )}
     </button>

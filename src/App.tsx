@@ -130,7 +130,7 @@ export function App() {
         <div class="banner coral" role="status">
           <AlertTriangle size={16} />
           <div>
-            {termConflicts.map((c) => `${DAYS[c.day - 1]}${c.period}限（${c.courses.map((x) => x.name).join(" / ")}）`).join("、")} が重複しています。
+            {groupConflicts(termConflicts).join("、")} が重複しています。
           </div>
         </div>
       )}
@@ -311,4 +311,16 @@ function MenuItem({ icon, title, sub, onClick }: { icon: any; title: string; sub
       </button>
     </div>
   );
+}
+
+/** "水1限(A/B)、水2限(A/B)" -> "水1・2限（A / B）" */
+function groupConflicts(cs: { day: number; period: number; courses: Course[] }[]): string[] {
+  const m = new Map<string, { day: number; periods: number[]; names: string[] }>();
+  for (const c of cs) {
+    const k = `${c.day}|${c.courses.map((x) => x.id).sort().join(",")}`;
+    const g = m.get(k) ?? { day: c.day, periods: [], names: c.courses.map((x) => x.name) };
+    g.periods.push(c.period);
+    m.set(k, g);
+  }
+  return [...m.values()].map((g) => `${DAYS[g.day - 1]}${g.periods.sort((a, b) => a - b).join("・")}限（${g.names.join(" / ")}）`);
 }

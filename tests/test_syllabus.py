@@ -111,6 +111,11 @@ class Evaluation(unittest.TestCase):
         self.assertIn("report-heavy", r["tags"])
         self.assertIn("no-exam", r["tags"])
 
+    def test_label_stops_at_previous_percentage(self):
+        r = self.parse("定期試験 70% および課題提出などの平常点 30%")
+        self.assertEqual([p["label"] for p in r["parts"]], ["定期試験", "課題提出などの平常点"])
+        self.assertEqual(r["parts"][1]["category"], "report")
+
     def test_quiz_is_not_exam(self):
         r = self.parse("小テスト 30%、レポート 70%")
         self.assertEqual(r["parts"][0]["category"], "quiz")

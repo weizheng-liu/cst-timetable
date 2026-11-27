@@ -117,12 +117,15 @@ def parse_evaluation(text: str, rules: dict) -> dict:
     """
     text = unicodedata.normalize("NFKC", clean(text))
     parts: list[dict] = []
+    prev_end = 0
     for m in _PCT.finditer(text):
         start = m.start()
-        # label = text since previous delimiter
+        # label = text since the previous delimiter or the previous percentage
         prev = text[:start]
-        cut = max(prev.rfind(ch) for ch in ["\n", "、", ",", "。", ";", "/", "+"])
+        cut = max([prev.rfind(ch) for ch in ["\n", "、", ",", "。", ";", "/", "+"]] + [prev_end - 1])
+        prev_end = m.end()
         label = prev[cut + 1:]
+        label = re.sub(r"^\s*[)）]?\s*(および|及び|と|と、|,|、)\s*", "", label)
         label = re.sub(r"[()（）\[\]【】:：=＝\s]+", " ", label).strip()
         label = re.sub(r"\d+(\.\d+)?$", "", label).strip()
         pct = float(m.group(1))

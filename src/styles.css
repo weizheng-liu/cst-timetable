@@ -296,3 +296,6 @@ footer.foot a { color: var(--text-2); }
 /* enlarge touch targets to >= 44px without making small controls look heavy */
 .chip, .segmented button { position: relative; }
 .chip::after, .segmented button::after { content: ""; position: absolute; inset: -3px 0; }
+
+.wide-only { display: none; }
+@media (min-width: 760px) { .wide-only { display: inline; } .narrow-only { display: none; } }
