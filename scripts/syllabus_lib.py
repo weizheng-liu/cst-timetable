@@ -216,7 +216,8 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
 
     teachers = [clean(k.get("kyouinMei")).replace("　", " ") for k in (entry.get("kyouins") or [])]
 
-    sessions = []
+    sessions: list[dict] = []
+    by_key: dict[tuple, dict] = {}
     default_dates = ((detail or {}).get("courseViewData") or {}).get("defaultScheduledDates") or []
     regular_count = (sd.get("formatData") or {}).get("regularCount")
     for row in sd.get("classScheduleData") or []:
@@ -234,7 +235,17 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
         mode = "ondemand" if cs.get("isOnline") == 2 else "face"
         if dpage.get("classFormat") == 2 and mode == "face":
             mode = "online"
-        sessions.append({
+        # 連続コマの授業は 1 回分が displaySubIndex 1, 2 … の複数行になっているので 1 件にまとめる
+        key = (cat, idx)
+        if key in by_key:
+            prev = by_key[key]
+            if content and content not in prev["content"]:
+                prev["content"] = (prev["content"] + "\n" + content).strip()
+            if mode != "face":
+                prev["mode"] = mode
+            prev["cancelled"] = prev["cancelled"] or bool(re.search(r"休講", content))
+            continue
+        item = {
             "no": idx,
             "kind": "regular" if cat == 1 else "ondemand",
             "date": start,
@@ -242,7 +253,9 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
             "mode": mode,
             "content": content,
             "cancelled": bool(re.search(r"休講", content)),
-        })
+        }
+        by_key[key] = item
+        sessions.append(item)
     sessions.sort(key=lambda s: (s["kind"] != "regular", s["no"] or 0))
 
     texts = []

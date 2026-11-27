@@ -46,7 +46,11 @@
         "Report",
         "report",
         "Assignment",
-        "assignment"
+        "assignment",
+        "製作",
+        "実験報告",
+        "報告書",
+        "週報"
       ]
     },
     {
@@ -65,7 +69,8 @@
         "積極性",
         "貢献",
         "Participation",
-        "participation"
+        "participation",
+        "実施度"
       ]
     },
     {
