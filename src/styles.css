@@ -103,7 +103,7 @@ input, select { font: inherit; color: inherit; }
 
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .segmented { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; }
-.segmented button { min-height: 36px; padding: 0 16px; border-radius: 8px; color: var(--text-2); font-weight: 500; transition: background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.segmented button { min-height: 40px; padding: 0 16px; border-radius: 8px; color: var(--text-2); font-weight: 500; transition: background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
 .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-card), 0 0 0 1px var(--line); }
 .summary { font-size: var(--fs-1); color: var(--text-2); text-align: right; }
 .summary b { color: var(--text); font-weight: 600; font-size: var(--fs-2); }
@@ -163,7 +163,7 @@ input, select { font: inherit; color: inherit; }
 
 .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
 .chips::-webkit-scrollbar { display: none; }
-.chip { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--text-2); font-size: var(--fs-1); display: inline-flex; align-items: center; gap: 5px; transition: all 0.18s var(--ease); }
+.chip { flex: none; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--text-2); font-size: var(--fs-1); display: inline-flex; align-items: center; gap: 5px; transition: all 0.18s var(--ease); }
 .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
 .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 6px; font-size: 11px; background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
 .tag.req { background: var(--accent-soft); color: var(--accent-text); }
@@ -252,7 +252,7 @@ input, select { font: inherit; color: inherit; }
 .greq .gap { font-size: var(--fs-1); color: var(--text-2); }
 .greq .gap.ok { color: var(--c-basic-bar); }
 .earned { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: var(--fs-1); color: var(--text-2); }
-.earned input { width: 56px; height: 32px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); padding: 0 8px; text-align: right; font-family: var(--font-num); }
+.earned input { width: 64px; height: 40px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); padding: 0 8px; text-align: right; font-family: var(--font-num); }
 .big { font-size: var(--fs-4); font-weight: 600; font-family: var(--font-num); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
 /* setup */
@@ -292,3 +292,7 @@ footer.foot a { color: var(--text-2); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* enlarge touch targets to >= 44px without making small controls look heavy */
+.chip, .segmented button { position: relative; }
+.chip::after, .segmented button::after { content: ""; position: absolute; inset: -3px 0; }

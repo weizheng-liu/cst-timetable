@@ -1,5 +1,5 @@
 import { AlertTriangle, Info } from "lucide-preact";
-import { leafGroups, progress } from "../lib/credits";
+import { leafGroups, normName, progress } from "../lib/credits";
 import type { Course, Requirements } from "../lib/types";
 
 interface Props {
@@ -100,6 +100,36 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
           )}
         </div>
       ))}
+
+      {(req.choiceRules ?? []).length > 0 && (
+        <>
+          <div class="block-title">選択必修</div>
+          {req.choiceRules!.map((ch) => {
+            const names = new Set(ch.courses.map(normName));
+            const seen = new Set<string>();
+            let got = 0;
+            for (const c of selected) {
+              const n = normName(c.name);
+              if (names.has(n) && !seen.has(n)) {
+                seen.add(n);
+                got += c.credits;
+              }
+            }
+            return (
+              <div key={ch.id} class="greq">
+                <div class="top">
+                  <span class="label">{ch.courses.join("・")}</span>
+                  <span class="val">
+                    {got}
+                    <span class="faint"> / {ch.minCredits}</span>
+                  </span>
+                </div>
+                <div class="small muted">今年度の選択のみで判定 · p.{ch.page}</div>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {pr.unmatched.length > 0 && (
         <>
