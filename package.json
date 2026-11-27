@@ -1,0 +1,23 @@
+{
+  "name": "cst-timetable",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/prepare_public.mjs && vite",
+    "build": "node scripts/prepare_public.mjs && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "prepare_public": "node scripts/prepare_public.mjs"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.9.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "lucide-preact": "^0.460.0",
+    "preact": "^10.25.1"
+  }
+}
