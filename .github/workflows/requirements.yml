@@ -48,7 +48,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures 2>/dev/null || true
+          for p in data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures; do if [ -e "$p" ]; then git add "$p"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git commit -m "data: extract requirements ${{ inputs.entry_year }} ${{ inputs.dept }}"
           git pull --rebase origin ${{ github.ref_name }}
