@@ -43,6 +43,9 @@ DEPARTMENTS: list[tuple[str, str]] = [
     ("13", "数学科"),
 ]
 
+# 共通・教養科目（全学科向け）の一覧は gakka=99 の Index にある。学科としては選択肢に出さない
+COMMON_DEPT = ("99", "共通・教養科目")
+
 # youbiKbn: 2=月 ... 7=土  -> we store 1=月 ... 6=土
 DAY_LABELS = {1: "月", 2: "火", 3: "水", 4: "木", 5: "金", 6: "土"}
 
@@ -106,6 +109,91 @@ def ymd(s: str | None) -> str | None:
     if re.fullmatch(r"\d{8}", s):
         return f"{s[0:4]}-{s[4:6]}-{s[6:8]}"
     return None
+
+
+# ---------------------------------------------------------------- eligibility
+
+# 学科の略称 -> 学科コード（シラバスの「クラス」欄は自由記述。表記ゆれを吸収する。順序に意味がある）
+DEPT_ALIASES: list[tuple[str, str]] = [
+    ("06", r"精機|精密"),
+    ("05", r"(?<!精密)機械"),
+    ("07", r"航宇|航空"),
+    ("04", r"海建|海洋"),
+    ("03", r"(?<!海洋)建築"),
+    ("14", r"まち"),
+    ("02", r"交通"),
+    ("01", r"土木"),
+    ("08", r"電気"),
+    ("09", r"電子"),
+    ("15", r"情報"),
+    ("10", r"応化|物質"),
+    ("12", r"物理"),
+    ("13", r"数学"),
+]
+ALL_DEPTS = [c for c, _ in DEPARTMENTS]
+_OPEN = r"全学科|学科共通|共通科目|全学年|学科による(履修)?制限は(ありません|ない)|学科・学年による(履修)?制限|制限はありません|制限はない"
+_PLAIN_CLASS = r"(\d{1,2}|[A-Z]|[A-Z]-\d+|F\d|\dS\d-\d|全クラス|クラス\d*|)"
+
+
+def depts_in(text: str) -> list[str]:
+    return [code for code, pat in DEPT_ALIASES if re.search(pat, text)]
+
+
+def parse_eligibility(raw: str | None) -> dict:
+    """Parse the free-text 「クラス」 field of a 共通・教養科目 page into who may take it.
+
+    Returns {"kind", "rules", "flags", "text"}:
+      kind  = "open"    : no department restriction found
+              "depts"   : only the listed departments (all grades from 配当年次)
+              "graded"  : rules per grade, e.g. 1年生は土木・海建・機械・電子のみ、2年生以上は全学科
+              "special" : 再履修 / 教職 / 留学生 向けなど (通常の履修対象外として扱う)
+              "unknown" : 読み取れなかった (画面では「履修条件 要確認」)
+      rules = [{"minGrade": n|None, "maxGrade": n|None, "depts": [codes] | None(=全学科)}]
+    See docs/DECISIONS.md and tests/test_syllabus.py for examples.
+    """
+    text = unicodedata.normalize("NFKC", raw or "")
+    t = re.sub(r"[\s「」\"]+", "", text)
+    flags = []
+    if re.search(r"再履", t):
+        flags.append("retake")
+    if re.search(r"教職|免許", t):
+        flags.append("teacher")
+    if re.search(r"留学生", t):
+        flags.append("international")
+    if re.search(r"集中", t):
+        flags.append("intensive")
+    base = {"text": (raw or "").strip(), "flags": flags}
+    if {"retake", "teacher", "international"} & set(flags):
+        return {**base, "kind": "special", "rules": []}
+
+    t2 = re.sub(r"(夏季|春季)?集中(授業)?", "", t)
+    if re.fullmatch(_PLAIN_CLASS, t2):
+        return {**base, "kind": "open", "rules": [{"minGrade": None, "maxGrade": None, "depts": None}]}
+
+    # 「N年生は…のみ」「N年生以上は全学科」のような学年ごとの条件
+    marks = list(re.finditer(r"(\d)年[生次]?(以上|~)?", t2))
+    rules = []
+    for i, m in enumerate(marks):
+        seg = t2[m.end(): marks[i + 1].start() if i + 1 < len(marks) else len(t2)]
+        n = int(m.group(1))
+        upward = bool(m.group(2))
+        if re.search(_OPEN, seg) or not depts_in(seg):
+            depts = None
+        else:
+            depts = depts_in(seg)
+        rules.append({"minGrade": n, "maxGrade": None if upward else n, "depts": depts})
+    if rules:
+        # 「1年生は…のみ」だけで上の学年の記述がない場合、それ以外の学年は不明なので記録しない
+        return {**base, "kind": "graded", "rules": rules}
+
+    if re.search(r"数学科以外", t2):
+        return {**base, "kind": "depts", "rules": [{"minGrade": None, "maxGrade": None, "depts": [c for c in ALL_DEPTS if c != "13"]}]}
+    if re.search(_OPEN, t2):
+        return {**base, "kind": "open", "rules": [{"minGrade": None, "maxGrade": None, "depts": None}]}
+    ds = depts_in(t2)
+    if ds:
+        return {**base, "kind": "depts", "rules": [{"minGrade": None, "maxGrade": None, "depts": ds}]}
+    return {**base, "kind": "unknown", "rules": []}
 
 
 # ---------------------------------------------------------------- evaluation
@@ -221,7 +309,8 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
 
     jcd = j0.get("jikanwariCD") or (entry.get("jikanwariCD") or [""])[0]
     tags_raw = parse_bikou(j0.get("bikou", ""))
-    class_group = next((t for t in tags_raw if t.isdigit()), dpage.get("class") or None)
+    page_class = clean(dpage.get("class"))
+    class_group = next((t for t in tags_raw if t.isdigit()), page_class if 0 < len(page_class) <= 6 else None)
 
     evaluation_text = clean(dpage.get("evaluation"))
     ev = parse_evaluation(evaluation_text, rules)
@@ -294,6 +383,7 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
         "credits": kamou.get("taniSu"),
         "lectureType": LECTURE_TYPES.get(kamou.get("jugyouKbn") or "", kamou.get("jugyouKbn")),
         "classGroup": class_group,
+        "eligibility": parse_eligibility(page_class) if (j0.get("setiGakkaCD") or page.get("setiGakkaCD")) == "99" else None,
         "notes": [t for t in tags_raw if not t.isdigit()],
         "campus": CAMPUS.get(j0.get("kousyaCD") or "", j0.get("kousyaCD")),
         "room": j0.get("kyousituNo") or None,

@@ -60,6 +60,28 @@
         "credits": { "type": "number", "exclusiveMinimum": 0 },
         "lectureType": { "type": ["string", "null"] },
         "classGroup": { "type": ["string", "null"] },
+        "eligibility": {
+          "description": "共通・教養科目のみ。シラバスの「クラス」欄から読み取った履修できる学科・学年 (scripts/syllabus_lib.py parse_eligibility)",
+          "type": ["object", "null"],
+          "required": ["kind", "rules", "flags", "text"],
+          "properties": {
+            "kind": { "enum": ["open", "depts", "graded", "special", "unknown"] },
+            "text": { "type": "string" },
+            "flags": { "type": "array", "items": { "enum": ["retake", "teacher", "international", "intensive"] } },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["minGrade", "maxGrade", "depts"],
+                "properties": {
+                  "minGrade": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+                  "maxGrade": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+                  "depts": { "type": ["array", "null"], "items": { "type": "string", "pattern": "^[0-9]{2}$" } }
+                }
+              }
+            }
+          }
+        },
         "notes": { "type": "array", "items": { "type": "string" } },
         "campus": { "type": ["string", "null"] },
         "room": { "type": ["string", "null"] },

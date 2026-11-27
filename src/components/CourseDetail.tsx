@@ -2,12 +2,14 @@ import { ExternalLink, Plus, Check, AlertTriangle, MonitorPlay } from "lucide-pr
 import { EVAL_CATEGORY } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
+import type { Eligible } from "../lib/eligibility";
 
 interface Props {
   c: Course;
   on: boolean;
   req?: ReqCourse;
   clash: Course[];
+  status?: Eligible;
   onToggle: (c: Course) => void;
 }
 
@@ -17,7 +19,7 @@ const md = (d: string | null | undefined) => {
   return `${x.getMonth() + 1}/${x.getDate()}(${"日月火水木金土"[x.getDay()]})`;
 };
 
-export function CourseDetail({ c, on, req, clash, onToggle }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle }: Props) {
   const parts = c.evaluation.parts;
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -31,6 +33,18 @@ export function CourseDetail({ c, on, req, clash, onToggle }: Props) {
         <div class="banner coral">
           <AlertTriangle size={16} />
           <div>{clash.map((x) => x.name).join("、")} と時間が重なっています。</div>
+        </div>
+      )}
+      {status === "maybe" && (
+        <div class="banner warn">
+          <AlertTriangle size={16} />
+          <div>履修できる学科・学年をシラバスの記載から読み取れませんでした。下の「履修条件」を確認してください。</div>
+        </div>
+      )}
+      {status === "no" && (
+        <div class="banner warn">
+          <AlertTriangle size={16} />
+          <div>この科目は、選択中の学科・学年の履修対象外と判定しました（他キャンパス・他学科向け・再履修用など）。</div>
         </div>
       )}
       <dl class="kv">
@@ -51,6 +65,12 @@ export function CourseDetail({ c, on, req, clash, onToggle }: Props) {
           {c.classGroup ? ` · クラス${c.classGroup}` : ""}
           {c.notes.length ? ` · ${c.notes.join("・")}` : ""}
         </dd>
+        {c.eligibility && (
+          <>
+            <dt>履修条件</dt>
+            <dd>{c.eligibility.text || "記載なし（共通・教養科目）"}</dd>
+          </>
+        )}
         <dt>形態・教室</dt>
         <dd>
           {c.classFormat}

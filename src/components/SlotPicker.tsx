@@ -4,17 +4,19 @@ import { EVAL_TAGS } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import { clashesWith } from "../lib/schedule";
 import type { Course, ReqCourse } from "../lib/types";
+import type { Eligible } from "../lib/eligibility";
 
 interface Props {
   offered: Course[]; // courses at this cell for the term
   selected: Course[]; // all selected courses
   grade: number;
+  statusOf: (c: Course) => Eligible;
   reqOf: (c: Course) => ReqCourse | undefined;
   onToggle: (c: Course) => void;
   onOpen: (c: Course) => void;
 }
 
-export function SlotPicker({ offered, selected, grade, reqOf, onToggle, onOpen }: Props) {
+export function SlotPicker({ offered, selected, grade, statusOf, reqOf, onToggle, onOpen }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [allGrades, setAllGrades] = useState(false);
   const selectedIds = new Set(selected.map((c) => c.id));
@@ -24,12 +26,19 @@ export function SlotPicker({ offered, selected, grade, reqOf, onToggle, onOpen }
     () =>
       offered
         .filter((c) => !selectedIds.has(c.id))
-        .filter((c) => allGrades || c.grade == null || c.grade === grade)
+        .filter((c) => allGrades || statusOf(c) !== "otherGrade")
         .filter((c) => tags.every((t) => c.evaluation.tags.includes(t)))
-        .sort((a, b) => Number(!!reqOf(b)?.required) - Number(!!reqOf(a)?.required) || (a.grade ?? 9) - (b.grade ?? 9) || a.name.localeCompare(b.name, "ja")),
+        .sort(
+          (a, b) =>
+            Number(!!reqOf(b)?.required) - Number(!!reqOf(a)?.required) ||
+            Number(!!reqOf(b)) - Number(!!reqOf(a)) ||
+            Number(statusOf(a) === "maybe") - Number(statusOf(b) === "maybe") ||
+            (a.grade ?? 9) - (b.grade ?? 9) ||
+            a.name.localeCompare(b.name, "ja"),
+        ),
     [offered, selected, tags, allGrades, grade],
   );
-  const hiddenOtherGrades = offered.filter((c) => !selectedIds.has(c.id) && c.grade != null && c.grade !== grade).length;
+  const hiddenOtherGrades = offered.filter((c) => !selectedIds.has(c.id) && statusOf(c) === "otherGrade").length;
 
   const toggleTag = (id: string) => setTags((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
 
@@ -59,7 +68,7 @@ export function SlotPicker({ offered, selected, grade, reqOf, onToggle, onOpen }
 
       <div class="list">
         {filtered.map((c) => (
-          <Row key={c.id} c={c} on={false} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={onToggle} onOpen={onOpen} showGrade={allGrades} />
+          <Row key={c.id} c={c} on={false} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={onToggle} onOpen={onOpen} showGrade={allGrades} status={statusOf(c)} />
         ))}
       </div>
 
@@ -86,7 +95,7 @@ export function SlotPicker({ offered, selected, grade, reqOf, onToggle, onOpen }
   );
 }
 
-function Row({ c, on, req, clash, onToggle, onOpen, showGrade }: { c: Course; on: boolean; req?: ReqCourse; clash: Course[]; onToggle: (c: Course) => void; onOpen: (c: Course) => void; showGrade?: boolean }) {
+function Row({ c, on, req, clash, onToggle, onOpen, showGrade, status }: { c: Course; on: boolean; req?: ReqCourse; clash: Course[]; onToggle: (c: Course) => void; onOpen: (c: Course) => void; showGrade?: boolean; status?: Eligible }) {
   const evalTags = EVAL_TAGS.filter((t) => c.evaluation.tags.includes(t.id));
   return (
     <div class={`row ${on ? "on" : ""} ${clash.length && on ? "clash" : ""}`}>
@@ -102,6 +111,8 @@ function Row({ c, on, req, clash, onToggle, onOpen, showGrade }: { c: Course; on
         </div>
         <div class="row-tags">
           {req?.required && <span class="tag req">必修</span>}
+          {c.eligibility && <span class="tag">共通・教養</span>}
+          {status === "maybe" && <span class="tag amber">履修条件 要確認</span>}
           {c.notes.includes("再") && <span class="tag">再履修</span>}
           {c.classFormat === "オンライン" && <span class="tag">オンライン</span>}
           {evalTags.map((t) => (

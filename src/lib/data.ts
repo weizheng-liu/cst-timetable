@@ -17,6 +17,16 @@ export function loadDept(year: number, code: string): Promise<DeptFile> {
   return getJson<DeptFile>(`${year}/dept-${code}.json`);
 }
 
+/** 共通・教養科目（gakka=99）。データにない年度は空 */
+export async function loadCommon(index: DataIndex): Promise<Course[]> {
+  if (!index.common) return [];
+  try {
+    return (await getJson<DeptFile>(`${index.year}/dept-${index.common.code}.json`)).courses;
+  } catch {
+    return [];
+  }
+}
+
 export interface ReqIndexEntry {
   entryYear: number;
   dept: string;

@@ -7,7 +7,8 @@ import { SlotPicker } from "./components/SlotPicker";
 import { CourseDetail } from "./components/CourseDetail";
 import { Credits } from "./components/Credits";
 import { Setup } from "./components/Setup";
-import { familyOf, loadDept, loadIndex, loadRequirements } from "./lib/data";
+import { familyOf, loadCommon, loadDept, loadIndex, loadRequirements } from "./lib/data";
+import { eligibleFor, homeCampusOf, type Eligible } from "./lib/eligibility";
 import { normName, reqIndex } from "./lib/credits";
 import { buildIcs } from "./lib/ics";
 import { DAYS, resolveTimes } from "./lib/periods";
@@ -22,6 +23,7 @@ export function App() {
   const [index, setIndex] = useState<DataIndex | null>(null);
   const [dept, setDept] = useState<DeptFile | null>(null);
   const [req, setReq] = useState<Requirements | null>(null);
+  const [common, setCommon] = useState<Course[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [stack, setStack] = useState<Panel[]>([]);
   const [toast, setToast] = useState<string | null>(null);
@@ -33,7 +35,10 @@ export function App() {
   };
 
   useEffect(() => {
-    loadIndex().then(setIndex, (e) => setError(String(e)));
+    loadIndex().then((ix) => {
+      setIndex(ix);
+      loadCommon(ix).then(setCommon);
+    }, (e) => setError(String(e)));
   }, []);
 
   useTheme(st.theme);
@@ -47,7 +52,19 @@ export function App() {
     loadRequirements(profile.entryYear, profile.dept).then(setReq);
   }, [index, profile?.dept, profile?.entryYear]);
 
-  const byId = useMemo(() => new Map((dept?.courses ?? []).map((c) => [c.id, c])), [dept]);
+  // 学科の科目 + その学生が履修できる共通・教養科目
+  const allCourses = useMemo(() => {
+    const own = dept?.courses ?? [];
+    const ids = new Set(own.map((c) => c.id));
+    return [...own, ...common.filter((c) => !ids.has(c.id))];
+  }, [dept, common]);
+  const homeCampus = useMemo(() => homeCampusOf(dept?.courses ?? [], profile?.grade ?? 1), [dept, profile?.grade]);
+  const statusOf = useMemo(() => {
+    const m = new Map<string, Eligible>();
+    for (const c of allCourses) m.set(c.id, profile ? eligibleFor(c, profile.dept, profile.grade, homeCampus) : "yes");
+    return (c: Course) => m.get(c.id) ?? "no";
+  }, [allCourses, profile?.dept, profile?.grade, homeCampus]);
+  const byId = useMemo(() => new Map(allCourses.map((c) => [c.id, c])), [allCourses]);
   const selected = useMemo(() => st.selected.map((id) => byId.get(id)).filter(Boolean) as Course[], [st.selected, byId]);
   const rIdx = useMemo(() => reqIndex(req), [req]);
   const reqOf = (c: Course) => rIdx.get(normName(c.name));
@@ -57,9 +74,12 @@ export function App() {
   const cells = useMemo(() => buildCells(selected, view), [selected, view]);
   const offered = useMemo(() => {
     const s = new Set<string>();
-    for (const c of dept?.courses ?? []) if (inTerm(c, view) && (c.grade == null || c.grade === profile?.grade)) for (const x of c.slots) s.add(cellKey(x.day, x.period));
+    for (const c of allCourses) {
+      const st = statusOf(c);
+      if (inTerm(c, view) && (st === "yes" || st === "maybe")) for (const x of c.slots) s.add(cellKey(x.day, x.period));
+    }
     return s;
-  }, [dept, view, profile?.grade]);
+  }, [allCourses, view, statusOf]);
   const conflicts = useMemo(() => findConflicts(selected), [selected]);
   const termConflicts = conflicts.filter((c) => c.term === view);
   const termCredits = selected.filter((c) => inTerm(c, view)).reduce((s, c) => s + (c.credits || 0), 0);
@@ -213,7 +233,7 @@ export function App() {
     if (!top) return { title: "" };
     switch (top.kind) {
       case "slot": {
-        const n = coursesAt(dept?.courses ?? [], top.day, top.period, view).length;
+        const n = coursesAt(allCourses, top.day, top.period, view).filter((c) => ["yes", "maybe"].includes(statusOf(c))).length;
         return { title: `${DAYS[top.day - 1]}曜 ${top.period}限`, sub: `${view} · 開講 ${n} 科目` };
       }
       case "detail": {
@@ -239,7 +259,8 @@ export function App() {
       case "slot":
         return (
           <SlotPicker
-            offered={coursesAt(dept?.courses ?? [], top.day, top.period, view)}
+            offered={coursesAt(allCourses, top.day, top.period, view).filter((c) => statusOf(c) !== "no" || st.selected.includes(c.id))}
+            statusOf={statusOf}
             selected={selected}
             grade={profile?.grade ?? 1}
             reqOf={reqOf}
@@ -250,7 +271,7 @@ export function App() {
       case "detail": {
         const c = byId.get(top.id);
         if (!c) return null;
-        return <CourseDetail c={c} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} />;
+        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} />;
       }
       case "credits":
         return (

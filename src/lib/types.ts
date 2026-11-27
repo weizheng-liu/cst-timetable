@@ -36,6 +36,7 @@ export interface Course {
   credits: number;
   lectureType: string | null;
   classGroup: string | null;
+  eligibility?: Eligibility | null; // 共通・教養科目のみ
   notes: string[];
   campus: string | null;
   room: string | null;
@@ -50,6 +51,13 @@ export interface Course {
   url: string;
 }
 
+export interface Eligibility {
+  kind: "open" | "depts" | "graded" | "special" | "unknown";
+  text: string;
+  flags: string[];
+  rules: { minGrade: number | null; maxGrade: number | null; depts: string[] | null }[];
+}
+
 export interface DeptFile {
   year: number;
   department: { code: string; name: string };
@@ -60,6 +68,7 @@ export interface DataIndex {
   year: number;
   generatedAt: string;
   departments: { code: string; name: string; count: number }[];
+  common?: { code: string; name: string; count: number } | null;
 }
 
 export interface ReqGroup {

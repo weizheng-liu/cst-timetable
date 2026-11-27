@@ -4,6 +4,7 @@ import { progress } from "./credits";
 import { buildIcs } from "./ics";
 import { sanitize } from "./store";
 import { resolveTimes } from "./periods";
+import { eligibleFor } from "./eligibility";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 
@@ -148,5 +149,25 @@ describe("import sanitising", () => {
   });
   it("returns an empty state for garbage", () => {
     expect(sanitize("nope").selected).toEqual([]);
+  });
+});
+
+describe("eligibility of common courses", () => {
+  const g = (kind: any, rules: any[], extra: Partial<Course> = {}) =>
+    mk("W1", "倫理学", "前期", [[1, 1]], { department: "99", campus: "船橋", grade: 1, eligibility: { kind, rules, flags: [], text: "" }, ...extra });
+  it("follows graded rules", () => {
+    const c = g("graded", [{ minGrade: 1, maxGrade: 1, depts: ["01", "04", "05", "09"] }, { minGrade: 2, maxGrade: null, depts: null }]);
+    expect(eligibleFor(c, "09", 1, "船橋")).toBe("yes");
+    expect(eligibleFor(c, "02", 1, "船橋")).toBe("no");
+    expect(eligibleFor(c, "02", 3, "船橋")).toBe("yes");
+  });
+  it("hides other campus, other departments and special classes", () => {
+    expect(eligibleFor(g("open", [{ minGrade: null, maxGrade: null, depts: null }], { campus: "駿河台" }), "09", 1, "船橋")).toBe("no");
+    expect(eligibleFor(g("depts", [{ minGrade: null, maxGrade: null, depts: ["06", "07", "09"] }]), "08", 1, "船橋")).toBe("no");
+    expect(eligibleFor(g("special", []), "09", 1, "船橋")).toBe("no");
+  });
+  it("puts other 配当年次 behind the 他学年 toggle and flags unknown text", () => {
+    expect(eligibleFor(g("open", [{ minGrade: null, maxGrade: null, depts: null }]), "09", 2, "船橋")).toBe("otherGrade");
+    expect(eligibleFor(g("unknown", []), "09", 1, "船橋")).toBe("maybe");
   });
 });

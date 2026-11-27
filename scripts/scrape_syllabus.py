@@ -81,7 +81,7 @@ class Client:
 def scrape(year: str, depts: list[str], grade: int | None, client: Client, details: bool = True,
            log=print) -> dict:
     rules = lib.load_eval_rules()
-    names = dict(lib.DEPARTMENTS)
+    names = dict(lib.DEPARTMENTS + [lib.COMMON_DEPT])
     courses: dict[str, dict] = {}
     dept_members: dict[str, list[str]] = {}
     failures: list[str] = []
@@ -147,7 +147,7 @@ def write_outputs(result: dict, merge: bool = True) -> None:
             new_ids = {c["id"] for c in result["courses"]}
             keep_ids = {i for d in keep_depts for i in d["courseIds"]} - new_ids
             result["courses"] += [c for c in old["courses"] if c["id"] in keep_ids]
-            order = [c for c, _ in lib.DEPARTMENTS]
+            order = [c for c, _ in lib.DEPARTMENTS + [lib.COMMON_DEPT]]
             result["departments"] = sorted(keep_depts + result["departments"],
                                            key=lambda d: order.index(d["code"]) if d["code"] in order else 99)
             result["courses"].sort(key=lambda c: (c["department"] or "", c["grade"] or 0, c["id"]))
@@ -167,7 +167,11 @@ def write_outputs(result: dict, merge: bool = True) -> None:
     (pub / "index.json").write_text(json.dumps({
         "year": year,
         "generatedAt": result["meta"]["generatedAt"],
-        "departments": [{"code": d["code"], "name": d["name"], "count": len(d["courseIds"])} for d in result["departments"]],
+        "departments": [{"code": d["code"], "name": d["name"], "count": len(d["courseIds"])}
+                        for d in result["departments"] if d["code"] != lib.COMMON_DEPT[0]],
+        # 共通・教養科目（gakka=99）。学科の選択肢には出さず、各学科の画面に「履修できる科目」として混ぜる
+        "common": next(({"code": d["code"], "name": d["name"], "count": len(d["courseIds"])}
+                        for d in result["departments"] if d["code"] == lib.COMMON_DEPT[0]), None),
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     (ROOT / "public" / "data" / "years.json").write_text(json.dumps({"latest": year}) + "\n", encoding="utf-8")
 
@@ -202,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
 
     today = dt.date.today()
     year = a.year or str(today.year if today.month >= 4 else today.year - 1)
-    depts = [c for c, _ in lib.DEPARTMENTS] if a.dept == "all" else a.dept.split(",")
+    depts = [c for c, _ in lib.DEPARTMENTS] + [lib.COMMON_DEPT[0]] if a.dept == "all" else a.dept.split(",")
     client = Client(delay=a.delay, use_cache=not a.no_cache)
     result = scrape(year, depts, a.grade, client, details=not a.no_details)
     write_outputs(result, merge=not a.no_merge)
