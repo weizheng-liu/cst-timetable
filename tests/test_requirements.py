@@ -84,3 +84,15 @@ class Validator(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_crosscheck_reference_matches_extracted_2025_electronics():
+    import json
+    from extract_requirements import ROOT, crosscheck_values
+    req = json.loads((ROOT / "data/requirements/2025_electronics.json").read_text(encoding="utf-8"))
+    ref = json.loads((ROOT / "data/requirements/crosscheck/2025_electronics.json").read_text(encoding="utf-8"))
+    for it in ref["items"]:
+        v, n = crosscheck_values(req, it)
+        assert v == it["credits"], it["label"]
+        if it.get("courses") is not None:
+            assert n == it["courses"], it["label"]

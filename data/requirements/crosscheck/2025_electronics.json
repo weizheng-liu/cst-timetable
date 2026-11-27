@@ -1,0 +1,26 @@
+{
+  "source": "学生個人成績表の卒業条件欄（基準科目数・基準単位数）。個人の成績・氏名・学籍番号は含めていない",
+  "checkedAt": "2026-11-27",
+  "note": "成績表では「卒研」は「専門必」に含まれず「専門計」に含まれる。抽出データの専門必修は卒業研究を含むので、比較時は 専門必 + 卒研 と照合する。",
+  "items": [
+    {"label": "全学共通（必修）", "groups": ["common"], "field": "requiredCredits", "credits": 2},
+    {"label": "教養Ⅰ群", "groups": ["liberal.g1"], "field": "minCredits", "credits": 6},
+    {"label": "教養Ⅱ群 必修", "groups": ["liberal.g2"], "field": "requiredFromCourses", "credits": 1, "courses": 1},
+    {"label": "教養Ⅱ群", "groups": ["liberal.g2"], "field": "minCredits", "credits": 4},
+    {"label": "教養Ⅲ群", "groups": ["liberal.g3"], "field": "minCredits", "credits": 4},
+    {"label": "教養Ⅳ群", "groups": ["liberal.g4"], "field": "minCredits", "credits": 0},
+    {"label": "教養 計", "groups": ["liberal"], "field": "minCredits", "credits": 16},
+    {"label": "基礎 英語必修", "groups": ["basic.global"], "field": "requiredCredits", "credits": 4, "courses": 4},
+    {"label": "基礎 英語選択（※）", "choice": "basic.global.a", "credits": 2},
+    {"label": "基礎 英語特殊（◎）", "choice": "basic.global.b", "credits": 1},
+    {"label": "基礎 英語 計", "groups": ["basic.global"], "field": "minCredits", "credits": 7},
+    {"label": "基礎 数学系", "groups": ["basic.science.math"], "field": "minCredits", "credits": 2},
+    {"label": "基礎 物理学系", "groups": ["basic.science.physics"], "field": "minCredits", "credits": 2},
+    {"label": "基礎 化学系", "groups": ["basic.science.chem"], "field": "minCredits", "credits": 2},
+    {"label": "基礎 科学 計", "groups": ["basic.science"], "field": "minCredits", "credits": 14},
+    {"label": "基礎 計", "groups": ["basic"], "field": "minCredits", "credits": 22},
+    {"label": "専門必修 + 卒研（37 + 6）", "groups": ["major"], "field": "requiredFromCourses", "credits": 43, "courses": 17},
+    {"label": "専門 計", "groups": ["major"], "field": "minCredits", "credits": 86},
+    {"label": "合計", "field": "totalCredits", "credits": 126}
+  ]
+}

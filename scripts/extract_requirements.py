@@ -404,7 +404,49 @@ def review_markdown(req: dict) -> str:
               ""]
     if sum(g["minCredits"] for g in top) < req["totalCredits"]:
         lines.insert(-1, "- 区分最低単位の合計と総単位の差は自由選択枠（どの区分でもよい）と解釈している。要確認。")
+    lines += crosscheck_markdown(req)
     return "\n".join(lines)
+
+
+def crosscheck_values(req: dict, item: dict) -> tuple[float | None, int | None]:
+    """Value of the extracted data that corresponds to one cross-check item."""
+    if item.get("field") == "totalCredits":
+        return req["totalCredits"], None
+    if "choice" in item:
+        ch = next((c for c in req.get("choiceRules", []) if c["id"] == item["choice"]), None)
+        return (ch["minCredits"] if ch else None), None
+    gid = item["groups"][0]
+    g = next((x for x in req["groups"] if x["id"] == gid), None)
+    if g is None:
+        return None, None
+    if item["field"] == "requiredFromCourses":
+        rs = [c for c in req["courses"] if c["required"] and (c["group"] == gid or c["group"].startswith(gid + "."))]
+        return sum(c["credits"] for c in rs), len(rs)
+    if item["field"] == "requiredCredits":
+        rs = [c for c in req["courses"] if c["required"] and (c["group"] == gid or c["group"].startswith(gid + "."))]
+        return g.get("requiredCredits"), len(rs)
+    return g.get(item["field"]), None
+
+
+def crosscheck_markdown(req: dict) -> list[str]:
+    slug = SLUGS.get(req["department"]["code"], req["department"]["code"])
+    path = ROOT / "data" / "requirements" / "crosscheck" / f"{req['entryYear']}_{slug}.json"
+    if not path.exists():
+        return []
+    ref = json.loads(path.read_text(encoding="utf-8"))
+    lines = ["## 7. 別資料との照合", "",
+             f"出典: {ref['source']}（{ref['checkedAt']} 照合）。学部要覧そのものではないので、これで `verified` を true にはしない。", ""]
+    if ref.get("note"):
+        lines += [f"> {ref['note']}", ""]
+    lines += ["| 項目 | 別資料 | 抽出データ | 一致 |", "|---|---:|---:|:---:|"]
+    for it in ref["items"]:
+        v, n = crosscheck_values(req, it)
+        exp = f"{it['credits']}単位" + (f" / {it['courses']}科目" if it.get("courses") is not None else "")
+        got = "—" if v is None else f"{v:g}単位" + (f" / {n}科目" if n is not None and it.get("courses") is not None else "")
+        ok = v is not None and v == it["credits"] and (it.get("courses") is None or n == it["courses"])
+        lines.append(f"| {it['label']} | {exp} | {got} | {'✅' if ok else '⚠️'} |")
+    lines.append("")
+    return lines
 
 
 def main(argv=None) -> int:
