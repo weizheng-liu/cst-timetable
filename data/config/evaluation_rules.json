@@ -1,0 +1,126 @@
+{
+  "$comment": "成績評価テキストの分類ルール。categories は上から順に判定し、最初にマッチしたカテゴリになる。keywords/exclude は正規表現。tags は categories の合計割合(%)で判定する。詳しくは docs/EVALUATION_RULES.md",
+  "categories": [
+    {
+      "id": "quiz",
+      "label": "小テスト",
+      "keywords": [
+        "小テスト",
+        "ミニテスト",
+        "確認テスト",
+        "クイズ",
+        "Quiz",
+        "quiz"
+      ],
+      "exclude": [
+        "理解度確認"
+      ]
+    },
+    {
+      "id": "exam",
+      "label": "試験",
+      "keywords": [
+        "試験",
+        "テスト",
+        "期末",
+        "中間",
+        "定期",
+        "考査",
+        "Exam",
+        "exam"
+      ]
+    },
+    {
+      "id": "report",
+      "label": "レポート・課題",
+      "keywords": [
+        "レポート",
+        "課題",
+        "宿題",
+        "提出物",
+        "演習問題",
+        "作品",
+        "製図",
+        "論文",
+        "ポートフォリオ",
+        "Report",
+        "report",
+        "Assignment",
+        "assignment"
+      ]
+    },
+    {
+      "id": "attendance",
+      "label": "出席・平常点",
+      "keywords": [
+        "出席",
+        "参加",
+        "取り組み",
+        "取組",
+        "授業態度",
+        "受講態度",
+        "平常",
+        "リアクション",
+        "コメントシート",
+        "積極性",
+        "貢献",
+        "Participation",
+        "participation"
+      ]
+    },
+    {
+      "id": "presentation",
+      "label": "発表",
+      "keywords": [
+        "発表",
+        "プレゼン",
+        "口頭",
+        "ディスカッション",
+        "討論"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "id": "no-exam",
+      "label": "試験なし",
+      "description": "試験(期末・中間・理解度確認テスト等)の割合が 0%。小テストは含まない。",
+      "when": {
+        "requires_parts": true,
+        "category_max": {
+          "exam": 0
+        }
+      }
+    },
+    {
+      "id": "report-heavy",
+      "label": "レポート中心",
+      "description": "レポート・課題の合計が 50% 以上",
+      "when": {
+        "category_min": {
+          "report": 50
+        }
+      }
+    },
+    {
+      "id": "attendance-heavy",
+      "label": "出席重視",
+      "description": "出席・平常点・授業参加の合計が 30% 以上",
+      "when": {
+        "category_min": {
+          "attendance": 30
+        }
+      }
+    },
+    {
+      "id": "exam-heavy",
+      "label": "試験重視",
+      "description": "試験の合計が 60% 以上",
+      "when": {
+        "category_min": {
+          "exam": 60
+        }
+      }
+    }
+  ]
+}

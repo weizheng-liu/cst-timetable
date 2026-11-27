@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weizheng-liu.github.io/cst-timetable/schema/courses.schema.json",
+  "title": "CST syllabus courses",
+  "type": "object",
+  "required": ["meta", "departments", "courses"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["year", "generatedAt", "source"],
+      "properties": {
+        "year": { "type": "integer", "minimum": 2000 },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "source": { "type": "string" },
+        "requests": { "type": "integer" },
+        "detailFailures": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "departments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "name", "courseIds"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[0-9A-Z]{2}$" },
+          "name": { "type": "string" },
+          "courseIds": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "courses": { "type": "array", "items": { "$ref": "#/$defs/course" } }
+  },
+  "$defs": {
+    "course": {
+      "type": "object",
+      "required": ["id", "code", "name", "teachers", "grade", "term", "slots", "credits", "evaluation", "sessions", "url"],
+      "properties": {
+        "id": { "type": "string", "description": "時間割CD (unique per year)", "pattern": "^[0-9A-Za-z]+$" },
+        "pageId": { "type": ["integer", "null"] },
+        "code": { "type": ["string", "null"], "description": "科目コード" },
+        "name": { "type": "string", "minLength": 1, "description": "科目名" },
+        "subtitle": { "type": "string" },
+        "teachers": { "type": "array", "items": { "type": "string" } },
+        "department": { "type": ["string", "null"] },
+        "syllabusDepartment": { "type": ["string", "null"] },
+        "grade": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+        "term": { "enum": ["前期", "後期", "年間", "不明"] },
+        "termCode": { "type": ["string", "null"] },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["day", "period"],
+            "properties": {
+              "day": { "type": "integer", "minimum": 1, "maximum": 6, "description": "1=月 … 6=土" },
+              "period": { "type": "integer", "minimum": 1, "maximum": 7 }
+            }
+          }
+        },
+        "credits": { "type": "number", "exclusiveMinimum": 0 },
+        "lectureType": { "type": ["string", "null"] },
+        "classGroup": { "type": ["string", "null"] },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "campus": { "type": ["string", "null"] },
+        "room": { "type": ["string", "null"] },
+        "classFormat": { "enum": ["対面", "オンライン"] },
+        "onlineMethod": { "type": ["string", "null"] },
+        "objectives": { "type": "string" },
+        "lectureForm": { "type": "string" },
+        "evaluation": {
+          "type": "object",
+          "required": ["text", "parts", "tags"],
+          "properties": {
+            "text": { "type": "string" },
+            "parts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["label", "percent", "category"],
+                "properties": {
+                  "label": { "type": "string" },
+                  "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "category": { "type": "string" }
+                }
+              }
+            },
+            "totals": { "type": "object", "additionalProperties": { "type": "number" } },
+            "tags": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "textbooks": { "type": "array", "items": { "type": "object" } },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["no", "kind", "date", "mode", "content"],
+            "properties": {
+              "no": { "type": ["integer", "null"] },
+              "kind": { "enum": ["regular", "ondemand"] },
+              "date": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+              "endDate": { "type": ["string", "null"] },
+              "mode": { "enum": ["face", "online", "ondemand"] },
+              "content": { "type": "string" },
+              "cancelled": { "type": "boolean" }
+            }
+          }
+        },
+        "hasDetail": { "type": "boolean" },
+        "url": { "type": "string" }
+      }
+    }
+  }
+}

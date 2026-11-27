@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graduation requirements for one (入学年度 × 学科)",
+  "type": "object",
+  "required": ["entryYear", "department", "verified", "source", "totalCredits", "groups", "courses"],
+  "properties": {
+    "entryYear": { "type": "integer" },
+    "department": {
+      "type": "object",
+      "required": ["code", "name"],
+      "properties": { "code": { "type": "string" }, "name": { "type": "string" } }
+    },
+    "verified": { "type": "boolean", "description": "false until a human has checked every rule against the PDF" },
+    "source": {
+      "type": "object",
+      "required": ["url", "pages"],
+      "properties": { "url": { "type": "string" }, "title": { "type": "string" }, "pages": { "type": "array", "items": { "type": "integer" } } }
+    },
+    "totalCredits": { "type": "integer", "minimum": 1 },
+    "groups": {
+      "type": "array",
+      "description": "科目区分ごとの最低単位数。parent で入れ子を表す",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "minCredits", "page"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "parent": { "type": ["string", "null"] },
+          "minCredits": { "type": "integer", "minimum": 0 },
+          "requiredCredits": { "type": "integer", "minimum": 0 },
+          "note": { "type": "string" },
+          "page": { "type": "integer" }
+        }
+      }
+    },
+    "courses": {
+      "type": "array",
+      "description": "授業科目配置表の科目 (名前で シラバスと照合)",
+      "items": {
+        "type": "object",
+        "required": ["name", "credits", "group", "required", "year"],
+        "properties": {
+          "name": { "type": "string" },
+          "credits": { "type": "number" },
+          "group": { "type": "string" },
+          "required": { "type": "boolean" },
+          "year": { "type": "integer", "minimum": 1, "maximum": 4 },
+          "choice": { "type": "string" }
+        }
+      }
+    },
+    "choiceRules": { "type": "array" },
+    "thesisPrerequisites": { "type": "array", "items": { "type": "object" } }
+  }
+}
