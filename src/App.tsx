@@ -567,9 +567,19 @@ function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned
               <i class="ruler-plan" style={{ width: `${p}%` }} />
             </span>
             <span class="scale num" aria-hidden="true">
-              <span style={{ left: 0 }}>0</span>
-              {earned > 0 && <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>修得済 {earned}</span>}
-              <span class="is-plan" style={{ left: `${e}%`, paddingLeft: earned > 0 ? 4 : 0 }}>今年度 {planned}</span>
+              {/* 修得済の段が短いと注記どうしが重なるので、そのときは左端に 1 つにまとめる */}
+              {e >= 22 ? (
+                <>
+                  <span style={{ left: 0 }}>0</span>
+                  <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>修得済 {earned}</span>
+                  <span class="is-plan" style={{ left: `${e}%`, paddingLeft: 4 }}>今年度 {planned}</span>
+                </>
+              ) : (
+                <span style={{ left: 0 }}>
+                  {earned > 0 && `修得済 ${earned} · `}
+                  <span class="is-plan" style={{ position: "static" }}>今年度 {planned}</span>
+                </span>
+              )}
               <span style={{ right: 0 }}>卒業 {T}</span>
             </span>
           </>

@@ -1,5 +1,5 @@
 import { ExternalLink, Plus, Check, AlertTriangle, MonitorPlay } from "lucide-preact";
-import { EVAL_CATEGORY } from "../lib/data";
+import { EVAL_CATEGORY, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
@@ -78,12 +78,12 @@ export function CourseDetail({ c, on, req, clash, status, onToggle }: Props) {
           {c.classFormat}
           {c.onlineMethod ? `（${c.onlineMethod}）` : ""}
           {c.campus ? ` · ${c.campus}` : ""}
-          {c.room ? ` ${c.room}` : ""}
+          {roomOf(c) ? ` · 教室 ${roomOf(c)}` : " · 教室未定"}
         </dd>
         <dt>時間割CD</dt>
         <dd class="num">
           {c.id}
-          {c.code ? ` / 科目 ${c.code}` : ""}
+          {c.code ? ` / 科目コード ${c.code}` : ""}
         </dd>
       </dl>
 

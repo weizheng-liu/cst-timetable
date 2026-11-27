@@ -1,6 +1,6 @@
 import { SearchX } from "lucide-preact";
 import { useMemo, useState } from "preact/hooks";
-import { CATEGORY_LABEL, EVAL_TAGS, type Category } from "../lib/data";
+import { CATEGORY_LABEL, EVAL_TAGS, roomOf, type Category } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import { clashesWith } from "../lib/schedule";
 import type { Course, ReqCourse } from "../lib/types";
@@ -188,7 +188,12 @@ function Row({ c, on, picked, cat, clash, showGrade, status, onPick }: { c: Cour
             </span>
           </span>
           <span class="pick-meta">
-            {c.code && <span class="code">{c.code}</span>}
+            {roomOf(c) && (
+              <span class="code" title="教室">
+                <small>教室</small>
+                {roomOf(c)}
+              </span>
+            )}
             <span class="pick-meta-text">
               {c.teachers.slice(0, 2).join("・")}
               {c.teachers.length > 2 ? " 他" : ""} · {CATEGORY_LABEL[cat]}

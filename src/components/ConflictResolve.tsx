@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { CATEGORY_LABEL, EVAL_TAGS, type Category } from "../lib/data";
+import { CATEGORY_LABEL, EVAL_TAGS, roomOf, type Category } from "../lib/data";
 import { slotText, type ResolveOption } from "../lib/resolve";
 import type { Course } from "../lib/types";
 
@@ -74,9 +74,12 @@ function CmpCard({ c, cat, required, alt }: { c: Course; cat: Category; required
         <span class="cmp-tag">{required ? "必修" : "選択"}</span>
       </div>
       <b class="cmp-name">{c.name}</b>
-      {c.code && (
+      {roomOf(c) && (
         <div class="cmp-who">
-          <span class="code">{c.code}</span>
+          <span class="code">
+            <small>教室</small>
+            {roomOf(c)}
+          </span>
         </div>
       )}
       <div class="cmp-who">

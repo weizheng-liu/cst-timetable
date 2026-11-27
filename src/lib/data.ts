@@ -71,6 +71,12 @@ export function categoryOf(c: Course, req?: { group: string; required: boolean }
   return "general";
 }
 
+/** 教室番号（シラバスの kyousituNo）。"0000" は未定・オンラインなどの仮の値なので出さない */
+export function roomOf(c: Course): string | null {
+  const r = (c.room || "").trim();
+  return r && !/^0+$/.test(r) ? r : null;
+}
+
 export const EVAL_TAGS: { id: string; label: string }[] = [
   { id: "no-exam", label: "試験なし" },
   { id: "report-heavy", label: "レポート中心" },

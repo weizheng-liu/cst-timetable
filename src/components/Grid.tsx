@@ -1,7 +1,7 @@
 import { DAYS, type PeriodTimes } from "../lib/periods";
 import { cellKey } from "../lib/schedule";
 import type { Course } from "../lib/types";
-import type { Category } from "../lib/data";
+import { roomOf, type Category } from "../lib/data";
 
 const EN_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -96,7 +96,7 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
           onClick={() => onCell(d, p)}
         >
           <b class="name">{c.name}</b>
-          <small class="meta">{c.room ?? c.teachers[0] ?? ""}</small>
+          <small class="meta">{roomOf(c) ?? c.teachers[0] ?? ""}</small>
         </button>,
       );
     }
