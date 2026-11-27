@@ -87,6 +87,15 @@ def day_of(youbi: str | None) -> int | None:
     return d if d in DAY_LABELS else None
 
 
+def grade_of(gakunen) -> int | None:
+    """学年 1-6. Other codes (e.g. 8 seen for some cross-grade courses) mean 学年指定なし -> None."""
+    try:
+        g = int(gakunen)
+    except (TypeError, ValueError):
+        return None
+    return g if 1 <= g <= 6 else None
+
+
 def parse_bikou(bikou: str) -> list[str]:
     """'{1}{未来}' -> ['1', '未来']"""
     return re.findall(r"\{([^}]*)\}", bikou or "")
@@ -278,7 +287,7 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
         "teachers": teachers,
         "department": j0.get("setiGakkaCD") or page.get("setiGakkaCD"),
         "syllabusDepartment": page.get("syllabusSetiGakkaCD"),
-        "grade": int(j0["gakunen"]) if str(j0.get("gakunen", "")).isdigit() else None,
+        "grade": grade_of(j0.get("gakunen")),
         "term": term_of(j0.get("risyukiKbn")),
         "termCode": j0.get("risyukiKbn"),
         "slots": slots,

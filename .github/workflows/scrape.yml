@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Restore HTTP cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: .cache/syllabus
           key: syllabus-${{ github.run_id }}
@@ -45,6 +45,13 @@ jobs:
           if [ -n "${{ inputs.year }}" ]; then ARGS="$ARGS --year ${{ inputs.year }}"; fi
           if [ -n "${{ inputs.dump_fixtures }}" ]; then ARGS="$ARGS --dump-fixtures ${{ inputs.dump_fixtures }}"; fi
           python scripts/scrape_syllabus.py $ARGS
+      # 検証が失敗しても次回の再実行が速いようにキャッシュは必ず保存する
+      - name: Save HTTP cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/syllabus
+          key: syllabus-${{ github.run_id }}
       - name: Validate
         run: |
           pip install -q jsonschema

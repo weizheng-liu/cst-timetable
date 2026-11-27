@@ -129,3 +129,11 @@ class Evaluation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_grade_of_maps_unknown_codes_to_none():
+    from syllabus_lib import grade_of
+    assert grade_of("2") == 2
+    assert grade_of("8") is None
+    assert grade_of("") is None
+    assert grade_of(None) is None
