@@ -16,14 +16,15 @@ export interface SavedState {
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
   periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
   theme: Theme;
+  photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
 
-export type Theme = "system" | "light" | "dark" | "sepia";
-export const THEMES: Theme[] = ["system", "light", "dark", "sepia"];
+export type Theme = "system" | "light" | "dark" | "sepia" | "blueprint" | "scope" | "photo";
+export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint", "scope", "photo"];
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system" });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system", photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -75,6 +76,7 @@ export function sanitize(x: any): SavedState {
     earned,
     periodTimes,
     theme: THEMES.includes(x.theme) ? x.theme : "system",
+    photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
   };
 }
 
@@ -98,4 +100,44 @@ export function download(filename: string, text: string, type: string) {
     URL.revokeObjectURL(a.href);
     a.remove();
   }, 0);
+}
+
+/** 写真テーマの背景画像（端末内のみ。縮小した JPEG の data URL） */
+const BG_KEY = "cst-timetable:photo";
+
+export function loadPhoto(): string | null {
+  try {
+    const v = localStorage.getItem(BG_KEY);
+    return v && v.startsWith("data:image/") ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export function savePhoto(dataUrl: string | null): boolean {
+  try {
+    if (dataUrl) localStorage.setItem(BG_KEY, dataUrl);
+    else localStorage.removeItem(BG_KEY);
+    return true;
+  } catch {
+    return false; // 容量オーバーなど
+  }
+}
+
+/** Downscale a picked image to <= maxSide px and re-encode as JPEG so it fits in localStorage. */
+export async function shrinkImage(file: File, maxSide = 1600, quality = 0.8): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const k = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.naturalWidth * k);
+    c.height = Math.round(img.naturalHeight * k);
+    c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", quality);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }

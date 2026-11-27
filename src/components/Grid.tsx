@@ -4,6 +4,8 @@ import { cellKey } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import { FAMILY_VARS, type Family } from "../lib/data";
 
+const EN_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
 interface Props {
   days: number; // 5 or 6
   periods: number; // 6 or 7
@@ -23,6 +25,7 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, family, o
     rows.push(
       <div key={`h${d}`} class={`head ${todayIdx === d - 1 ? "today" : ""}`}>
         {DAYS[d - 1]}
+        <small class="en">{EN_DAYS[d - 1]}</small>
       </div>,
     );
   for (let p = 1; p <= periods; p++) {

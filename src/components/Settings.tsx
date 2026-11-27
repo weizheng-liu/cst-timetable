@@ -1,38 +1,88 @@
-import { Check, Monitor, Moon, RotateCcw, Sun, Sunset } from "lucide-preact";
+import { Check, ImagePlus, RotateCcw } from "lucide-preact";
 import { useEffect, useState } from "preact/hooks";
 import { PERIOD_TIMES, validRange, type PeriodTimes } from "../lib/periods";
 import type { Theme } from "../lib/store";
 
-const THEME_OPTIONS: { id: Theme; label: string; sub: string; icon: any; swatch: [string, string, string] }[] = [
-  { id: "system", label: "自動", sub: "端末の設定に合わせる", icon: Monitor, swatch: ["#f7f7f8", "#0e0e10", "#5b5bd6"] },
-  { id: "light", label: "ライト", sub: "白地・ニュートラル", icon: Sun, swatch: ["#f7f7f8", "#ffffff", "#5b5bd6"] },
-  { id: "dark", label: "ダーク", sub: "夜・暗い場所で", icon: Moon, swatch: ["#0e0e10", "#17171a", "#8b8bf0"] },
-  { id: "sepia", label: "セピア", sub: "目にやさしい紙色・青色光少なめ", icon: Sunset, swatch: ["#f3ecdc", "#faf5ea", "#a2683a"] },
+type ThemeOpt = { id: Theme; label: string; sub: string };
+const SIMPLE: ThemeOpt[] = [
+  { id: "system", label: "自動", sub: "端末の設定に合わせる" },
+  { id: "light", label: "ライト", sub: "白地・ニュートラル" },
+  { id: "dark", label: "ダーク", sub: "夜・暗い場所で" },
+  { id: "sepia", label: "セピア", sub: "目にやさしい紙色・青色光少なめ" },
+];
+const ART: ThemeOpt[] = [
+  { id: "blueprint", label: "設計図", sub: "青焼きの製図用紙・方眼・寸法線" },
+  { id: "scope", label: "オシロスコープ", sub: "黒緑の目盛り・蛍光グリーンの波形" },
+  { id: "photo", label: "写真", sub: "好きな写真を背景に（端末内のみ保存）" },
 ];
 
-export function ThemePicker({ value, onChange }: { value: Theme; onChange: (t: Theme) => void }) {
+interface ThemeProps {
+  value: Theme;
+  onChange: (t: Theme) => void;
+  hasPhoto: boolean;
+  onPhoto: (f: File | null) => void;
+  dim: number;
+  onDim: (v: number) => void;
+}
+
+export function ThemePicker({ value, onChange, hasPhoto, onPhoto, dim, onDim }: ThemeProps) {
+  const opt = (o: ThemeOpt) => (
+    <button key={o.id} role="radio" aria-checked={value === o.id} class="theme-opt" onClick={() => onChange(o.id)}>
+      <span class={`swatch sw-${o.id}`} aria-hidden="true">
+        <span>
+          <i />
+          <b />
+        </span>
+      </span>
+      <span class="theme-text">
+        <span class="row-title">{o.label}</span>
+        <span class="row-sub">{o.sub}</span>
+      </span>
+      {value === o.id && <Check size={16} class="theme-check" />}
+    </button>
+  );
   return (
-    <div class="theme-grid" role="radiogroup" aria-label="テーマ">
-      {THEME_OPTIONS.map((o) => (
-        <button key={o.id} role="radio" aria-checked={value === o.id} class="theme-opt" onClick={() => onChange(o.id)}>
-          <span class="swatch" aria-hidden="true">
-            {o.id === "system" ? (
-              <span style={{ background: `linear-gradient(135deg, ${o.swatch[0]} 50%, ${o.swatch[1]} 50%)` }} />
-            ) : (
-              <span style={{ background: o.swatch[0] }}>
-                <i style={{ background: o.swatch[1] }} />
-                <b style={{ background: o.swatch[2] }} />
-              </span>
-            )}
-          </span>
-          <span class="theme-text">
-            <span class="row-title">{o.label}</span>
-            <span class="row-sub">{o.sub}</span>
-          </span>
-          {value === o.id && <Check size={16} class="theme-check" />}
-        </button>
-      ))}
-    </div>
+    <>
+      <div class="section-label" style={{ marginTop: 0 }}>シンプル</div>
+      <div class="theme-grid" role="radiogroup" aria-label="シンプルなテーマ">
+        {SIMPLE.map(opt)}
+      </div>
+      <div class="section-label">理工系アート</div>
+      <div class="theme-grid" role="radiogroup" aria-label="アートテーマ">
+        {ART.map(opt)}
+      </div>
+      {value === "photo" && (
+        <div class="photo-tools">
+          <label class="btn ghost block">
+            <ImagePlus size={16} />
+            {hasPhoto ? "写真を変更" : "写真を選ぶ"}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const f = (e.target as HTMLInputElement).files?.[0];
+                if (f) onPhoto(f);
+                (e.target as HTMLInputElement).value = "";
+              }}
+            />
+          </label>
+          {hasPhoto && (
+            <button class="btn ghost block" onClick={() => onPhoto(null)}>
+              <RotateCcw size={16} />
+              既定の背景に戻す
+            </button>
+          )}
+          <label class="dim">
+            <span class="small muted">背景の暗さ</span>
+            <input type="range" min={0.3} max={0.85} step={0.05} value={dim} onInput={(e) => onDim(Number((e.target as HTMLInputElement).value))} aria-label="背景の暗さ" />
+          </label>
+          <p class="small faint" style={{ margin: 0 }}>
+            写真はこの端末のブラウザにだけ保存され、どこにも送信されません。文字が読みにくいときは暗さを上げてください。
+          </p>
+        </div>
+      )}
+    </>
   );
 }
 

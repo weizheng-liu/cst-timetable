@@ -149,6 +149,7 @@ input, select { font: inherit; color: inherit; }
   gap: 5px;
 }
 .grid .head { text-align: center; font-size: var(--fs-1); color: var(--text-2); padding: 2px 0 4px; font-weight: 500; }
+.grid .head .en { display: none; }
 .grid .head.today { color: var(--accent-text); font-weight: 600; }
 .grid .head.today::after { content: ""; display: block; width: 4px; height: 4px; border-radius: 2px; background: var(--accent); margin: 3px auto 0; }
 .grid .period { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 8px; font-size: var(--fs-1); color: var(--text-3); line-height: 1.25; border-radius: 8px; transition: background 0.18s var(--ease); }
@@ -214,7 +215,7 @@ input, select { font: inherit; color: inherit; }
 .sheet {
   position: fixed; z-index: 41; left: 0; right: 0; bottom: 0;
   max-height: min(88dvh, 760px);
-  background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: var(--shadow-sheet);
+  background: var(--sheet-bg, var(--surface)); border-radius: 18px 18px 0 0; box-shadow: var(--shadow-sheet);
   transform: translateY(100%); transition: transform 0.24s var(--ease);
   display: flex; flex-direction: column;
   padding-bottom: env(safe-area-inset-bottom);
@@ -357,3 +358,218 @@ footer.foot a { color: var(--text-2); }
 
 .wide-only { display: none; }
 @media (min-width: 760px) { .wide-only { display: inline; } .narrow-only { display: none; } }
+
+/* ================================================================== 理工系アートテーマ
+   どれも「背景を替えただけ」にならないよう、背景・セル・数字・装飾をまとめて設計している。
+   文字サイズは 4 段階のまま、操作部は 44px 以上、動きは追加しない。 */
+
+.deco-title, .deco-scope { display: none; }
+.photo-tools { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.photo-tools .dim { display: flex; flex-direction: column; gap: 4px; }
+.photo-tools input[type="range"] { width: 100%; height: 44px; accent-color: var(--accent); }
+label.btn { cursor: pointer; }
+
+/* swatches in the picker */
+.theme-opt .swatch > span { background: #f7f7f8; }
+.sw-system > span { background: linear-gradient(135deg, #f7f7f8 50%, #0e0e10 50%) !important; }
+.sw-system i, .sw-system b { display: none; }
+.sw-light i { background: #fff; } .sw-light b { background: #5b5bd6; }
+.sw-dark > span { background: #0e0e10 !important; } .sw-dark i { background: #17171a; } .sw-dark b { background: #8b8bf0; }
+.sw-sepia > span { background: #f3ecdc !important; } .sw-sepia i { background: #faf5ea; } .sw-sepia b { background: #a2683a; }
+.sw-blueprint > span { background-color: #0d2b4e !important; background-image: linear-gradient(rgba(170,210,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(170,210,255,.35) 1px, transparent 1px) !important; background-size: 6px 6px !important; }
+.sw-blueprint i { background: transparent; border: 1px solid #cfe6ff; border-bottom: 0; } .sw-blueprint b { background: #7fd3ff; }
+.sw-scope > span { background: radial-gradient(circle at 50% 40%, #0d2318, #040a07) !important; }
+.sw-scope i { background: transparent; border-top: 1px dashed rgba(61,255,160,.4); }
+.sw-scope b { width: 26px !important; height: 2px !important; top: 16px !important; left: 7px !important; background: #3dffa0; box-shadow: 0 0 6px #3dffa0; }
+.sw-photo > span { background: linear-gradient(160deg, #1d2b64 0%, #6a3d8f 45%, #f0a35e 100%) !important; }
+.sw-photo i { background: rgba(255,255,255,.18); backdrop-filter: blur(2px); } .sw-photo b { background: #fff; }
+
+/* ------------------------------------------------ 設計図 (blueprint) */
+:root[data-theme="blueprint"] {
+  --bg: #0d2b4e;
+  --surface: rgba(220, 235, 255, 0.07);
+  --surface-2: rgba(220, 235, 255, 0.1);
+  --sheet-bg: #0f3158;
+  --line: rgba(190, 220, 255, 0.2);
+  --line-strong: rgba(190, 220, 255, 0.36);
+  --text: #eaf3ff;
+  --text-2: #a7c3e6;
+  --text-3: #7695bd;
+  --accent: #7fd3ff;
+  --accent-soft: rgba(127, 211, 255, 0.14);
+  --accent-text: #9fe0ff;
+  --coral: #ff9478;
+  --coral-soft: rgba(255, 148, 120, 0.16);
+  --coral-text: #ffb19c;
+  --amber-soft: rgba(255, 210, 120, 0.14);
+  --amber-text: #ffd889;
+  --c-major: rgba(127, 211, 255, 0.1);  --c-major-bar: #7fd3ff;
+  --c-basic: rgba(160, 240, 200, 0.09); --c-basic-bar: #a6f0c6;
+  --c-liberal: rgba(255, 214, 140, 0.09); --c-liberal-bar: #ffd68c;
+  --c-other: rgba(200, 215, 235, 0.07); --c-other-bar: #b9c9df;
+  --shadow-card: none;
+  --shadow-sheet: 0 -8px 40px rgba(0, 10, 30, 0.5);
+  --shadow-dock: 0 6px 24px rgba(0, 10, 30, 0.45);
+  --font-num: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+:root[data-theme="blueprint"] body { background-color: var(--bg); }
+/* 背景は固定レイヤーに描く（iOS Safari は background-attachment: fixed に対応していないため） */
+:root[data-theme="blueprint"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  /* 製図用紙: 16px の細目と 80px の太目の方眼 + 中央が少し明るい青焼きのムラ */
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(80, 140, 210, 0.22), transparent 70%),
+    linear-gradient(rgba(170, 210, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 210, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(170, 210, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 210, 255, 0.045) 1px, transparent 1px);
+  background-size: 100% 100%, 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+}
+:root[data-theme="blueprint"] .brand { font-family: var(--font-num); letter-spacing: 0.06em; }
+:root[data-theme="blueprint"] .grid .head .en,
+:root[data-theme="scope"] .grid .head .en { display: block; font-family: var(--font-num); font-size: var(--fs-1); letter-spacing: 0.12em; color: var(--text-3); line-height: 1.2; }
+:root[data-theme="blueprint"] .grid .head.today::after { width: 100%; height: 1px; border-radius: 0; }
+:root[data-theme="blueprint"] .cell { border-radius: 4px; border: 1px dashed var(--line); background: transparent; }
+:root[data-theme="blueprint"] .cell.has-offer { border-style: solid; background: rgba(200, 225, 255, 0.04); }
+:root[data-theme="blueprint"] .cell.filled { background: rgba(13, 43, 78, 0.6); border: 1.5px solid var(--bar); box-shadow: none; }
+:root[data-theme="blueprint"] .cell.filled::before { display: none; }
+/* 製図のトンボ（四隅の目印） */
+:root[data-theme="blueprint"] .cell.filled::after {
+  content: ""; position: absolute; inset: 3px; pointer-events: none;
+  background:
+    linear-gradient(var(--bar), var(--bar)) left top / 7px 1px no-repeat,
+    linear-gradient(var(--bar), var(--bar)) left top / 1px 7px no-repeat,
+    linear-gradient(var(--bar), var(--bar)) right bottom / 7px 1px no-repeat,
+    linear-gradient(var(--bar), var(--bar)) right bottom / 1px 7px no-repeat;
+  opacity: 0.8;
+}
+:root[data-theme="blueprint"] .cell.cont-up { border-top-style: dashed; }
+:root[data-theme="blueprint"] .cell.cont-down { border-bottom-style: dashed; }
+:root[data-theme="blueprint"] .cell.conflict { border-color: var(--coral); background: repeating-linear-gradient(-45deg, rgba(255, 148, 120, 0.14) 0 4px, transparent 4px 9px); }
+:root[data-theme="blueprint"] .grid .period { border-right: 1px solid var(--line); border-radius: 0; }
+:root[data-theme="blueprint"] .segmented { background: transparent; border: 1px solid var(--line-strong); border-radius: 6px; }
+:root[data-theme="blueprint"] .segmented button { border-radius: 4px; }
+:root[data-theme="blueprint"] .segmented button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent); }
+:root[data-theme="blueprint"] .deco-title {
+  display: grid; grid-template-columns: 2fr repeat(4, 1fr); margin-top: 20px;
+  border: 1.5px solid var(--line-strong); font-family: var(--font-num);
+}
+:root[data-theme="blueprint"] .tb-cell { padding: 6px 8px; border-left: 1px solid var(--line); min-width: 0; }
+:root[data-theme="blueprint"] .tb-cell:first-child { border-left: 0; }
+:root[data-theme="blueprint"] .tb-cell span { display: block; font-size: var(--fs-1); color: var(--text-3); letter-spacing: 0.1em; }
+:root[data-theme="blueprint"] .tb-cell b { display: block; font-size: var(--fs-1); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 520px) {
+  :root[data-theme="blueprint"] .deco-title { grid-template-columns: 1fr 1fr; }
+  :root[data-theme="blueprint"] .tb-wide { grid-column: 1 / -1; border-bottom: 1px solid var(--line); }
+  :root[data-theme="blueprint"] .tb-cell:nth-child(2n) { border-left: 0; }
+  :root[data-theme="blueprint"] .tb-cell:nth-child(n + 2) { border-top: 1px solid var(--line); }
+}
+
+/* ------------------------------------------------ オシロスコープ (scope) */
+:root[data-theme="scope"] {
+  --bg: #050d09;
+  --surface: rgba(20, 48, 34, 0.55);
+  --surface-2: rgba(61, 255, 160, 0.07);
+  --sheet-bg: #08150f;
+  --line: rgba(61, 255, 160, 0.13);
+  --line-strong: rgba(61, 255, 160, 0.26);
+  --text: #dcfbe9;
+  --text-2: #8fcfab;
+  --text-3: #5a8f72;
+  --accent: #3dffa0;
+  --accent-soft: rgba(61, 255, 160, 0.12);
+  --accent-text: #6effb8;
+  --coral: #ff6b57;
+  --coral-soft: rgba(255, 107, 87, 0.15);
+  --coral-text: #ff8b7a;
+  --amber-soft: rgba(255, 207, 90, 0.13);
+  --amber-text: #ffd76e;
+  --c-major: rgba(61, 255, 160, 0.09);  --c-major-bar: #3dffa0;
+  --c-basic: rgba(95, 212, 255, 0.09);  --c-basic-bar: #5fd4ff;
+  --c-liberal: rgba(255, 207, 90, 0.08); --c-liberal-bar: #ffcf5a;
+  --c-other: rgba(150, 190, 170, 0.07); --c-other-bar: #8fb3a0;
+  --shadow-card: none;
+  --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.6);
+  --shadow-dock: 0 6px 24px rgba(0, 0, 0, 0.6);
+  --font-num: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+:root[data-theme="scope"] body { background-color: var(--bg); }
+/* 背景は固定レイヤーに描く（iOS Safari は background-attachment: fixed に対応していないため） */
+:root[data-theme="scope"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  /* ブラウン管の目盛り（10 div）と周辺減光 */
+  background-image:
+    radial-gradient(ellipse at 50% 35%, rgba(40, 110, 75, 0.25), transparent 65%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%),
+    linear-gradient(rgba(61, 255, 160, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61, 255, 160, 0.07) 1px, transparent 1px),
+    radial-gradient(circle, rgba(61, 255, 160, 0.16) 1px, transparent 1.5px);
+  background-size: 100% 100%, 100% 100%, 96px 96px, 96px 96px, 19.2px 19.2px;
+}
+:root[data-theme="scope"] .brand { font-family: var(--font-num); letter-spacing: 0.04em; color: var(--accent-text); text-shadow: 0 0 10px rgba(61, 255, 160, 0.35); }
+:root[data-theme="scope"] .deco-scope { display: block; margin: -4px 0 12px; }
+:root[data-theme="scope"] .deco-scope svg { display: block; width: 100%; height: 28px; overflow: visible; }
+:root[data-theme="scope"] .deco-scope path { fill: none; stroke: var(--accent); stroke-width: 1.4; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 3px rgba(61, 255, 160, 0.8)); opacity: 0.85; }
+:root[data-theme="scope"] .readout { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-size: var(--fs-1); color: var(--text-2); letter-spacing: 0.04em; }
+:root[data-theme="scope"] .readout .warn { color: var(--coral-text); }
+:root[data-theme="scope"] .cell { border-radius: 6px; border-color: var(--line); background: rgba(4, 14, 9, 0.4); }
+:root[data-theme="scope"] .cell.has-offer { background: rgba(20, 48, 34, 0.35); }
+:root[data-theme="scope"] .cell.filled { background: rgba(8, 22, 15, 0.85); border-color: color-mix(in srgb, var(--bar) 55%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--bar) 15%, transparent), 0 0 14px color-mix(in srgb, var(--bar) 18%, transparent); }
+:root[data-theme="scope"] .cell.filled::before { width: 2px; box-shadow: 0 0 6px var(--bar); }
+:root[data-theme="scope"] .cell .name { text-shadow: 0 0 8px rgba(61, 255, 160, 0.18); }
+:root[data-theme="scope"] .cell.conflict { box-shadow: 0 0 0 1px rgba(255, 107, 87, 0.5), 0 0 16px rgba(255, 107, 87, 0.25); }
+:root[data-theme="scope"] .grid .period b { color: var(--accent-text); }
+:root[data-theme="scope"] .segmented { background: rgba(61, 255, 160, 0.06); border: 1px solid var(--line); }
+:root[data-theme="scope"] .segmented button[aria-pressed="true"] { background: rgba(61, 255, 160, 0.14); color: var(--accent-text); box-shadow: 0 0 10px rgba(61, 255, 160, 0.2); }
+:root[data-theme="scope"] .meter i { box-shadow: 0 0 8px currentColor; }
+
+/* ------------------------------------------------ 写真 (photo) */
+:root[data-theme="photo"] {
+  --bg: #0b0d12;
+  --surface: rgba(18, 20, 28, 0.5);
+  --surface-2: rgba(255, 255, 255, 0.1);
+  --sheet-bg: rgba(16, 18, 26, 0.88);
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --text: #ffffff;
+  --text-2: rgba(255, 255, 255, 0.78);
+  --text-3: rgba(255, 255, 255, 0.55);
+  --accent: #9db4ff;
+  --accent-soft: rgba(157, 180, 255, 0.18);
+  --accent-text: #c3d1ff;
+  --coral: #ff8f7a;
+  --coral-soft: rgba(255, 120, 100, 0.25);
+  --coral-text: #ffc0b3;
+  --amber-soft: rgba(255, 200, 100, 0.22);
+  --amber-text: #ffdf9c;
+  --c-major: rgba(157, 180, 255, 0.16);  --c-major-bar: #9db4ff;
+  --c-basic: rgba(140, 230, 190, 0.14);  --c-basic-bar: #8ce6be;
+  --c-liberal: rgba(255, 205, 140, 0.14); --c-liberal-bar: #ffcd8c;
+  --c-other: rgba(255, 255, 255, 0.08);  --c-other-bar: rgba(255, 255, 255, 0.6);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.25);
+  --shadow-sheet: 0 -8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-dock: 0 8px 30px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+:root[data-theme="photo"] body { background-color: var(--bg); }
+/* 背景は固定レイヤーに描く（iOS Safari は background-attachment: fixed に対応していないため） */
+:root[data-theme="photo"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  /* 写真がないときの既定: 夜明け前の空のようなグラデーション + 細かいノイズ */
+  background-image:
+    linear-gradient(rgba(6, 8, 14, var(--photo-dim, 0.55)), rgba(6, 8, 14, calc(var(--photo-dim, 0.55) + 0.12))),
+    var(--photo, radial-gradient(ellipse at 20% 10%, #3c4fa8 0%, transparent 55%), radial-gradient(ellipse at 85% 30%, #8a4ea0 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, #e0874f 0%, transparent 60%), linear-gradient(#141a3a, #2b1d3f));
+  background-size: cover;
+  background-position: center;
+}
+:root[data-theme="photo"] .cell,
+:root[data-theme="photo"] .segmented,
+:root[data-theme="photo"] .banner { backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); }
+:root[data-theme="photo"] .cell { background: rgba(14, 16, 24, 0.28); border-color: rgba(255, 255, 255, 0.1); }
+:root[data-theme="photo"] .cell.has-offer { background: rgba(255, 255, 255, 0.08); }
+:root[data-theme="photo"] .cell.filled { background: rgba(14, 16, 24, 0.55); }
+:root[data-theme="photo"] .cell .name, :root[data-theme="photo"] .brand, :root[data-theme="photo"] .grid .head, :root[data-theme="photo"] .grid .period { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45); }
+:root[data-theme="photo"] .sheet { backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%); }
+:root[data-theme="photo"] .row, :root[data-theme="photo"] .theme-opt { background: rgba(255, 255, 255, 0.05); }

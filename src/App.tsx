@@ -13,7 +13,7 @@ import { normName, reqIndex } from "./lib/credits";
 import { buildIcs } from "./lib/ics";
 import { DAYS, resolveTimes } from "./lib/periods";
 import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } from "./lib/schedule";
-import { download, exportJson, sanitize, usePersistentState, type Theme } from "./lib/store";
+import { download, exportJson, loadPhoto, sanitize, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
 type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" };
@@ -41,7 +41,8 @@ export function App() {
     }, (e) => setError(String(e)));
   }, []);
 
-  useTheme(st.theme);
+  const [photo, setPhoto] = useState<string | null>(loadPhoto);
+  useTheme(st.theme, photo, st.photoDim);
   const times = useMemo(() => resolveTimes(st.periodTimes), [st.periodTimes]);
 
   const profile = st.profile;
@@ -136,6 +137,19 @@ export function App() {
         </button>
       </header>
 
+      <div class="deco-scope" aria-hidden="true">
+        <svg viewBox="0 0 400 40" preserveAspectRatio="none">
+          <path d="M0 20 Q 12.5 2 25 20 T 50 20 T 75 20 T 100 20 T 125 20 T 150 20 T 175 20 T 200 20 T 225 20 T 250 20 T 275 20 T 300 20 T 325 20 T 350 20 T 375 20 T 400 20" />
+        </svg>
+        <div class="readout num">
+          <span>CH1 {termCredits}単位</span>
+          <span>CH2 {selected.filter((c) => inTerm(c, view)).length}科目</span>
+          <span>100min/div</span>
+          <span class={termConflicts.length ? "warn" : ""}>{termConflicts.length ? `TRIG ERR ×${groupConflicts(termConflicts).length}` : "TRIG OK"}</span>
+        </div>
+      </div>
+
+
       <div class="toolbar">
         <div class="segmented" role="group" aria-label="学期">
           {(["前期", "後期"] as const).map((t) => (
@@ -174,6 +188,29 @@ export function App() {
         （{index ? new Date(index.generatedAt).toLocaleDateString("ja-JP") : "—"} 取得）
       </footer>
 
+      {/* アートテーマ用の装飾（設計図の表題欄 / オシロの測定値表示）。シンプルなテーマでは非表示 */}
+      <div class="deco-title" aria-hidden="true">
+        <div class="tb-cell tb-wide">
+          <span>TITLE</span>
+          <b>{deptName || "—"} 時間割</b>
+        </div>
+        <div class="tb-cell">
+          <span>DWG NO.</span>
+          <b class="num">CST-{index?.year ?? ""}-{profile?.dept ?? ""}{view === "前期" ? "A" : "B"}</b>
+        </div>
+        <div class="tb-cell">
+          <span>GRADE</span>
+          <b class="num">{profile?.grade ?? "-"}</b>
+        </div>
+        <div class="tb-cell">
+          <span>LOAD</span>
+          <b class="num">{termCredits} cr</b>
+        </div>
+        <div class="tb-cell">
+          <span>SCALE</span>
+          <b class="num">1 : 1</b>
+        </div>
+      </div>
       <nav class="dock" aria-label="メニュー">
         <button onClick={() => push({ kind: "credits" })}>
           <GraduationCap size={20} />
@@ -299,7 +336,29 @@ export function App() {
       case "times":
         return <PeriodEditor periods={maxPeriod} times={times} custom={st.periodTimes} onChange={(pt) => setSt((s) => ({ ...s, periodTimes: pt }))} />;
       case "theme":
-        return <ThemePicker value={st.theme} onChange={(t) => setSt((s) => ({ ...s, theme: t }))} />;
+        return (
+          <ThemePicker
+            value={st.theme}
+            onChange={(t) => setSt((s) => ({ ...s, theme: t }))}
+            hasPhoto={!!photo}
+            onPhoto={async (f) => {
+              if (!f) {
+                savePhoto(null);
+                setPhoto(null);
+                return;
+              }
+              try {
+                const url = await shrinkImage(f);
+                if (!savePhoto(url)) say("写真が大きすぎて保存できませんでした（この表示中のみ反映）");
+                setPhoto(url);
+              } catch {
+                say("この画像は読み込めませんでした");
+              }
+            }}
+            dim={st.photoDim}
+            onDim={(v) => setSt((s) => ({ ...s, photoDim: v }))}
+          />
+        );
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
@@ -338,11 +397,25 @@ export function App() {
   }
 }
 
-const THEME_LABEL: Record<Theme, string> = { system: "自動（端末の設定）", light: "ライト", dark: "ダーク", sepia: "セピア（目にやさしい）" };
-const THEME_COLOR: Record<string, string> = { light: "#f7f7f8", dark: "#0e0e10", sepia: "#f3ecdc" };
+const THEME_LABEL: Record<Theme, string> = {
+  system: "自動（端末の設定）",
+  light: "ライト",
+  dark: "ダーク",
+  sepia: "セピア（目にやさしい）",
+  blueprint: "設計図",
+  scope: "オシロスコープ",
+  photo: "写真",
+};
+const THEME_COLOR: Record<string, string> = { light: "#f7f7f8", dark: "#0e0e10", sepia: "#f3ecdc", blueprint: "#0d2b4e", scope: "#050d09", photo: "#0b0d12" };
 
 /** Resolve the theme (following the OS for "system") and put it on <html data-theme>. */
-function useTheme(theme: Theme) {
+function useTheme(theme: Theme, photo: string | null, dim: number) {
+  useEffect(() => {
+    const st = document.documentElement.style;
+    if (theme === "photo" && photo) st.setProperty("--photo", `url("${photo}")`);
+    else st.removeProperty("--photo");
+    st.setProperty("--photo-dim", String(dim));
+  }, [theme, photo, dim]);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
