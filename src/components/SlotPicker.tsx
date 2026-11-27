@@ -19,6 +19,7 @@ interface Props {
 export function SlotPicker({ offered, selected, grade, statusOf, reqOf, onToggle, onOpen }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [allGrades, setAllGrades] = useState(false);
+  const [cert, setCert] = useState(false);
   const selectedIds = new Set(selected.map((c) => c.id));
 
   const here = offered.filter((c) => selectedIds.has(c.id));
@@ -27,6 +28,7 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, onToggle
       offered
         .filter((c) => !selectedIds.has(c.id))
         .filter((c) => allGrades || statusOf(c) !== "otherGrade")
+        .filter((c) => cert || statusOf(c) !== "cert")
         .filter((c) => tags.every((t) => c.evaluation.tags.includes(t)))
         .sort(
           (a, b) =>
@@ -36,8 +38,9 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, onToggle
             (a.grade ?? 9) - (b.grade ?? 9) ||
             a.name.localeCompare(b.name, "ja"),
         ),
-    [offered, selected, tags, allGrades, grade],
+    [offered, selected, tags, allGrades, cert, grade],
   );
+  const certCount = offered.filter((c) => !selectedIds.has(c.id) && statusOf(c) === "cert").length;
   const hiddenOtherGrades = offered.filter((c) => !selectedIds.has(c.id) && statusOf(c) === "otherGrade").length;
 
   const toggleTag = (id: string) => setTags((t) => (t.includes(id) ? t.filter((x) => x !== id) : [...t, id]));
@@ -64,6 +67,11 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, onToggle
         <button class="chip" aria-pressed={allGrades} onClick={() => setAllGrades((v) => !v)}>
           他学年も表示
         </button>
+        {certCount > 0 && (
+          <button class="chip" aria-pressed={cert} onClick={() => setCert((v) => !v)}>
+            教職・学芸員 {certCount}
+          </button>
+        )}
       </div>
 
       <div class="list">
@@ -111,7 +119,7 @@ function Row({ c, on, req, clash, onToggle, onOpen, showGrade, status }: { c: Co
         </div>
         <div class="row-tags">
           {req?.required && <span class="tag req">必修</span>}
-          {c.eligibility && <span class="tag">共通・教養</span>}
+          {c.eligibility && <span class="tag">{status === "cert" ? "資格課程" : "共通・教養"}</span>}
           {status === "maybe" && <span class="tag amber">履修条件 要確認</span>}
           {c.notes.includes("再") && <span class="tag">再履修</span>}
           {c.classFormat === "オンライン" && <span class="tag">オンライン</span>}

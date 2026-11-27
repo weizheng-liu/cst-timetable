@@ -170,6 +170,7 @@ describe("eligibility of common courses", () => {
   it("puts other 配当年次 behind the 他学年 toggle and flags unknown text", () => {
     expect(eligibleFor(g("open", [{ minGrade: null, maxGrade: null, depts: null }]), "09", 2, "船橋")).toBe("otherGrade");
     expect(eligibleFor(g("unknown", []), "09", 1, "船橋")).toBe("maybe");
+    expect(eligibleFor(g("open", [{ minGrade: null, maxGrade: null, depts: null }], { name: "教）教育原論" }), "09", 1, "船橋")).toBe("cert");
   });
 });
 
