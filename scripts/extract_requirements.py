@@ -50,17 +50,25 @@ def decode_cid(s: str) -> str:
 
 # ------------------------------------------------------------------ locate pages
 
+def side_tab(page) -> str:
+    """Text of the vertical index tab printed in the page margin, e.g. '電子工学科卒業条件等'."""
+    cs = [c for c in page.chars if c["x0"] < 40 or c["x1"] > page.width - 40]
+    cs.sort(key=lambda c: (round(c["x0"] / 10), c["top"]))
+    return "".join(c["text"] for c in cs).replace(" ", "")
+
+
 def find_pages(pdf, dept_name: str) -> tuple[int, int]:
-    """Return 0-based indexes of the 卒業条件等 page and the 授業科目配置表 page."""
+    """Return 0-based indexes of the 卒業条件等 page and the 授業科目配置表 page (found via the margin tab)."""
     cond = table = None
     for i, page in enumerate(pdf.pages):
-        t = re.sub(r"\s+", "", page.extract_text() or "")
-        if dept_name not in t and not all(ch in t for ch in dept_name):
+        tab = side_tab(page)
+        if not tab.startswith(dept_name):
             continue
-        if cond is None and "卒業研究着手条件" in t and "卒業条件" in t:
+        if cond is None and "卒業条件" in tab:
             cond = i
-        elif cond is not None and table is None and i == cond + 1:
+        elif table is None and "授業科目配置表" in tab:
             table = i
+        if cond is not None and table is not None:
             break
     if cond is None or table is None:
         raise SystemExit(f"could not find requirement pages for {dept_name}")
