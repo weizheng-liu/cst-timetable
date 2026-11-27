@@ -1,5 +1,5 @@
 import { AlertTriangle } from "lucide-preact";
-import { DAYS, PERIOD_TIMES } from "../lib/periods";
+import { DAYS, type PeriodTimes } from "../lib/periods";
 import { cellKey } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import { FAMILY_VARS, type Family } from "../lib/data";
@@ -7,13 +7,15 @@ import { FAMILY_VARS, type Family } from "../lib/data";
 interface Props {
   days: number; // 5 or 6
   periods: number; // 6 or 7
+  times: PeriodTimes;
+  onPeriod: (period: number) => void;
   cells: Map<string, Course[]>; // selected courses by cell (current term)
   offered: Set<string>; // cells where at least one course is offered
   family: (c: Course) => Family;
   onCell: (day: number, period: number) => void;
 }
 
-export function Grid({ days, periods, cells, offered, family, onCell }: Props) {
+export function Grid({ days, periods, times, onPeriod, cells, offered, family, onCell }: Props) {
   const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
   const rows = [];
   rows.push(<div key="corner" />);
@@ -25,10 +27,11 @@ export function Grid({ days, periods, cells, offered, family, onCell }: Props) {
     );
   for (let p = 1; p <= periods; p++) {
     rows.push(
-      <div key={`p${p}`} class="period">
+      <button key={`p${p}`} class="period" aria-label={`${p}限 ${times[p]?.[0]}〜${times[p]?.[1]}（授業時間を編集）`} onClick={() => onPeriod(p)}>
         <b>{p}</b>
-        <span>{PERIOD_TIMES[p]?.[0]}</span>
-      </div>,
+        <span class="t">{times[p]?.[0]}</span>
+        <span class="t end">{times[p]?.[1]}</span>
+      </button>,
     );
     for (let d = 1; d <= days; d++) {
       const cs = cells.get(cellKey(d, p)) ?? [];

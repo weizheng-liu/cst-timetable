@@ -3,6 +3,8 @@ import { buildCells, clashesWith, findConflicts } from "./schedule";
 import { progress } from "./credits";
 import { buildIcs } from "./ics";
 import { sanitize } from "./store";
+import { resolveTimes } from "./periods";
+import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
@@ -109,6 +111,30 @@ describe("ics", () => {
   it("uses CRLF and folds long lines", () => {
     expect(r.text.includes("\r\n")).toBe(true);
     for (const line of r.text.split("\r\n")) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
+  });
+});
+
+describe("custom period times", () => {
+  it("are used for .ics and validated on import", () => {
+    const c = mk("J1", "テスト", "前期", [[5, 1]], { sessions: [{ no: 1, kind: "regular", date: "2026-04-17", mode: "face", content: "x" }] });
+    const r = buildIcs([c], new Date("2026-03-01T00:00:00Z"), resolveTimes({ "1": ["08:50", "10:30"], "2": ["11:00", "10:00"] }));
+    expect(r.text).toContain("DTSTART;TZID=Asia/Tokyo:20260417T085000");
+    expect(r.text).toContain("DTEND;TZID=Asia/Tokyo:20260417T103000");
+    expect(resolveTimes({ "2": ["11:00", "10:00"] })[2]).toEqual(["10:50", "12:30"]);
+    const s = sanitize({ periodTimes: { "1": ["08:50", "10:30"], "2": ["25:00", "26:00"], x: ["01:00", "02:00"] }, theme: "sepia" });
+    expect(s.periodTimes).toEqual({ "1": ["08:50", "10:30"] });
+    expect(s.theme).toBe("sepia");
+    expect(sanitize({ theme: "neon" }).theme).toBe("system");
+  });
+});
+
+describe("time input", () => {
+  it("normalises loose input to HH:MM", () => {
+    expect(normalizeTime("920")).toBe("09:20");
+    expect(normalizeTime("13:20")).toBe("13:20");
+    expect(normalizeTime("1320")).toBe("13:20");
+    expect(normalizeTime("25:00")).toBeNull();
+    expect(normalizeTime("abc")).toBeNull();
   });
 });
 

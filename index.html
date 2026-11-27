@@ -8,6 +8,16 @@
     <meta name="description" content="日本大学理工学部の公開シラバスをもとにした非公式の履修計画ツール" />
     <title>理工 時間割プランナー</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b5bd6'/%3E%3Cpath d='M9 10h6v6H9zM17 10h6v6h-6zM9 18h6v6H9z' fill='white'/%3E%3C/svg%3E" />
+    <script>
+      // 初回描画の前にテーマを決めてチラつきを防ぐ（保存先は localStorage のみ）
+      try {
+        var t = (JSON.parse(localStorage.getItem("cst-timetable:v1") || "{}") || {}).theme || "system";
+        if (t === "system") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        document.documentElement.dataset.theme = "light";
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />

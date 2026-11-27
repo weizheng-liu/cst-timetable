@@ -9,6 +9,24 @@ export const PERIOD_TIMES: Record<number, [string, string]> = {
   7: ["20:40", "22:20"], // 公式表に記載なし。データに7限が現れた場合のみ表示 (docs/DECISIONS.md)
 };
 
+export type PeriodTimes = Record<number, [string, string]>;
+
+const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Default times merged with the user's overrides (only valid HH:MM pairs with start < end are kept). */
+export function resolveTimes(custom?: Record<string, [string, string]> | null): PeriodTimes {
+  const out: PeriodTimes = { ...PERIOD_TIMES };
+  for (const [k, v] of Object.entries(custom ?? {})) {
+    const p = Number(k);
+    if (out[p] && validRange(v)) out[p] = [v[0], v[1]];
+  }
+  return out;
+}
+
+export function validRange(v: unknown): v is [string, string] {
+  return Array.isArray(v) && v.length === 2 && HM.test(String(v[0])) && HM.test(String(v[1])) && v[0] < v[1];
+}
+
 export const DAYS = ["月", "火", "水", "木", "金", "土"] as const;
 
 export const dayLabel = (d: number) => DAYS[d - 1] ?? "?";

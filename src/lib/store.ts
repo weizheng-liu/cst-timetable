@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import type { Profile } from "./types";
+import { validRange } from "./periods";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -13,11 +14,16 @@ export interface SavedState {
   selected: string[];
   view: "前期" | "後期";
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
+  periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
+  theme: Theme;
 }
+
+export type Theme = "system" | "light" | "dark" | "sepia";
+export const THEMES: Theme[] = ["system", "light", "dark", "sepia"];
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {} });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system" });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -56,6 +62,10 @@ export function sanitize(x: any): SavedState {
   if (x.earned && typeof x.earned === "object") {
     for (const [k, v] of Object.entries(x.earned)) if (typeof v === "number" && v >= 0 && v < 400) earned[k] = v;
   }
+  const periodTimes: Record<string, [string, string]> = {};
+  if (x.periodTimes && typeof x.periodTimes === "object") {
+    for (const [k, v] of Object.entries(x.periodTimes)) if (/^[1-7]$/.test(k) && validRange(v)) periodTimes[k] = [v[0], v[1]];
+  }
   return {
     version: 1,
     profile,
@@ -63,6 +73,8 @@ export function sanitize(x: any): SavedState {
     selected: [...new Set<string>(selected)],
     view: x.view === "後期" ? "後期" : x.view === "前期" ? "前期" : base.view,
     earned,
+    periodTimes,
+    theme: THEMES.includes(x.theme) ? x.theme : "system",
   };
 }
 

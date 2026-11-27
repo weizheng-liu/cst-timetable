@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, CalendarPlus, Download, GraduationCap, MoreHorizontal, Settings2, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, CalendarPlus, Clock, Download, GraduationCap, MoreHorizontal, Palette, Settings2, Upload, RotateCcw } from "lucide-preact";
+import { PeriodEditor, ThemePicker } from "./components/Settings";
 import { Grid, GridSkeleton } from "./components/Grid";
 import { Sheet } from "./components/Sheet";
 import { SlotPicker } from "./components/SlotPicker";
@@ -9,12 +10,12 @@ import { Setup } from "./components/Setup";
 import { familyOf, loadDept, loadIndex, loadRequirements } from "./lib/data";
 import { normName, reqIndex } from "./lib/credits";
 import { buildIcs } from "./lib/ics";
-import { DAYS } from "./lib/periods";
+import { DAYS, resolveTimes } from "./lib/periods";
 import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } from "./lib/schedule";
-import { download, exportJson, sanitize, usePersistentState } from "./lib/store";
+import { download, exportJson, sanitize, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -34,6 +35,9 @@ export function App() {
   useEffect(() => {
     loadIndex().then(setIndex, (e) => setError(String(e)));
   }, []);
+
+  useTheme(st.theme);
+  const times = useMemo(() => resolveTimes(st.periodTimes), [st.periodTimes]);
 
   const profile = st.profile;
   useEffect(() => {
@@ -59,7 +63,6 @@ export function App() {
   const conflicts = useMemo(() => findConflicts(selected), [selected]);
   const termConflicts = conflicts.filter((c) => c.term === view);
   const termCredits = selected.filter((c) => inTerm(c, view)).reduce((s, c) => s + (c.credits || 0), 0);
-  const allCredits = selected.reduce((s, c) => s + (c.credits || 0), 0);
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
   const days = 6;
@@ -136,7 +139,7 @@ export function App() {
       )}
 
       {dept ? (
-        <Grid days={days} periods={maxPeriod} cells={cells} offered={offered} family={family} onCell={(d, p) => setStack([{ kind: "slot", day: d, period: p }])} />
+        <Grid days={days} periods={maxPeriod} times={times} onPeriod={() => setStack([{ kind: "times" }])} cells={cells} offered={offered} family={family} onCell={(d, p) => setStack([{ kind: "slot", day: d, period: p }])} />
       ) : (
         <GridSkeleton days={days} periods={6} />
       )}
@@ -154,7 +157,7 @@ export function App() {
       <nav class="dock" aria-label="メニュー">
         <button onClick={() => push({ kind: "credits" })}>
           <GraduationCap size={20} />
-          <span>単位 {allCredits}</span>
+          <span>単位</span>
         </button>
         <button onClick={() => exportIcs()}>
           <CalendarPlus size={20} />
@@ -201,7 +204,7 @@ export function App() {
       say("先に科目を追加してください");
       return;
     }
-    const r = buildIcs(selected);
+    const r = buildIcs(selected, new Date(), times);
     download(`cst-timetable-${index?.year ?? ""}.ics`, r.text, "text/calendar;charset=utf-8");
     say(`${r.events}件の授業を書き出しました${r.skippedCancelled ? `（休講${r.skippedCancelled}件を除外）` : ""}`);
   }
@@ -223,6 +226,10 @@ export function App() {
         return { title: "その他" };
       case "profile":
         return { title: "学科・学年" };
+      case "times":
+        return { title: "授業時間", sub: "時限ごとの開始・終了" };
+      case "theme":
+        return { title: "テーマ" };
     }
   }
 
@@ -268,9 +275,20 @@ export function App() {
             }}
           />
         ) : null;
+      case "times":
+        return <PeriodEditor periods={maxPeriod} times={times} custom={st.periodTimes} onChange={(pt) => setSt((s) => ({ ...s, periodTimes: pt }))} />;
+      case "theme":
+        return <ThemePicker value={st.theme} onChange={(t) => setSt((s) => ({ ...s, theme: t }))} />;
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
+            <MenuItem icon={<Palette size={18} />} title="テーマ" sub={THEME_LABEL[st.theme]} onClick={() => push({ kind: "theme" })} />
+            <MenuItem
+              icon={<Clock size={18} />}
+              title="授業時間を編集"
+              sub={Object.keys(st.periodTimes).length ? `${Object.keys(st.periodTimes).length}つの時限を変更中` : "標準：1限 9:00–10:40 …"}
+              onClick={() => push({ kind: "times" })}
+            />
             <MenuItem icon={<CalendarPlus size={18} />} title="カレンダーに書き出す (.ics)" sub="各回の授業を予定として出力。休講日は除外し、オンライン回は件名に表示" onClick={exportIcs} />
             <MenuItem
               icon={<Download size={18} />}
@@ -297,6 +315,25 @@ export function App() {
         );
     }
   }
+}
+
+const THEME_LABEL: Record<Theme, string> = { system: "自動（端末の設定）", light: "ライト", dark: "ダーク", sepia: "セピア（目にやさしい）" };
+const THEME_COLOR: Record<string, string> = { light: "#f7f7f8", dark: "#0e0e10", sepia: "#f3ecdc" };
+
+/** Resolve the theme (following the OS for "system") and put it on <html data-theme>. */
+function useTheme(theme: Theme) {
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () => {
+      const t = theme === "system" ? (mq.matches ? "dark" : "light") : theme;
+      document.documentElement.dataset.theme = t;
+      document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", THEME_COLOR[t]));
+    };
+    apply();
+    if (theme !== "system") return;
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, [theme]);
 }
 
 function MenuItem({ icon, title, sub, onClick }: { icon: any; title: string; sub: string; onClick: () => void }) {

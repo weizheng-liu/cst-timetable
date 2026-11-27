@@ -1,4 +1,4 @@
-import { PERIOD_TIMES } from "./periods";
+import { PERIOD_TIMES, type PeriodTimes } from "./periods";
 import type { Course, Session } from "./types";
 
 const VTIMEZONE = [
@@ -66,7 +66,7 @@ export interface IcsResult {
   coursesWithoutDates: string[];
 }
 
-export function buildIcs(courses: Course[], stamp = new Date()): IcsResult {
+export function buildIcs(courses: Course[], stamp = new Date(), times: PeriodTimes = PERIOD_TIMES): IcsResult {
   const now = stamp.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
   const lines = [
     "BEGIN:VCALENDAR",
@@ -93,7 +93,7 @@ export function buildIcs(courses: Course[], stamp = new Date()): IcsResult {
         skippedCancelled++;
         continue;
       }
-      lines.push(...eventFor(c, s, where, now));
+      lines.push(...eventFor(c, s, where, now, times));
       events++;
     }
   }
@@ -101,7 +101,7 @@ export function buildIcs(courses: Course[], stamp = new Date()): IcsResult {
   return { text: lines.map(fold).join("\r\n") + "\r\n", events, skippedCancelled, coursesWithoutDates: noDates };
 }
 
-function eventFor(c: Course, s: Session, where: string, now: string): string[] {
+function eventFor(c: Course, s: Session, where: string, now: string, times: PeriodTimes): string[] {
   const online = s.mode !== "face";
   const no = s.no ? `第${s.no}回 ` : "";
   const prefix = online ? "【オンライン】" : "";
@@ -130,8 +130,8 @@ function eventFor(c: Course, s: Session, where: string, now: string): string[] {
     } else {
       const [a, b] = range;
       head.push(
-        `DTSTART;TZID=Asia/Tokyo:${ymd(date)}T${hm(PERIOD_TIMES[a][0])}`,
-        `DTEND;TZID=Asia/Tokyo:${ymd(date)}T${hm(PERIOD_TIMES[b][1])}`,
+        `DTSTART;TZID=Asia/Tokyo:${ymd(date)}T${hm(times[a][0])}`,
+        `DTEND;TZID=Asia/Tokyo:${ymd(date)}T${hm(times[b][1])}`,
       );
     }
   }
