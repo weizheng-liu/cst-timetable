@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { AlertTriangle, CalendarPlus, Clock, Download, GraduationCap, MoreHorizontal, Palette, Settings2, Upload, RotateCcw } from "lucide-preact";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
-import { Grid, GridSkeleton } from "./components/Grid";
+import { Grid, GridSkeleton, ScopeTrace } from "./components/Grid";
 import { Sheet } from "./components/Sheet";
 import { SlotPicker } from "./components/SlotPicker";
 import { CourseDetail } from "./components/CourseDetail";
@@ -138,13 +138,10 @@ export function App() {
       </header>
 
       <div class="deco-scope" aria-hidden="true">
-        <svg viewBox="0 0 400 40" preserveAspectRatio="none">
-          <path d="M0 20 Q 12.5 2 25 20 T 50 20 T 75 20 T 100 20 T 125 20 T 150 20 T 175 20 T 200 20 T 225 20 T 250 20 T 275 20 T 300 20 T 325 20 T 350 20 T 375 20 T 400 20" />
-        </svg>
         <div class="readout num">
           <span>CH1 {termCredits}単位</span>
           <span>CH2 {selected.filter((c) => inTerm(c, view)).length}科目</span>
-          <span>100min/div</span>
+          <span>{times[1]?.[0]}–{times[maxPeriod]?.[1] ?? times[6][1]}</span>
           <span class={termConflicts.length ? "warn" : ""}>{termConflicts.length ? `TRIG ERR ×${groupConflicts(termConflicts).length}` : "TRIG OK"}</span>
         </div>
       </div>
@@ -172,6 +169,7 @@ export function App() {
         </div>
       )}
 
+      {dept && <ScopeTrace days={days} cells={cells} />}
       {dept ? (
         <Grid days={days} periods={maxPeriod} times={times} onPeriod={() => setStack([{ kind: "times" }])} cells={cells} offered={offered} family={family} onCell={(d, p) => setStack([{ kind: "slot", day: d, period: p }])} />
       ) : (

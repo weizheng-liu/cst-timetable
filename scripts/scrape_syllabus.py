@@ -101,10 +101,8 @@ def scrape(year: str, depts: list[str], grade: int | None, client: Client, detai
             members.append(jcd)
             if jcd in courses and courses[jcd]["hasDetail"]:
                 # several syllabus pages share one 時間割CD (e.g. 卒業研究 per lab): merge teachers
-                for k in e.get("kyouins") or []:
-                    name = lib.clean(k.get("kyouinMei")).replace("\u3000", " ")
-                    if name and name not in courses[jcd]["teachers"]:
-                        courses[jcd]["teachers"].append(name)
+                names = [lib.clean(k.get("kyouinMei")).replace("\u3000", " ") for k in e.get("kyouins") or []]
+                courses[jcd]["teachers"] = lib.tidy_teachers(courses[jcd]["teachers"] + names)
                 continue
             detail = None
             if details:

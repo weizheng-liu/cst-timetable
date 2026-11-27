@@ -101,3 +101,49 @@ export function GridSkeleton({ days = 6, periods = 6 }) {
     </div>
   );
 }
+
+/** sine segment with `cycles` periods and amplitude `amp` across a 100x40 box */
+export function tracePath(cycles: number, amp: number): string {
+  if (cycles <= 0) return "M0 20 L100 20";
+  const pts: string[] = [];
+  const steps = Math.max(24, cycles * 16);
+  for (let i = 0; i <= steps; i++) {
+    const x = (i / steps) * 100;
+    const y = 20 - amp * Math.sin((i / steps) * cycles * 2 * Math.PI);
+    pts.push(`${i ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`);
+  }
+  return pts.join(" ");
+}
+
+/**
+ * オシロスコープテーマ専用: 曜日ごとの「負荷波形」。振幅と周期数がその日のコマ数に比例し、
+ * 重複がある日は赤いトレースになる。列は時間割のマスと揃えてある。
+ */
+export function ScopeTrace({ days, cells }: { days: number; cells: Map<string, Course[]> }) {
+  const cols = [];
+  cols.push(
+    <div key="l" class="trace-label num">
+      LOAD
+    </div>,
+  );
+  for (let d = 1; d <= days; d++) {
+    let n = 0;
+    let err = false;
+    for (let p = 1; p <= 7; p++) {
+      const cs = cells.get(cellKey(d, p)) ?? [];
+      if (cs.length) n++;
+      if (cs.length > 1) err = true;
+    }
+    cols.push(
+      <svg key={d} class={`trace ${err ? "err" : ""} ${n ? "" : "idle"}`} viewBox="0 0 100 40" preserveAspectRatio="none">
+        <line x1="0" y1="20" x2="100" y2="20" class="axis" />
+        <path d={tracePath(n, n ? 5 + n * 2.2 : 0)} />
+      </svg>,
+    );
+  }
+  return (
+    <div class="scope-trace" style={{ "--days": days }} aria-hidden="true">
+      {cols}
+    </div>
+  );
+}

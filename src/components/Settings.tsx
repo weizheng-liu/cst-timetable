@@ -11,8 +11,8 @@ const SIMPLE: ThemeOpt[] = [
   { id: "sepia", label: "セピア", sub: "目にやさしい紙色・青色光少なめ" },
 ];
 const ART: ThemeOpt[] = [
+  { id: "scope", label: "オシロスコープ", sub: "曜日ごとの負荷を波形で表示・蛍光グリーン" },
   { id: "blueprint", label: "設計図", sub: "青焼きの製図用紙・方眼・寸法線" },
-  { id: "scope", label: "オシロスコープ", sub: "黒緑の目盛り・蛍光グリーンの波形" },
   { id: "photo", label: "写真", sub: "好きな写真を背景に（端末内のみ保存）" },
 ];
 

@@ -99,6 +99,16 @@ def grade_of(gakunen) -> int | None:
     return g if 1 <= g <= 6 else None
 
 
+def tidy_teachers(names: list[str]) -> list[str]:
+    """Drop summary labels such as 「大谷・布施 他」 when the individual names are also listed."""
+    out = []
+    for n in names:
+        if n and n not in out:
+            out.append(n)
+    real = [n for n in out if not re.search(r"他$|・", n)]
+    return real if real else out
+
+
 def parse_bikou(bikou: str) -> list[str]:
     """'{1}{未来}' -> ['1', '未来']"""
     return re.findall(r"\{([^}]*)\}", bikou or "")
@@ -226,7 +236,7 @@ def parse_evaluation(text: str, rules: dict) -> dict:
         label = re.sub(r"[()（）\[\]【】:：=＝\s]+", " ", label).strip()
         label = re.sub(r"\d+(\.\d+)?$", "", label).strip()
         pct = float(m.group(1))
-        if not label or pct > 100:
+        if not label or pct > 100 or re.fullmatch(r"(合計|総計|計|total|Total|TOTAL)", label):
             continue
         parts.append({"label": label[:40], "percent": pct, "category": categorize(label, rules)})
 
@@ -315,7 +325,7 @@ def build_course(entry: dict, detail: dict | None, year: str, rules: dict) -> di
     evaluation_text = clean(dpage.get("evaluation"))
     ev = parse_evaluation(evaluation_text, rules)
 
-    teachers = [clean(k.get("kyouinMei")).replace("　", " ") for k in (entry.get("kyouins") or [])]
+    teachers = tidy_teachers([clean(k.get("kyouinMei")).replace("　", " ") for k in (entry.get("kyouins") or [])])
 
     sessions: list[dict] = []
     by_key: dict[tuple, dict] = {}

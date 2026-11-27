@@ -190,3 +190,15 @@ def test_parse_eligibility_keeps_seimitsu_and_kaiyou_apart():
     assert depts_in("海洋建築工学科") == ["04"]
     assert depts_in("機械・建築") == ["05", "03"]
     assert depts_in("応用情報工学科・物質応用化学科") == ["15", "10"]
+
+
+def test_tidy_teachers_drops_summary_label():
+    from syllabus_lib import tidy_teachers
+    assert tidy_teachers(["大谷・布施 他", "大谷 昭仁", "布施 匡章", "大谷 昭仁"]) == ["大谷 昭仁", "布施 匡章"]
+    assert tidy_teachers(["大谷・布施 他"]) == ["大谷・布施 他"]
+
+
+def test_evaluation_ignores_total_line():
+    from syllabus_lib import load_eval_rules, parse_evaluation
+    ev = parse_evaluation("参加度 20%\n中間テスト 30%\nレポート 50%\n合計 100%", load_eval_rules())
+    assert [p["label"] for p in ev["parts"]] == ["参加度", "中間テスト", "レポート"]

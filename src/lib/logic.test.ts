@@ -5,6 +5,7 @@ import { buildIcs } from "./ics";
 import { sanitize } from "./store";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
+import { tracePath } from "../components/Grid";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 
@@ -169,5 +170,14 @@ describe("eligibility of common courses", () => {
   it("puts other 配当年次 behind the 他学年 toggle and flags unknown text", () => {
     expect(eligibleFor(g("open", [{ minGrade: null, maxGrade: null, depts: null }]), "09", 2, "船橋")).toBe("otherGrade");
     expect(eligibleFor(g("unknown", []), "09", 1, "船橋")).toBe("maybe");
+  });
+});
+
+describe("scope trace", () => {
+  it("is flat for a free day and oscillates once per class", () => {
+    expect(tracePath(0, 0)).toBe("M0 20 L100 20");
+    const ys = tracePath(2, 9).split(/[ML]/).filter(Boolean).map((p) => Number(p.trim().split(" ")[1]));
+    expect(Math.min(...ys)).toBeCloseTo(11, 0);
+    expect(Math.max(...ys)).toBeCloseTo(29, 0);
   });
 });
