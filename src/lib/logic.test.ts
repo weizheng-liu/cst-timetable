@@ -9,6 +9,7 @@ import { tracePath } from "../components/Grid";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 import { resolveOptions, slotText } from "./resolve";
+import { bookmarklet, codesFromHash, parseCodes } from "./importer";
 import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf } from "./data";
@@ -268,5 +269,33 @@ describe("grades / GPA (日本大学の成績評価)", () => {
     const plan = planRequired(req, [only], [busy], 2, "09", () => true, new Set(), new Set());
     expect(plan.add).toEqual([]);
     expect(plan.clashing.map((r) => r.name)).toEqual(["電子回路Ⅰ"]);
+  });
+});
+
+describe("履修届確認表 import", () => {
+  // 実際の表の書式をまねたダミー（個人情報は含めない）
+  const sample = `履修届確認表 2026/11/28
+学部:理工学部 学年:2年 学生番号:0000 氏名:TEST
+(前期)J31D:電磁気学Ⅰ及び演習{2}[未来]<教員A>③【船】↓連続2時限
+(後期)J31G:電磁気学Ⅱ及び演習{2}[未来]<教員A>③【船】
+（前期）P41I：英語ⅡA<教員B>①【船】
+(年間)J43C:電子工学実験Ⅱ{1}[未来]<教員C>④【船】↓連続2時限
+(前期)J31D:電磁気学Ⅰ及び演習  重複は 1 回だけ
+抽選結果 前期 月 1 X99Z 心理学`;
+
+  it("extracts only codes that follow a term marker, once each", () => {
+    expect(parseCodes(sample)).toEqual(["J31D", "J31G", "P41I", "J43C"]);
+  });
+
+  it("reads codes from the URL hash and drops junk", () => {
+    expect(codesFromHash("#import=J31D,P41I,bad,J31D")).toEqual(["J31D", "P41I"]);
+    expect(codesFromHash("#other")).toBeNull();
+  });
+
+  it("builds a bookmarklet that only carries codes", () => {
+    const b = decodeURIComponent(bookmarklet("https://example.invalid/app/"));
+    expect(b.startsWith("javascript:")).toBe(true);
+    expect(b).toContain("#import=");
+    expect(b).not.toMatch(/学生番号|氏名|fetch|XMLHttpRequest/);
   });
 });

@@ -766,3 +766,27 @@ button.tag.fail { cursor: pointer; }
 .gbtn::after { content: ""; position: absolute; inset: -6px -2px; }
 .gbtn.on { background: var(--ink); color: var(--bg); box-shadow: none; }
 .gbtn.bad.on { background: var(--conflict); color: var(--on-accent); }
+
+/* ---------------------------------------------------------- 履修届確認表の取り込み */
+.steps { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 4px; color: var(--ink-2); font-size: 12.5px; line-height: 18px; }
+.steps li::marker { font: 600 11px var(--font-mono); color: var(--hiiro); }
+.paste-box { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: var(--radius-md); background: var(--cell); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-3); }
+.paste-box:focus-within { box-shadow: inset 0 0 0 1.5px var(--accent); }
+.paste-box textarea { flex: 1; min-width: 0; resize: vertical; border: 0; background: none; color: var(--ink); font: 13px/19px var(--font-mono); outline: none; }
+.fine { margin: 8px 0 0; color: var(--ink-3); font-size: 11px; line-height: 16px; }
+.sec-label { margin: 18px 0 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.04em; }
+.sec-label .num { color: var(--hiiro); }
+.sec-label .dim { color: var(--ink-3); font-weight: 500; }
+.pick-btn.static { cursor: default; }
+.mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+.note.miss { flex-direction: column; align-items: flex-start; gap: 4px; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-2); }
+.note.miss b { color: var(--ink); }
+.note.miss .mono { color: var(--conflict-ink); font-size: 12.5px; word-break: break-all; }
+.sheet-cta.col { flex-direction: column; }
+.sheet-cta.col .btn.ghost { height: 44px; width: 100%; }
+.bm { margin-top: 20px; padding: 10px 12px; border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--line); }
+.bm summary { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink); list-style: none; }
+.bm summary::-webkit-details-marker { display: none; }
+.bm[open] summary { margin-bottom: 10px; }
+.bm-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bm-row a.btn { text-decoration: none; cursor: grab; box-shadow: inset 0 0 0 1.5px var(--accent); color: var(--accent-strong); }

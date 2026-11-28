@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
+import { ImportPanel } from "./components/ImportPanel";
+import { codesFromHash } from "./lib/importer";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
@@ -22,7 +24,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } fr
 import { download, exportJson, loadPhoto, sanitize, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -40,6 +42,12 @@ export function App() {
     setToast(t);
     setTimeout(() => setToast((x) => (x === t ? null : x)), extra.undo ? 5000 : 2400);
   };
+
+  // ブックマークレットから #import=J31D,... で開かれたとき。読んだらすぐ URL から消す
+  const [pendingImport, setPendingImport] = useState<string[] | null>(() => codesFromHash(location.hash));
+  useEffect(() => {
+    if (pendingImport) history.replaceState(null, "", location.pathname + location.search);
+  }, []);
 
   useEffect(() => {
     loadIndex().then((ix) => {
@@ -128,6 +136,14 @@ export function App() {
     }
     setSt((s) => ({ ...s, selected: on ? s.selected.filter((x) => x !== c.id) : [...s.selected, c.id], dataYear: index?.year ?? s.dataYear }));
   };
+
+  const dataReady = !!profile && !!dept && common.length > 0;
+  useEffect(() => {
+    if (pendingImport && dataReady) {
+      setStack([{ kind: "import", codes: pendingImport }]);
+      setPendingImport(null);
+    }
+  }, [pendingImport, dataReady]);
 
   const push = (p: Panel) => setStack((s) => [...s, p]);
   const pop = () => setStack((s) => s.slice(0, -1));
@@ -355,6 +371,15 @@ export function App() {
     say(`必修 ${ids.length} 科目を追加しました${rest ? `（${rest}）` : ""}`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
   }
 
+  function applyImport(ids: string[], mode: "replace" | "append") {
+    const before = st.selected;
+    const next = mode === "replace" ? ids : [...new Set([...st.selected, ...ids])];
+    setSt((s) => ({ ...s, selected: next, dataYear: index?.year ?? s.dataYear }));
+    close();
+    const added = next.filter((id) => !before.includes(id)).length;
+    say(mode === "replace" ? `確認表の ${ids.length} 科目で時間割を置き換えました` : `${added} 科目を追加しました`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
+  }
+
   function applyResolve(o: ResolveOption) {
     const before = st.selected;
     const undo = () => setSt((s) => ({ ...s, selected: before }));
@@ -397,6 +422,8 @@ export function App() {
         return { title: "その他" };
       case "grades":
         return { eyebrow: "GRADES · GPA", title: "成績と GPA", sub: "修得した科目に評価を付けると、GPA と単位を計算します" };
+      case "import":
+        return { eyebrow: "IMPORT", title: "履修届確認表から取り込む", sub: top.codes ? "ブックマークレットで読み取った時間割CD" : "学校の確認表を貼り付けると、登録済みの科目を時間割に並べます" };
       case "search":
         return { eyebrow: "SEARCH", title: "科目を探す", sub: "全学年・全時限から（再履修のクラス探しなど）" };
       case "profile":
@@ -494,6 +521,17 @@ export function App() {
             }}
           />
         );
+      case "import":
+        return (
+          <ImportPanel
+            initialCodes={top.codes}
+            byId={byId}
+            selectedIds={new Set(st.selected)}
+            siteUrl={location.origin + location.pathname}
+            onApply={applyImport}
+            onCopied={(m) => say(m)}
+          />
+        );
       case "search":
         return (
           <SearchPanel
@@ -546,6 +584,7 @@ export function App() {
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
+            <MenuItem icon={<ClipboardList size={18} />} title="履修届確認表から取り込む" sub="学校で登録した科目を貼り付けて一括で時間割に" onClick={() => push({ kind: "import", codes: null })} />
             <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />
             <MenuItem icon={<Search size={18} />} title="科目を探す" sub="全学年・全時限から（再履修など）" onClick={() => push({ kind: "search", q: "" })} />
             <MenuItem icon={<Palette size={18} />} title="テーマ" sub={THEME_LABEL[st.theme]} onClick={() => push({ kind: "theme" })} />
