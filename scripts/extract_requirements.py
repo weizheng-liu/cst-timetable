@@ -61,7 +61,7 @@ def find_pages(pdf, dept_name: str) -> tuple[int, int]:
     """Return 0-based indexes of the 卒業条件等 page and the 授業科目配置表 page (found via the margin tab)."""
     cond = table = None
     for i, page in enumerate(pdf.pages):
-        tab = side_tab(page)
+        tab = re.sub(r"^[、。，．,.「」『』\s]+", "", side_tab(page))  # 余白の見出しの前に句読点が混ざることがある
         if not tab.startswith(dept_name):
             continue
         if cond is None and "卒業条件" in tab:
