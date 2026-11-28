@@ -1,3 +1,4 @@
+import { dayName, getLang, t } from "./i18n";
 // 理工学部の時限 (公式シラバスサイトの時間割表に準拠, 100分授業)
 export const PERIOD_TIMES: Record<number, [string, string]> = {
   1: ["09:00", "10:40"],
@@ -29,14 +30,15 @@ export function validRange(v: unknown): v is [string, string] {
 
 export const DAYS = ["月", "火", "水", "木", "金", "土"] as const;
 
-export const dayLabel = (d: number) => DAYS[d - 1] ?? "?";
+/** 表示用の曜日名（画面の言語に合わせる） */
+export const dayLabel = (d: number) => dayName(d);
 
 export function slotLabel(slots: { day: number; period: number }[]): string {
-  if (!slots.length) return "時間割なし";
+  if (!slots.length) return t("時間割なし");
   const byDay = new Map<number, number[]>();
   for (const s of slots) byDay.set(s.day, [...(byDay.get(s.day) ?? []), s.period]);
   return [...byDay.entries()]
     .sort((a, b) => a[0] - b[0])
-    .map(([d, ps]) => `${dayLabel(d)}${ps.sort((a, b) => a - b).join("・")}`)
+    .map(([d, ps]) => `${dayLabel(d)}${getLang() === "ja" ? "" : " "}${ps.sort((a, b) => a - b).join("・")}`)
     .join(" ");
 }

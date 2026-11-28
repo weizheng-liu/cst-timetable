@@ -1,4 +1,5 @@
 import { PERIOD_TIMES, type PeriodTimes } from "./periods";
+import { t } from "./i18n";
 import type { Course, Session } from "./types";
 
 const VTIMEZONE = [
@@ -73,7 +74,7 @@ export function buildIcs(courses: Course[], stamp = new Date(), times: PeriodTim
     "VERSION:2.0",
     "PRODID:-//cst-timetable//JA",
     "CALSCALE:GREGORIAN",
-    "X-WR-CALNAME:理工 時間割",
+    `X-WR-CALNAME:${t("理工 時間割")}`,
     "X-WR-TIMEZONE:Asia/Tokyo",
     ...VTIMEZONE,
   ];
@@ -87,7 +88,7 @@ export function buildIcs(courses: Course[], stamp = new Date(), times: PeriodTim
       noDates.push(c.name);
       continue;
     }
-    const where = [c.campus, c.room ? `${c.room}教室` : ""].filter(Boolean).join(" ");
+    const where = [c.campus, c.room ? t("{room}教室", { room: c.room }) : ""].filter(Boolean).join(" ");
     for (const s of dated) {
       if (s.cancelled) {
         skippedCancelled++;
@@ -103,12 +104,12 @@ export function buildIcs(courses: Course[], stamp = new Date(), times: PeriodTim
 
 function eventFor(c: Course, s: Session, where: string, now: string, times: PeriodTimes): string[] {
   const online = s.mode !== "face";
-  const no = s.no ? `第${s.no}回 ` : "";
-  const prefix = online ? "【オンライン】" : "";
+  const no = s.no ? t("第{n}回", { n: s.no }) + " " : "";
+  const prefix = online ? t("【オンライン】") : "";
   const summary = `${prefix}${c.name}`;
   const desc = [
     `${no}${s.content}`.trim(),
-    s.mode === "ondemand" ? "オンデマンド授業" : "",
+    s.mode === "ondemand" ? t("オンデマンド授業") : "",
     c.teachers.join("、"),
     c.url,
   ]

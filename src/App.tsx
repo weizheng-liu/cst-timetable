@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, ClipboardList, ImagePlus, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, ImagePlus, Languages, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
@@ -11,7 +11,7 @@ import { ShotImportPanel } from "./components/ShotImportPanel";
 import { useInstall } from "./lib/pwa";
 import { customToCourse, isCustomId, newCustomId, type CustomCourse } from "./lib/custom";
 import { entriesFromHash, type Entry } from "./lib/importer";
-import { ALERT_LABEL, md as mdShort, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
+import { ALERT_LABEL, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
@@ -26,15 +26,18 @@ import { eligibleFor, homeCampusOf, type Eligible } from "./lib/eligibility";
 import { normName, progress, reqIndex } from "./lib/credits";
 import { alternativesFor, resolveOptions, slotText, type ResolveOption } from "./lib/resolve";
 import { buildIcs } from "./lib/ics";
-import { DAYS, resolveTimes } from "./lib/periods";
+import { resolveTimes } from "./lib/periods";
+import { useBackButton } from "./lib/backnav";
+import { LANGS, dateLabel, dayName, k, locale, setLang, t, tv } from "./lib/i18n";
 import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm, isUnscheduled } from "./lib/schedule";
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string; focus?: { day: number; period: number } } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string; focus?: { day: number; period: number } } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" } | { kind: "lang" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
+  setLang(st.lang); // 画面の文はこの言語で描く（子の部品も同じ描画の中で t() を呼ぶ）
   const [index, setIndex] = useState<DataIndex | null>(null);
   const [dept, setDept] = useState<DeptFile | null>(null);
   const [req, setReq] = useState<Requirements | null>(null);
@@ -188,7 +191,7 @@ export function App() {
     const on = st.selected.includes(c.id);
     if (!on) {
       const clash = clashesWith(c, selected);
-      if (clash.length) say(`${clash[0].name} と時間が重なっています`);
+      if (clash.length) say(t("{name} と時間が重なっています", { name: clash[0].name }));
     }
     setSt((s) => ({ ...s, selected: on ? s.selected.filter((x) => x !== c.id) : [...s.selected, c.id], dataYear: index?.year ?? s.dataYear }));
   };
@@ -204,6 +207,8 @@ export function App() {
   const push = (p: Panel) => setStack((s) => [...s, p]);
   const pop = () => setStack((s) => s.slice(0, -1));
   const close = () => setStack([]);
+  // スマホの戻る = アプリの中の 1 つ前へ。ホームでは 2 回で終了
+  useBackButton(stack.length, pop, () => say(t("もう一度戻ると終了します")));
   const top = stack[stack.length - 1];
 
   // ---------------------------------------------------------------- render
@@ -213,7 +218,7 @@ export function App() {
       <div class="app">
         <div class="banner coral" style={{ marginTop: 40 }}>
           <AlertTriangle size={16} />
-          <div>データを読み込めませんでした。時間をおいて再読み込みしてください。（{error}）</div>
+          <div>{t("データを読み込めませんでした。時間をおいて再読み込みしてください。")}（{error}）</div>
         </div>
       </div>
     );
@@ -232,43 +237,43 @@ export function App() {
       <header class="topbar">
         <div class="brand">
           <span class="brand-mark" aria-hidden="true" />
-          <span class="brand-ja">日大理工 履修アシスタント</span>
+          <span class="brand-ja">{t("日大理工 履修アシスタント")}</span>
           <span class="eyebrow" aria-hidden="true">CST · NIHON UNIV.</span>
         </div>
         <div class="titlerow">
-          <h1 class="title">時間割</h1>
+          <h1 class="title">{t("時間割")}</h1>
           <span class="term num">
-            {index?.year ?? "—"} · {view}
+            {index?.year ?? "—"} · {tv(view)}
           </span>
         </div>
         <div class="selects">
-          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`学科：${deptName}（変更）`}>
-            <small>学科</small>
+          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={t("学科：{name}（変更）", { name: deptName })}>
+            <small>{t("学科")}</small>
             <span class="sel-v">{deptName || "—"}</span>
             <ChevronDown size={11} class="chev" />
           </button>
-          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`在籍学年：${profile?.grade}年（変更）`}>
-            <small>在籍</small>
-            {profile?.grade ?? "-"}年
+          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={t("在籍学年：{n}年（変更）", { n: profile?.grade ?? "-" })}>
+            <small>{t("在籍")}</small>
+            {t("{n}年", { n: profile?.grade ?? "-" })}
             <ChevronDown size={11} class="chev" />
           </button>
           <label class="sel">
-            <small>学期</small>
-            <span class="sel-v">{view}</span>
-            <select class="sel-native" value={view} aria-label="学期" onChange={(e) => setSt((s) => ({ ...s, view: (e.target as HTMLSelectElement).value as "前期" | "後期" }))}>
-              <option value="前期">前期</option>
-              <option value="後期">後期</option>
+            <small>{t("学期")}</small>
+            <span class="sel-v">{tv(view)}</span>
+            <select class="sel-native" value={view} aria-label={t("学期")} onChange={(e) => setSt((s) => ({ ...s, view: (e.target as HTMLSelectElement).value as "前期" | "後期" }))}>
+              <option value="前期">{tv("前期")}</option>
+              <option value="後期">{tv("後期")}</option>
             </select>
             <ChevronDown size={11} class="chev" />
           </label>
           <span class="sel-gap" />
-          <button class="icon-btn sm" aria-label="その他" onClick={() => push({ kind: "menu" })}>
+          <button class="icon-btn sm" aria-label={t("その他")} onClick={() => push({ kind: "menu" })}>
             <MoreHorizontal size={18} />
           </button>
         </div>
       </header>
 
-      <div class="years" role="tablist" aria-label="学年ごとの時間割">
+      <div class="years" role="tablist" aria-label={t("学年ごとの時間割")}>
         {Array.from({ length: maxGrade }, (_, i) => i + 1).map((g) => (
           <button
             key={g}
@@ -280,37 +285,35 @@ export function App() {
               setStack([]);
             }}
           >
-            <b>{g}年</b>
-            <small class="num">{g === nowGrade ? "在籍" : creditsOfYear(g) ? `${creditsOfYear(g)}cr` : g < nowGrade ? "履修済" : "計画"}</small>
+            <b>{t("{n}年", { n: g })}</b>
+            <small class="num">{g === nowGrade ? t("在籍") : creditsOfYear(g) ? `${creditsOfYear(g)}cr` : g < nowGrade ? t("履修済") : t("計画")}</small>
           </button>
         ))}
       </div>
       {viewGrade > nowGrade && (
         <p class="plan-note">
-          {viewGrade}年の計画は {index?.year ?? ""} 年度の開講表で組んでいます。実際の年度には曜日・時限・担当が変わることがあります。単位は卒業要件の集計に入ります。
+          {t("{g}年の計画は {y} 年度の開講表で組んでいます。実際の年度には曜日・時限・担当が変わることがあります。単位は卒業要件の集計に入ります。", { g: viewGrade, y: index?.year ?? "" })}
         </p>
       )}
 
       {dept && !satUsed && (
         <button class="sat-btn" onClick={() => setSt((s) => ({ ...s, showSat: !s.showSat }))}>
-          {st.showSat ? "土曜日をたたむ" : "土曜日も表示"}
+          {st.showSat ? t("土曜日をたたむ") : t("土曜日も表示")}
         </button>
       )}
 
       {agenda.length > 0 && (
-        <ul class="agenda" aria-label="近いうちの試験・オンライン授業">
+        <ul class="agenda" aria-label={t("近いうちの試験・オンライン授業")}>
           {agenda.map((a) => (
             <li key={a.course.id + a.kind + a.date}>
               <button class="agenda-row" onClick={() => setStack([{ kind: "detail", id: a.course.id }])}>
-                <i class={`al al-${a.kind}`}>{ALERT_LABEL[a.kind]}</i>
-                <span class="num">
-                  {mdShort(a.date)}({"日月火水木金土"[new Date(a.date + "T00:00:00").getDay()]})
-                </span>
+                <i class={`al al-${a.kind}`}>{tv(ALERT_LABEL[a.kind])}</i>
+                <span class="num">{dateLabel(a.date)}</span>
                 <b>
                   {a.course.name}
                   {a.text && <span class="agenda-note">{a.text}</span>}
                 </b>
-                <small>{a.kind === "note" ? "メモ" : a.byUser ? "自分で設定" : "シラバスより"}</small>
+                <small>{a.kind === "note" ? t("メモ") : a.byUser ? t("自分で設定") : t("シラバスより")}</small>
               </button>
             </li>
           ))}
@@ -319,8 +322,8 @@ export function App() {
 
       <div class="deco-scope" aria-hidden="true">
         <div class="readout num">
-          <span>CH1 {termCredits}単位</span>
-          <span>CH2 {selected.filter((c) => inTerm(c, view)).length}科目</span>
+          <span>CH1 {t("{n}単位", { n: termCredits })}</span>
+          <span>CH2 {t("{n}科目", { n: selected.filter((c) => inTerm(c, view)).length })}</span>
           <span>{times[1]?.[0]}–{times[maxPeriod]?.[1] ?? times[6][1]}</span>
           <span class={termConflicts.length ? "warn" : ""}>{termConflicts.length ? `TRIG ×${groupConflicts(termConflicts).length}` : "TRIG OK"}</span>
         </div>
@@ -352,11 +355,11 @@ export function App() {
 
       {floating.length > 0 && (
         <div class="floating">
-          <span class="floating-h">時間外・オンデマンド</span>
+          <span class="floating-h">{t("時間外・オンデマンド")}</span>
           {floating.map((c) => (
             <button key={c.id} class="floating-chip" onClick={() => push({ kind: "detail", id: c.id })}>
               {c.name}
-              <small>{c.onlineMethod ?? (c.classFormat === "オンライン" ? "オンライン" : "時間割外")} · {c.credits}単位</small>
+              <small>{tv(c.onlineMethod ?? (c.classFormat === "オンライン" ? "オンライン" : "時間割外"))} · {t("{n}単位", { n: c.credits })}</small>
             </button>
           ))}
         </div>
@@ -366,17 +369,17 @@ export function App() {
         <div key={g.key} class="note" role="status">
           <span class="note-dot" aria-hidden="true" />
           <span>
-            {DAYS[g.day - 1]}曜 {g.periods.join("・")}限：
+            {t("{day}曜 {p}限：", { day: dayName(g.day), p: g.periods.join("・") })}
             {g.courses.map((c, i) => (
               <>
-                {i > 0 && "と"}
+                {i > 0 && t("と")}
                 <b>{c.name}</b>
               </>
             ))}
-            が重複
+            {t("が重複")}
           </span>
           <button class="note-act" onClick={() => setStack([{ kind: "resolve", day: g.day, period: g.periods[0] }])}>
-            解決する
+            {t("解決する")}
           </button>
         </div>
       ))}
@@ -385,10 +388,10 @@ export function App() {
         <div key={r.name} class="note fail" role="status">
           <span class="note-dot" aria-hidden="true" />
           <span>
-            必修の<b>{r.name}</b>が不合格（{st.grades[gradeKey(r.name)]?.grade}）· 再履修が必要
+            {t("必修の")}<b>{r.name}</b>{t("が不合格（{g}）· 再履修が必要", { g: st.grades[gradeKey(r.name)]?.grade ?? "" })}
           </span>
           <button class="note-act" onClick={() => setStack([{ kind: "search", q: r.name }])}>
-            クラスを探す
+            {t("クラスを探す")}
           </button>
         </div>
       ))}
@@ -400,9 +403,9 @@ export function App() {
           </span>
           <span>
             <b>
-              {viewGrade}年・{view}に取れる科目の一覧
+              {t("{g}年・{term}に取れる科目の一覧", { g: viewGrade, term: tv(view) })}
             </b>
-            <small>必修・選択必修・教養などの区分別 · 曜日時限とキャンパス付き</small>
+            <small>{t("必修・選択必修・教養などの区分別 · 曜日時限とキャンパス付き")}</small>
           </span>
         </button>
       )}
@@ -413,29 +416,29 @@ export function App() {
             ＋
           </span>
           <span>
-            <b>{viewGrade}年の必修をまとめて追加</b>
+            <b>{t("{g}年の必修をまとめて追加", { g: viewGrade })}</b>
             <small>
-              {reqPlan.add.length}科目 · 学部要覧の授業科目配置表より{retake.size ? `（再履修 ${[...retake].filter((k) => reqPlan.add.some((c) => gradeKey(c.name) === k)).length}科目を含む）` : ""}
+              {t("{n}科目", { n: reqPlan.add.length })} · {t("学部要覧の授業科目配置表より")}{retake.size ? t("（再履修 {n}科目を含む）", { n: [...retake].filter((k) => reqPlan.add.some((c) => gradeKey(c.name) === k)).length }) : ""}
             </small>
           </span>
         </button>
       )}
 
-      {dept && selected.length === 0 && <p class="muted" style={{ textAlign: "center", marginTop: 20 }}>マスをタップすると、その時間に開講される科目が表示されます。</p>}
+      {dept && selected.length === 0 && <p class="muted" style={{ textAlign: "center", marginTop: 20 }}>{t("マスをタップすると、その時間に開講される科目が表示されます。")}</p>}
 
       <footer class="foot">
-        非公式ツールです。実際の履修登録は大学のシステムで行ってください。データ出典：
+        {t("非公式ツールです。実際の履修登録は大学のシステムで行ってください。データ出典：")}
         <a href="https://www.kyoumu.cst.nihon-u.ac.jp/syllabus/page/" target="_blank" rel="noopener noreferrer">
-          日本大学理工学部 シラバス
+          {t("日本大学理工学部 シラバス")}
         </a>
-        （{index ? new Date(index.generatedAt).toLocaleDateString("ja-JP") : "—"} 取得）
+        {t("（{d} 取得）", { d: index ? new Date(index.generatedAt).toLocaleDateString(locale()) : "—" })}
       </footer>
 
       {/* アートテーマ用の装飾（設計図の表題欄 / オシロの測定値表示）。シンプルなテーマでは非表示 */}
       <div class="deco-title" aria-hidden="true">
         <div class="tb-cell tb-wide">
           <span>TITLE</span>
-          <b>{deptName || "—"} 時間割</b>
+          <b>{deptName || "—"} {t("時間割")}</b>
         </div>
         <div class="tb-cell">
           <span>DWG NO.</span>
@@ -467,10 +470,10 @@ export function App() {
           try {
             const s = sanitize(JSON.parse(await f.text()));
             setSt(() => s);
-            say(`${s.selected.length}科目を読み込みました`);
+            say(t("{n}科目を読み込みました", { n: s.selected.length }));
             close();
           } catch {
-            say("JSONファイルを読み込めませんでした");
+            say(t("JSONファイルを読み込めませんでした"));
           }
           (e.target as HTMLInputElement).value = "";
         }}
@@ -491,7 +494,7 @@ export function App() {
               setToast(null);
             }}
           >
-            元に戻す
+            {t("元に戻す")}
           </button>
         )}
       </div>
@@ -503,8 +506,8 @@ export function App() {
     const before = st.selected;
     const ids = reqPlan.add.map((c) => c.id);
     setSt((s) => ({ ...s, selected: [...new Set([...s.selected, ...ids])], dataYear: index?.year ?? s.dataYear }));
-    const rest = [reqPlan.clashing.length ? `重複のため未追加 ${reqPlan.clashing.length}` : "", reqPlan.missing.length ? `開講なし ${reqPlan.missing.length}` : ""].filter(Boolean).join("・");
-    say(`必修 ${ids.length} 科目を追加しました${rest ? `（${rest}）` : ""}`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
+    const rest = [reqPlan.clashing.length ? t("重複のため未追加 {n}", { n: reqPlan.clashing.length }) : "", reqPlan.missing.length ? t("開講なし {n}", { n: reqPlan.missing.length }) : ""].filter(Boolean).join("・");
+    say(t("必修 {n} 科目を追加しました", { n: ids.length }) + (rest ? `（${rest}）` : ""), { undo: () => setSt((s) => ({ ...s, selected: before })) });
   }
 
   /** 自分で追加する科目を作る（同じ名前・学期・時間のものがあれば使い回す） */
@@ -531,8 +534,8 @@ export function App() {
     setSt((s) => ({ ...s, custom: [...s.custom, ...my.made].slice(-60), selected: next, dataYear: index?.year ?? s.dataYear }));
     close();
     const added = next.filter((id) => !before.selected.includes(id)).length;
-    const mine = extra.length ? `（自分で追加 ${extra.length}）` : "";
-    say(mode === "replace" ? `確認表の ${all.length} 科目で時間割を置き換えました${mine}` : `${added} 科目を追加しました${mine}`, { undo: () => setSt(() => before) });
+    const mine = extra.length ? t("（自分で追加 {n}）", { n: extra.length }) : "";
+    say((mode === "replace" ? t("確認表の {n} 科目で時間割を置き換えました", { n: all.length }) : t("{n} 科目を追加しました", { n: added })) + mine, { undo: () => setSt(() => before) });
   }
 
   function applyShot(ids: string[], extra: Omit<CustomCourse, "id">[], g: number, term: "前期" | "後期", mode: "replace" | "append") {
@@ -548,7 +551,7 @@ export function App() {
       return { ...n, custom: [...n.custom, ...made].slice(-60), selected: [...new Set([...keep, ...all])], view: term, dataYear: index?.year ?? n.dataYear };
     });
     close();
-    say(`${g}年の${term}に ${all.length} 科目を取り込みました${extra.length ? `（自分で追加 ${extra.length}）` : ""}`, { undo: () => setSt(() => before) });
+    say(t("{g}年の{term}に {n} 科目を取り込みました", { g, term: tv(term), n: all.length }) + (extra.length ? t("（自分で追加 {n}）", { n: extra.length }) : ""), { undo: () => setSt(() => before) });
   }
 
   function applyResolve(o: ResolveOption) {
@@ -556,22 +559,22 @@ export function App() {
     const undo = () => setSt((s) => ({ ...s, selected: before }));
     if (o.kind === "move") {
       setSt((s) => ({ ...s, selected: s.selected.map((id) => (id === o.from.id ? o.to.id : id)) }));
-      say(`${o.from.name}を${slotText(o.to.slots)}に移しました`, { undo, moved: o.to.id });
+      say(t("{name}を{slot}に移しました", { name: o.from.name, slot: slotText(o.to.slots) }), { undo, moved: o.to.id });
     } else {
       setSt((s) => ({ ...s, selected: s.selected.filter((id) => id !== o.drop.id) }));
-      say(`${o.drop.name}を外しました`, { undo });
+      say(t("{name}を外しました", { name: o.drop.name }), { undo });
     }
     close();
   }
 
   function exportIcs() {
     if (!selected.length) {
-      say("先に科目を追加してください");
+      say(t("先に科目を追加してください"));
       return;
     }
     const r = buildIcs(selected, new Date(), times);
     download(`cst-timetable-${index?.year ?? ""}.ics`, r.text, "text/calendar;charset=utf-8");
-    say(`${r.events}件の授業を書き出しました${r.skippedCancelled ? `（休講${r.skippedCancelled}件を除外）` : ""}`);
+    say(t("{n}件の授業を書き出しました", { n: r.events }) + (r.skippedCancelled ? t("（休講{n}件を除外）", { n: r.skippedCancelled }) : ""));
   }
 
   function sheetProps(): { title: any; sub?: any; eyebrow?: string } {
@@ -579,37 +582,39 @@ export function App() {
     switch (top.kind) {
       case "slot": {
         const n = coursesAt(allCourses, top.day, top.period, view).filter((c) => ["yes", "maybe"].includes(statusOf(c))).length;
-        return { eyebrow: `SLOT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: `${DAYS[top.day - 1]}曜 ${top.period}限`, sub: `この時限の開講科目 ${n}件 · ${view}` };
+        return { eyebrow: `SLOT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: t("{day}曜 {p}限", { day: dayName(top.day), p: top.period }), sub: t("この時限の開講科目 {n}件 · {term}", { n, term: tv(view) }) };
       }
       case "resolve":
-        return { eyebrow: `CONFLICT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: `${DAYS[top.day - 1]}曜 ${top.period}限が重複しています` };
+        return { eyebrow: `CONFLICT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: t("{day}曜 {p}限が重複しています", { day: dayName(top.day), p: top.period }) };
       case "detail": {
         const c = byId.get(top.id);
-        if (c && isCustomId(c.id)) return { eyebrow: "MY COURSE", title: c.name, sub: `自分で追加 · ${c.term} · ${c.credits}単位` };
-        return { eyebrow: c?.code ? `COURSE ${c.code}` : undefined, title: c?.name, sub: c?.subtitle || (c ? `${c.term} · ${c.credits}単位` : undefined) };
+        if (c && isCustomId(c.id)) return { eyebrow: "MY COURSE", title: c.name, sub: `${t("自分で追加")} · ${tv(c.term)} · ${t("{n}単位", { n: c.credits })}` };
+        return { eyebrow: c?.code ? `COURSE ${c.code}` : undefined, title: c?.name, sub: c?.subtitle || (c ? `${tv(c.term)} · ${t("{n}単位", { n: c.credits })}` : undefined) };
       }
       case "credits":
-        return { eyebrow: "CREDITS", title: "単位と卒業要件", sub: `${deptName} · ${profile?.entryYear}年度入学` };
+        return { eyebrow: "CREDITS", title: t("単位と卒業要件"), sub: `${deptName} · ${t("{y}年度入学", { y: profile?.entryYear ?? "" })}` };
       case "menu":
-        return { title: "その他" };
+        return { title: t("その他") };
       case "grades":
-        return { eyebrow: "GRADES · GPA", title: "成績と GPA", sub: "修得した科目に評価を付けると、GPA と単位を計算します" };
+        return { eyebrow: "GRADES · GPA", title: t("成績と GPA"), sub: t("修得した科目に評価を付けると、GPA と単位を計算します") };
       case "install":
-        return { eyebrow: "INSTALL", title: "ホーム画面に追加", sub: "アプリのようにアイコンからすぐ開けます" };
+        return { eyebrow: "INSTALL", title: t("ホーム画面に追加"), sub: t("アプリのようにアイコンからすぐ開けます") };
       case "catalog":
-        return { eyebrow: `CATALOG · ${viewGrade}年 ${view}`, title: "今学期の科目一覧", sub: `取れる科目 ${new Set(catalogCourses.map((c) => normName(c.name))).size}件 · 時間のボタンで追加` };
+        return { eyebrow: `CATALOG · Y${viewGrade} ${view === "前期" ? "SPRING" : "FALL"}`, title: t("今学期の科目一覧"), sub: t("取れる科目 {n}件 · 時間のボタンで追加", { n: new Set(catalogCourses.map((c) => normName(c.name))).size }) };
       case "shot":
-        return { eyebrow: "IMPORT", title: "画面写真から取り込む", sub: "他の時間割アプリのスクリーンショットを読み取って、学年ごとの計画に並べます" };
+        return { eyebrow: "IMPORT", title: t("画面写真から取り込む"), sub: t("他の時間割アプリのスクリーンショットを読み取って、学年ごとの計画に並べます") };
       case "import":
-        return { eyebrow: "IMPORT", title: "履修届確認表から取り込む", sub: top.codes ? "ブックマークレットで読み取った時間割CD" : "学校の確認表を貼り付けると、登録済みの科目を時間割に並べます" };
+        return { eyebrow: "IMPORT", title: t("履修届確認表から取り込む"), sub: top.codes ? t("ブックマークレットで読み取った時間割CD") : t("学校の確認表を貼り付けると、登録済みの科目を時間割に並べます") };
       case "search":
-        return { eyebrow: "SEARCH", title: "科目を探す", sub: "全学年・全時限から（再履修のクラス探しなど）" };
+        return { eyebrow: "SEARCH", title: t("科目を探す"), sub: t("全学年・全時限から（再履修のクラス探しなど）") };
       case "profile":
-        return { title: "学科・学年" };
+        return { title: t("学科・学年") };
       case "times":
-        return { title: "授業時間", sub: "時限ごとの開始・終了" };
+        return { title: t("授業時間"), sub: t("時限ごとの開始・終了") };
       case "theme":
-        return { title: "テーマ" };
+        return { title: t("テーマ") };
+      case "lang":
+        return { title: "言語 · 语言", sub: t("科目名・シラバスの本文は日本語のままです") };
     }
   }
 
@@ -638,7 +643,7 @@ export function App() {
         );
       case "resolve": {
         const cs = cells.get(cellKey(top.day, top.period)) ?? [];
-        if (cs.length < 2) return <p class="muted">重複は解消されています。</p>;
+        if (cs.length < 2) return <p class="muted">{t("重複は解消されています。")}</p>;
         const [a, b] = cs;
         const altOf = (x: Course) => alternativesFor(x, allCourses, selected, view, canTake)[0] ?? null;
         return (
@@ -671,7 +676,7 @@ export function App() {
                 const drop = (ids: string[]) => ids.filter((id) => id !== c.id);
                 setSt((s) => ({ ...s, custom: s.custom.filter((x) => x.id !== c.id), selected: drop(s.selected), plans: Object.fromEntries(Object.entries(s.plans).map(([k, v]) => [k, drop(v)])) }));
                 close();
-                say(`${c.name}を消しました`, { undo: () => setSt(() => before) });
+                say(t("{name}を消しました", { name: c.name }), { undo: () => setSt(() => before) });
               }}
             />
           );
@@ -713,7 +718,7 @@ export function App() {
             onClear={() => {
               const before = st.grades;
               setSt((s) => ({ ...s, grades: {} }));
-              say("成績を消しました", { undo: () => setSt((s) => ({ ...s, grades: before })) });
+              say(t("成績を消しました"), { undo: () => setSt((s) => ({ ...s, grades: before })) });
             }}
           />
         );
@@ -800,15 +805,28 @@ export function App() {
               }
               try {
                 const url = await shrinkImage(f);
-                if (!savePhoto(url)) say("写真が大きすぎて保存できませんでした（この表示中のみ反映）");
+                if (!savePhoto(url)) say(t("写真が大きすぎて保存できませんでした（この表示中のみ反映）"));
                 setPhoto(url);
               } catch {
-                say("この画像は読み込めませんでした");
+                say(t("この画像は読み込めませんでした"));
               }
             }}
             dim={st.photoDim}
             onDim={(v) => setSt((s) => ({ ...s, photoDim: v }))}
           />
+        );
+      case "lang":
+        return (
+          <div class="list" style={{ marginTop: 0 }}>
+            {LANGS.map((l) => (
+              <div class="row" key={l.id}>
+                <button class="row-main lang-row" aria-pressed={st.lang === l.id} onClick={() => (setSt((s) => ({ ...s, lang: l.id })), close())}>
+                  <b>{l.label}</b>
+                  {st.lang === l.id && <span class="tag on">✓</span>}
+                </button>
+              </div>
+            ))}
+          </div>
         );
       case "menu":
         return (
@@ -816,49 +834,50 @@ export function App() {
             {!install.installed && (
               <MenuItem
                 icon={<Smartphone size={18} />}
-                title="ホーム画面に追加"
-                sub={install.canPrompt ? "ワンタップでアプリとしてインストール" : install.ios ? "iPhone・iPad：共有ボタンから追加（手順を表示）" : "アイコンからすぐ開けるようにする"}
+                title={t("ホーム画面に追加")}
+                sub={install.canPrompt ? t("ワンタップでアプリとしてインストール") : install.ios ? t("iPhone・iPad：共有ボタンから追加（手順を表示）") : t("アイコンからすぐ開けるようにする")}
                 onClick={async () => {
                   if (install.canPrompt) {
                     close();
-                    if (await install.prompt()) say("ホーム画面に追加しました");
+                    if (await install.prompt()) say(t("ホーム画面に追加しました"));
                   } else push({ kind: "install" });
                 }}
               />
             )}
-            <MenuItem icon={<LayoutList size={18} />} title="今学期の科目一覧" sub="区分別・曜日時限・キャンパス付き" onClick={() => push({ kind: "catalog" })} />
-            <MenuItem icon={<ClipboardList size={18} />} title="履修届確認表から取り込む" sub="学校で登録した科目を貼り付けて一括で時間割に" onClick={() => push({ kind: "import", codes: null })} />
-            <MenuItem icon={<ImagePlus size={18} />} title="他のアプリの時間割を写真から取り込む" sub="スクリーンショットを端末の中で読み取り、学年を選んで並べる" onClick={() => push({ kind: "shot" })} />
-            <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />
-            <MenuItem icon={<Search size={18} />} title="科目を探す" sub="全学年・全時限から（再履修など）" onClick={() => push({ kind: "search", q: "" })} />
-            <MenuItem icon={<Palette size={18} />} title="テーマ" sub={THEME_LABEL[st.theme]} onClick={() => push({ kind: "theme" })} />
+            <MenuItem icon={<LayoutList size={18} />} title={t("今学期の科目一覧")} sub={t("区分別・曜日時限・キャンパス付き")} onClick={() => push({ kind: "catalog" })} />
+            <MenuItem icon={<ClipboardList size={18} />} title={t("履修届確認表から取り込む")} sub={t("学校で登録した科目を貼り付けて一括で時間割に")} onClick={() => push({ kind: "import", codes: null })} />
+            <MenuItem icon={<ImagePlus size={18} />} title={t("他のアプリの時間割を写真から取り込む")} sub={t("スクリーンショットを端末の中で読み取り、学年を選んで並べる")} onClick={() => push({ kind: "shot" })} />
+            <MenuItem icon={<Award size={18} />} title={t("成績と GPA")} sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · ${t("修得 {n} 単位", { n: gs.earned })}` : t("修得した科目に S〜E を付けて GPA を計算")} onClick={() => push({ kind: "grades" })} />
+            <MenuItem icon={<Search size={18} />} title={t("科目を探す")} sub={t("全学年・全時限から（再履修など）")} onClick={() => push({ kind: "search", q: "" })} />
+            <MenuItem icon={<Palette size={18} />} title={t("テーマ")} sub={t(THEME_LABEL[st.theme])} onClick={() => push({ kind: "theme" })} />
+            <MenuItem icon={<Languages size={18} />} title="言語 · 语言" sub={LANGS.find((l) => l.id === st.lang)?.label ?? ""} onClick={() => push({ kind: "lang" })} />
             <MenuItem
               icon={<Clock size={18} />}
-              title="授業時間を編集"
-              sub={Object.keys(st.periodTimes).length ? `${Object.keys(st.periodTimes).length}つの時限を変更中` : "標準：1限 9:00–10:40 …"}
+              title={t("授業時間を編集")}
+              sub={Object.keys(st.periodTimes).length ? t("{n}つの時限を変更中", { n: Object.keys(st.periodTimes).length }) : t("標準：1限 9:00–10:40 …")}
               onClick={() => push({ kind: "times" })}
             />
-            <MenuItem icon={<CalendarPlus size={18} />} title="カレンダーに書き出す (.ics)" sub="各回の授業を予定として出力。休講日は除外し、オンライン回は件名に表示" onClick={exportIcs} />
+            <MenuItem icon={<CalendarPlus size={18} />} title={t("カレンダーに書き出す (.ics)")} sub={t("各回の授業を予定として出力。休講日は除外し、オンライン回は件名に表示")} onClick={exportIcs} />
             <MenuItem
               icon={<Download size={18} />}
-              title="選択内容を保存 (JSON)"
-              sub="別の端末へ移すときに使います"
+              title={t("選択内容を保存 (JSON)")}
+              sub={t("別の端末へ移すときに使います")}
               onClick={() => download(`cst-timetable-${new Date().toISOString().slice(0, 10)}.json`, exportJson(st), "application/json")}
             />
-            <MenuItem icon={<Upload size={18} />} title="JSON を読み込む" sub="保存したファイルから復元します" onClick={() => fileRef.current?.click()} />
+            <MenuItem icon={<Upload size={18} />} title={t("JSON を読み込む")} sub={t("保存したファイルから復元します")} onClick={() => fileRef.current?.click()} />
             <MenuItem
               icon={<RotateCcw size={18} />}
-              title="時間割をリセット"
-              sub={`選択中の ${selected.length} 科目をすべて外します`}
+              title={t("時間割をリセット")}
+              sub={t("選択中の {n} 科目をすべて外します", { n: selected.length })}
               onClick={() => {
                 if (!selected.length) return;
                 setSt((s) => ({ ...s, selected: [] }));
                 close();
-                say("リセットしました");
+                say(t("リセットしました"));
               }}
             />
             <p class="small faint" style={{ marginTop: 16 }}>
-              データはこの端末のブラウザ（localStorage）にのみ保存され、外部へ送信されません。非公式ツールです。実際の履修登録は大学のシステムで行ってください。
+              {t("データはこの端末のブラウザ（localStorage）にのみ保存され、外部へ送信されません。非公式ツールです。実際の履修登録は大学のシステムで行ってください。")}
             </p>
           </div>
         );
@@ -867,13 +886,13 @@ export function App() {
 }
 
 const THEME_LABEL: Record<Theme, string> = {
-  system: "自動（端末の設定）",
-  light: "方眼紙（ライト）",
-  dark: "墨（ダーク）",
-  sepia: "セピア（目にやさしい）",
-  blueprint: "設計図",
-  scope: "オシロスコープ",
-  photo: "写真",
+  system: k("自動（端末の設定）"),
+  light: k("方眼紙（ライト）"),
+  dark: k("墨（ダーク）"),
+  sepia: k("セピア（目にやさしい）"),
+  blueprint: k("設計図"),
+  scope: k("オシロスコープ"),
+  photo: k("写真"),
 };
 const THEME_COLOR: Record<string, string> = { light: "#f8f6f1", dark: "#151412", sepia: "#f3ecdc", blueprint: "#0d2b4e", scope: "#050d09", photo: "#0b0d12" };
 
@@ -937,23 +956,23 @@ function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned
   const p = Math.min(100 - e, pct(planned));
   return (
     <footer class="creditbar">
-      <button class="creditbar-in" onClick={onOpen} aria-label="単位と卒業要件を開く">
+      <button class="creditbar-in" onClick={onOpen} aria-label={t("単位と卒業要件を開く")}>
         <span class="cb-line">
           <span>
-            取得予定 <b class="num is-plan">{planned}</b>
+            {t("取得予定")} <b class="num is-plan">{planned}</b>
             {T ? (
               <>
-                {" "}/ 卒業まで残り <b class="num">{left}</b> 単位
+                {" "}/ {t("卒業まで残り")} <b class="num">{left}</b> {t("単位")}
               </>
             ) : (
-              " 単位"
+              " " + t("単位")
             )}
           </span>
-          <span class="cb-more">詳細</span>
+          <span class="cb-more">{t("詳細")}</span>
         </span>
         {T > 0 && (
           <>
-            <span class="ruler" style={{ "--tick": `${(10 / T) * 100}%` }} role="img" aria-label={`修得済${earned}単位、4年計画${planned}単位、残り${left}単位`}>
+            <span class="ruler" style={{ "--tick": `${(10 / T) * 100}%` }} role="img" aria-label={t("修得済{e}単位、4年計画{p}単位、残り{l}単位", { e: earned, p: planned, l: left })}>
               <i class="ruler-done" style={{ width: `${e}%` }} />
               <i class="ruler-plan" style={{ width: `${p}%` }} />
             </span>
@@ -962,16 +981,16 @@ function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned
               {e >= 22 ? (
                 <>
                   <span style={{ left: 0 }}>0</span>
-                  <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>修得済 {earned}</span>
-                  <span class="is-plan" style={{ left: `${e}%`, paddingLeft: 4 }}>計画 {planned}</span>
+                  <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>{t("修得済")} {earned}</span>
+                  <span class="is-plan" style={{ left: `${e}%`, paddingLeft: 4 }}>{t("計画")} {planned}</span>
                 </>
               ) : (
                 <span style={{ left: 0 }}>
-                  {earned > 0 && `修得済 ${earned} · `}
-                  <span class="is-plan" style={{ position: "static" }}>計画 {planned}</span>
+                  {earned > 0 && `${t("修得済")} ${earned} · `}
+                  <span class="is-plan" style={{ position: "static" }}>{t("計画")} {planned}</span>
                 </span>
               )}
-              <span style={{ right: 0 }}>卒業 {T}</span>
+              <span style={{ right: 0 }}>{t("卒業")} {T}</span>
             </span>
           </>
         )}

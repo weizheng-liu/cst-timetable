@@ -1,3 +1,4 @@
+import { t, tv } from "../lib/i18n";
 import { Search, SearchX } from "lucide-preact";
 import { normName } from "../lib/credits";
 import { useMemo, useState } from "preact/hooks";
@@ -91,14 +92,14 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
     <>
       {here.length > 0 && (
         <>
-          <div class="section-label">選択中</div>
-          <ul class="pick-list" role="radiogroup" aria-label="選択中の科目">
+          <div class="section-label">{t("選択中")}</div>
+          <ul class="pick-list" role="radiogroup" aria-label={t("選択中の科目")}>
             {here.map(row)}
           </ul>
         </>
       )}
 
-      <div class="chips" style={{ marginTop: here.length ? 16 : 0 }} role="group" aria-label="絞り込み">
+      <div class="chips" style={{ marginTop: here.length ? 16 : 0 }} role="group" aria-label={t("絞り込み")}>
         <button
           class="chip"
           aria-pressed={all}
@@ -107,24 +108,24 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
             setMajorOnly(false);
           }}
         >
-          すべて
+          {t("すべて")}
         </button>
-        {tagList.slice(0, 2).map((t) => (
-          <button key={t.id} class="chip" aria-pressed={tags.includes(t.id)} onClick={() => toggleTag(t.id)}>
-            {t.label}
+        {tagList.slice(0, 2).map((x) => (
+          <button key={x.id} class="chip" aria-pressed={tags.includes(x.id)} onClick={() => toggleTag(x.id)}>
+            {tv(x.label)}
           </button>
         ))}
         <button class="chip" aria-pressed={majorOnly} onClick={() => setMajorOnly((v) => !v)}>
-          専門のみ
+          {t("専門のみ")}
         </button>
-        {tagList.slice(2).map((t) => (
-          <button key={t.id} class="chip" aria-pressed={tags.includes(t.id)} onClick={() => toggleTag(t.id)}>
-            {t.label}
+        {tagList.slice(2).map((x) => (
+          <button key={x.id} class="chip" aria-pressed={tags.includes(x.id)} onClick={() => toggleTag(x.id)}>
+            {tv(x.label)}
           </button>
         ))}
         {certCount > 0 && (
           <button class="chip" aria-pressed={cert} onClick={() => setCert((v) => !v)}>
-            教職・学芸員 {certCount}
+            {t("教職・学芸員")} {certCount}
           </button>
         )}
       </div>
@@ -132,11 +133,11 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
       {allGrades && (
         <label class="search">
           <Search size={15} />
-          <input type="search" placeholder="科目名・教員名で絞り込み" value={q} onInput={(e) => setQ((e.target as HTMLInputElement).value)} autoFocus />
+          <input type="search" placeholder={t("科目名・教員名で絞り込み")} value={q} onInput={(e) => setQ((e.target as HTMLInputElement).value)} autoFocus />
         </label>
       )}
 
-      <ul class="pick-list" role="radiogroup" aria-label="この時限の開講科目">
+      <ul class="pick-list" role="radiogroup" aria-label={t("この時限の開講科目")}>
         {filtered.map(row)}
       </ul>
 
@@ -148,7 +149,7 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
             setQ("");
           }}
         >
-          {allGrades ? "自分の学年の科目だけに戻す" : `他学年・再履修の科目を探す（${hiddenOtherGrades}件）`}
+          {allGrades ? t("自分の学年の科目だけに戻す") : t("他学年・再履修の科目を探す（{n}件）", { n: hiddenOtherGrades })}
         </button>
       )}
 
@@ -157,16 +158,16 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
           <SearchX size={22} />
           <div>
             {offered.length === 0
-              ? "この時間に開講される科目はありません。空きコマとして使いましょう。"
+              ? t("この時間に開講される科目はありません。空きコマとして使いましょう。")
               : tags.length || majorOnly || q
-                ? "条件に合う科目がありません。絞り込みを外してみてください。"
+                ? t("条件に合う科目がありません。絞り込みを外してみてください。")
                 : here.length
-                  ? "この時間の他の候補はありません。"
-                  : `${grade}年次の科目はありません。`}
+                  ? t("この時間の他の候補はありません。")
+                  : t("{n}年次の科目はありません。", { n: grade })}
           </div>
           {!allGrades && hiddenOtherGrades > 0 && (
             <button class="btn ghost" style={{ marginTop: 14 }} onClick={() => setAllGrades(true)}>
-              他学年・再履修の科目を探す（{hiddenOtherGrades}件）
+              {t("他学年・再履修の科目を探す（{n}件）", { n: hiddenOtherGrades })}
             </button>
           )}
         </div>
@@ -175,7 +176,7 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
       {picked && (
         <div class="sheet-cta">
           <button class="btn ghost" onClick={() => onOpen(picked)}>
-            詳細
+            {t("詳細")}
           </button>
           <button
             class={`btn ${pickedOn ? "ghost" : "primary"} cta`}
@@ -185,11 +186,11 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
             }}
           >
             <span class="cta-name">
-              {picked.name}を{pickedOn ? "外す" : "追加"}
+              {pickedOn ? t("{name}を外す", { name: picked.name }) : t("{name}を追加", { name: picked.name })}
             </span>
             <span class="cta-cr">
               {pickedOn ? "−" : "+"}
-              {picked.credits}単位
+              {t("{n}単位", { n: picked.credits })}
             </span>
           </button>
         </div>
@@ -199,7 +200,7 @@ export function SlotPicker({ offered, selected, grade, statusOf, reqOf, category
 }
 
 function Row({ c, on, picked, cat, required, group, retake, passed, clash, showGrade, status, onPick }: { c: Course; on: boolean; picked: boolean; cat: Category; required: boolean; group: string | null; retake: boolean; passed: string | null; clash: Course[]; showGrade?: boolean; status?: Eligible; onPick: () => void }) {
-  const evalTags = EVAL_TAGS.filter((t) => c.evaluation.tags.includes(t.id));
+  const evalTags = EVAL_TAGS.filter((x) => c.evaluation.tags.includes(x.id));
   const others = clash.filter((x) => x.id !== c.id);
   return (
     <li class={`pick cat-${cat} ${picked ? "is-picked" : ""}`}>
@@ -209,42 +210,42 @@ function Row({ c, on, picked, cat, required, group, retake, passed, clash, showG
           <span class="pick-top">
             <b>
               {c.name}
-              {c.classGroup && <span class="faint small"> クラス{c.classGroup}</span>}
+              {c.classGroup && <span class="faint small"> {t("クラス{g}", { g: c.classGroup })}</span>}
             </b>
             <span class="cr">
-              <em class="num">{c.credits}</em>単位
+              <em class="num">{c.credits}</em>{t("単位")}
             </span>
           </span>
           <span class="pick-meta">
             {roomOf(c) && (
-              <span class="code" title="教室">
-                <small>教室</small>
+              <span class="code" title={t("教室")}>
+                <small>{t("教室")}</small>
                 {roomOf(c)}
               </span>
             )}
             <span class="pick-meta-text">
-              {c.teachers.slice(0, 2).join("・")}
-              {c.teachers.length > 2 ? " 他" : ""} · {CATEGORY_LABEL[cat]}
-              {c.grade ? ` · ${c.grade}年` : ""}
+              {c.teachers.slice(0, 2).map(tv).join("・")}
+              {c.teachers.length > 2 ? t(" 他") : ""} · {tv(CATEGORY_LABEL[cat])}
+              {c.grade ? ` · ${t("{n}年", { n: c.grade })}` : ""}
               {c.slots.length > 1 ? ` · ${slotLabel(c.slots)}` : ""}
             </span>
           </span>
           <span class="tags">
-            {on && <span class="tag on">選択中</span>}
-            {retake && <span class="tag fail">再履修が必要</span>}
-            {passed && <span class="tag on">修得済（{passed}）</span>}
-            {required && <span class="tag must">必修</span>}
-            {group && group !== "専門" && <span class="tag">{group}</span>}
-            {c.eligibility && !group && <span class="tag">{status === "cert" ? "資格課程" : "共通・教養"}</span>}
-            {status === "maybe" && <span class="tag amber">履修条件 要確認</span>}
-            {c.notes.includes("再") && <span class="tag">再履修</span>}
-            {c.classFormat === "オンライン" && <span class="tag">オンライン</span>}
-            {evalTags.map((t) => (
-              <span key={t.id} class={`tag ${EASY.has(t.id) ? "easy" : ""}`}>
-                {t.label}
+            {on && <span class="tag on">{t("選択中")}</span>}
+            {retake && <span class="tag fail">{t("再履修が必要")}</span>}
+            {passed && <span class="tag on">{t("修得済（{g}）", { g: passed })}</span>}
+            {required && <span class="tag must">{tv("必修")}</span>}
+            {group && group !== "専門" && <span class="tag">{tv(group)}</span>}
+            {c.eligibility && !group && <span class="tag">{t(status === "cert" ? "資格課程" : "共通・教養")}</span>}
+            {status === "maybe" && <span class="tag amber">{t("履修条件 要確認")}</span>}
+            {c.notes.includes("再") && <span class="tag">{t("再履修")}</span>}
+            {c.classFormat === "オンライン" && <span class="tag">{tv("オンライン")}</span>}
+            {evalTags.map((x) => (
+              <span key={x.id} class={`tag ${EASY.has(x.id) ? "easy" : ""}`}>
+                {tv(x.label)}
               </span>
             ))}
-            {others.length > 0 && <span class="tag coral">{others[0].name}と重複</span>}
+            {others.length > 0 && <span class="tag coral">{t("{name}と重複", { name: others[0].name })}</span>}
           </span>
         </span>
         <span class="radio" aria-hidden="true" />

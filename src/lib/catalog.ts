@@ -2,16 +2,17 @@ import { categoryOf } from "./data";
 import { normName } from "./credits";
 import { groupTag } from "./grades";
 import type { Course, ReqCourse, Requirements } from "./types";
+import { k } from "./i18n";
 
 /** 一覧の区分。色は既存の --cat-* トークンを使い、文字ラベルと頭文字でも区別する（色だけに頼らない） */
 export type Kind = "must" | "choice" | "major" | "liberal" | "basic" | "other";
 export const KINDS: { id: Kind; label: string; mark: string; tone: string }[] = [
-  { id: "must", label: "必修", mark: "必", tone: "core" },
-  { id: "choice", label: "選択必修", mark: "択", tone: "lang" },
-  { id: "major", label: "専門選択", mark: "専", tone: "elective" },
-  { id: "liberal", label: "教養・全学共通", mark: "教", tone: "general" },
-  { id: "basic", label: "基礎・外国語", mark: "基", tone: "lab" },
-  { id: "other", label: "卒業要件の区分不明", mark: "他", tone: "none" },
+  { id: "must", label: k("必修"), mark: k("必"), tone: "core" },
+  { id: "choice", label: k("選択必修"), mark: k("択"), tone: "lang" },
+  { id: "major", label: k("専門選択"), mark: k("専"), tone: "elective" },
+  { id: "liberal", label: k("教養・全学共通"), mark: k("教"), tone: "general" },
+  { id: "basic", label: k("基礎・外国語"), mark: k("基"), tone: "lab" },
+  { id: "other", label: k("卒業要件の区分不明"), mark: k("他"), tone: "none" },
 ];
 
 export function kindOf(c: Course, rc: ReqCourse | undefined, req: Requirements | null): Kind {

@@ -2,18 +2,19 @@ import { Check, ImagePlus, RotateCcw } from "lucide-preact";
 import { useEffect, useState } from "preact/hooks";
 import { PERIOD_TIMES, validRange, type PeriodTimes } from "../lib/periods";
 import type { Theme } from "../lib/store";
+import { k, t } from "../lib/i18n";
 
 type ThemeOpt = { id: Theme; label: string; sub: string };
 const SIMPLE: ThemeOpt[] = [
-  { id: "system", label: "自動", sub: "端末の設定に合わせる" },
-  { id: "light", label: "方眼紙", sub: "緋と方眼・ライト（標準）" },
-  { id: "dark", label: "墨", sub: "緋と方眼・ダーク" },
-  { id: "sepia", label: "セピア", sub: "方眼紙をさらに黄ばませた目にやさしい版" },
+  { id: "system", label: k("自動"), sub: k("端末の設定に合わせる") },
+  { id: "light", label: k("方眼紙"), sub: k("緋と方眼・ライト（標準）") },
+  { id: "dark", label: k("墨"), sub: k("緋と方眼・ダーク") },
+  { id: "sepia", label: k("セピア"), sub: k("方眼紙をさらに黄ばませた目にやさしい版") },
 ];
 const ART: ThemeOpt[] = [
-  { id: "scope", label: "オシロスコープ", sub: "曜日ごとの負荷を波形で表示・蛍光グリーン" },
-  { id: "blueprint", label: "設計図", sub: "青焼きの製図用紙・方眼・寸法線" },
-  { id: "photo", label: "写真", sub: "好きな写真を背景に（端末内のみ保存）" },
+  { id: "scope", label: k("オシロスコープ"), sub: k("曜日ごとの負荷を波形で表示・蛍光グリーン") },
+  { id: "blueprint", label: k("設計図"), sub: k("青焼きの製図用紙・方眼・寸法線") },
+  { id: "photo", label: k("写真"), sub: k("好きな写真を背景に（端末内のみ保存）") },
 ];
 
 interface ThemeProps {
@@ -35,27 +36,27 @@ export function ThemePicker({ value, onChange, hasPhoto, onPhoto, dim, onDim }: 
         </span>
       </span>
       <span class="theme-text">
-        <span class="row-title">{o.label}</span>
-        <span class="row-sub">{o.sub}</span>
+        <span class="row-title">{t(o.label)}</span>
+        <span class="row-sub">{t(o.sub)}</span>
       </span>
       {value === o.id && <Check size={16} class="theme-check" />}
     </button>
   );
   return (
     <>
-      <div class="section-label" style={{ marginTop: 0 }}>シンプル</div>
-      <div class="theme-grid" role="radiogroup" aria-label="シンプルなテーマ">
+      <div class="section-label" style={{ marginTop: 0 }}>{t("シンプル")}</div>
+      <div class="theme-grid" role="radiogroup" aria-label={t("シンプルなテーマ")}>
         {SIMPLE.map(opt)}
       </div>
-      <div class="section-label">理工系アート</div>
-      <div class="theme-grid" role="radiogroup" aria-label="アートテーマ">
+      <div class="section-label">{t("理工系アート")}</div>
+      <div class="theme-grid" role="radiogroup" aria-label={t("アートテーマ")}>
         {ART.map(opt)}
       </div>
       {value === "photo" && (
         <div class="photo-tools">
           <label class="btn ghost block">
             <ImagePlus size={16} />
-            {hasPhoto ? "写真を変更" : "写真を選ぶ"}
+            {t(hasPhoto ? "写真を変更" : "写真を選ぶ")}
             <input
               type="file"
               accept="image/*"
@@ -70,15 +71,15 @@ export function ThemePicker({ value, onChange, hasPhoto, onPhoto, dim, onDim }: 
           {hasPhoto && (
             <button class="btn ghost block" onClick={() => onPhoto(null)}>
               <RotateCcw size={16} />
-              既定の背景に戻す
+              {t("既定の背景に戻す")}
             </button>
           )}
           <label class="dim">
-            <span class="small muted">背景の暗さ</span>
-            <input type="range" min={0.3} max={0.85} step={0.05} value={dim} onInput={(e) => onDim(Number((e.target as HTMLInputElement).value))} aria-label="背景の暗さ" />
+            <span class="small muted">{t("背景の暗さ")}</span>
+            <input type="range" min={0.3} max={0.85} step={0.05} value={dim} onInput={(e) => onDim(Number((e.target as HTMLInputElement).value))} aria-label={t("背景の暗さ")} />
           </label>
           <p class="small faint" style={{ margin: 0 }}>
-            写真はこの端末のブラウザにだけ保存され、どこにも送信されません。文字が読みにくいときは暗さを上げてください。
+            {t("写真はこの端末のブラウザにだけ保存され、どこにも送信されません。文字が読みにくいときは暗さを上げてください。")}
           </p>
         </div>
       )}
@@ -107,27 +108,27 @@ export function PeriodEditor({ periods, times, custom, onChange }: PeriodProps) 
   return (
     <>
       <p class="small muted" style={{ margin: "0 0 12px" }}>
-        初期値は理工学部の標準時限です。学科・校舎で違う場合はここで直せます。変更は時間割とカレンダー書き出し（.ics）に反映され、この端末にだけ保存されます。
+        {t("初期値は理工学部の標準時限です。学科・校舎で違う場合はここで直せます。変更は時間割とカレンダー書き出し（.ics）に反映され、この端末にだけ保存されます。")}
       </p>
       <div class="ptimes">
         {Array.from({ length: periods }, (_, i) => i + 1).map((p) => {
-          const t = custom[p] ?? times[p];
+          const tm = custom[p] ?? times[p];
           const bad = custom[p] && !validRange(custom[p]);
           const changed = !!custom[p];
           return (
             <div key={p} class={`ptime ${bad ? "bad" : ""}`}>
-              <span class="pno num">{p}限</span>
-              <TimeInput label={`${p}限 開始`} value={t[0]} onCommit={(v) => set(p, 0, v)} />
+              <span class="pno num">{t("{p}限", { p })}</span>
+              <TimeInput label={t("{p}限 開始", { p })} value={tm[0]} onCommit={(v) => set(p, 0, v)} />
               <span class="faint">–</span>
-              <TimeInput label={`${p}限 終了`} value={t[1]} onCommit={(v) => set(p, 1, v)} />
-              <span class="pmark small">{bad ? "終了は開始より後に" : changed ? "変更" : ""}</span>
+              <TimeInput label={t("{p}限 終了", { p })} value={tm[1]} onCommit={(v) => set(p, 1, v)} />
+              <span class="pmark small">{bad ? t("終了は開始より後に") : changed ? t("変更") : ""}</span>
             </div>
           );
         })}
       </div>
       <button class="btn ghost block" style={{ marginTop: 16 }} disabled={!edited} onClick={() => onChange({})}>
         <RotateCcw size={16} />
-        標準の時間に戻す
+        {t("標準の時間に戻す")}
       </button>
     </>
   );

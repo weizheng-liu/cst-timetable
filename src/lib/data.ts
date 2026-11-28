@@ -1,4 +1,5 @@
 import type { Course, DataIndex, DeptFile, EvalPart, Requirements } from "./types";
+import { k } from "./i18n";
 
 const BASE = import.meta.env.BASE_URL + "data/";
 
@@ -49,11 +50,11 @@ export async function loadRequirements(entryYear: number, dept: string): Promise
 export type Category = "core" | "elective" | "general" | "lang" | "lab";
 
 export const CATEGORY_LABEL: Record<Category, string> = {
-  core: "専門必修",
-  elective: "専門選択",
-  general: "共通教育",
-  lang: "外国語",
-  lab: "実験・演習",
+  core: k("専門必修"),
+  elective: k("専門選択"),
+  general: k("共通教育"),
+  lang: k("外国語"),
+  lab: k("実験・演習"),
 };
 
 const LANG_RE = /英語|English|ドイツ語|フランス語|中国語|スペイン語|韓国語|朝鮮語|ロシア語|イタリア語|日本語|TOEIC/i;
@@ -79,19 +80,19 @@ export function roomOf(c: Course): string | null {
 }
 
 export const EVAL_TAGS: { id: string; label: string }[] = [
-  { id: "no-exam", label: "試験なし" },
-  { id: "report-heavy", label: "レポート中心" },
-  { id: "attendance-heavy", label: "出席重視" },
-  { id: "exam-heavy", label: "試験重視" },
+  { id: "no-exam", label: k("試験なし") },
+  { id: "report-heavy", label: k("レポート中心") },
+  { id: "attendance-heavy", label: k("出席重視") },
+  { id: "exam-heavy", label: k("試験重視") },
 ];
 
 export const EVAL_CATEGORY: Record<string, { label: string; color: string }> = {
-  exam: { label: "試験", color: "var(--cat-core-ink)" },
-  quiz: { label: "小テスト", color: "var(--cat-lang-ink)" },
-  report: { label: "レポート・課題", color: "var(--cat-elective-ink)" },
-  attendance: { label: "出席・平常点", color: "var(--cat-general-ink)" },
-  presentation: { label: "発表", color: "var(--ink-3)" },
-  other: { label: "その他", color: "var(--cat-lab-ink)" },
+  exam: { label: k("試験"), color: "var(--cat-core-ink)" },
+  quiz: { label: k("小テスト"), color: "var(--cat-lang-ink)" },
+  report: { label: k("レポート・課題"), color: "var(--cat-elective-ink)" },
+  attendance: { label: k("出席・平常点"), color: "var(--cat-general-ink)" },
+  presentation: { label: k("発表"), color: "var(--ink-3)" },
+  other: { label: k("その他"), color: "var(--cat-lab-ink)" },
 };
 
 function guessEvalCategory(label: string): string {

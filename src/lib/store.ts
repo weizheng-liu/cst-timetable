@@ -4,6 +4,7 @@ import { validRange } from "./periods";
 import { GRADE_LIST, type Grades } from "./grades";
 import { MARK_KEY_RE, NOTE_MAX, type Marks } from "./alerts";
 import { sanitizeCustom, type CustomCourse } from "./custom";
+import { detectLang, isLang, type Lang } from "./i18n";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -24,6 +25,7 @@ export interface SavedState {
   showSat: boolean; // 土曜の列を常に出す（土曜に授業があれば自動で出る）
   marks: Marks; // 試験・オンライン回の手動の目印（科目id@日付）。この端末と JSON 保存のみ
   grades: Grades; // 自分で入力した成績（この端末にのみ保存。サーバーへは送らない）
+  lang: Lang; // 画面の言語（日本語・简体中文・English）。初回はブラウザの言語から
   rotation: Record<string, boolean>; // 班ごとにテーマが違う実験か（自動判定の上書き。科目id → true/false）
   custom: CustomCourse[]; // 自分で追加した科目（id は "my:…"）。この端末と JSON 保存のみ
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
@@ -34,7 +36,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, rotation: {}, custom: [], photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, lang: detectLang(), rotation: {}, custom: [], photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -117,6 +119,7 @@ export function sanitize(x: any): SavedState {
     showSat: x.showSat === true,
     marks,
     grades,
+    lang: isLang(x.lang) ? x.lang : detectLang(),
     rotation: Object.fromEntries(
       Object.entries<any>(x.rotation && typeof x.rotation === "object" ? x.rotation : {})
         .filter(([k, v]) => /^(?:[0-9A-Za-z]{1,12}|my:[a-z0-9]{1,16})$/.test(k) && typeof v === "boolean")

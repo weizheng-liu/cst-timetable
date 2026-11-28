@@ -1,3 +1,4 @@
+import { t } from "../lib/i18n";
 import type { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { ChevronLeft, X } from "lucide-preact";
@@ -65,7 +66,7 @@ export function Sheet({ open, onClose, title, sub, eyebrow, children, headExtra,
         <div class="grabber" />
         <div class="sheet-head">
           {onBack && (
-            <button class="icon-btn back" aria-label="戻る" onClick={onBack}>
+            <button class="icon-btn back" aria-label={t("戻る")} onClick={onBack}>
               <ChevronLeft size={20} />
             </button>
           )}
@@ -75,7 +76,7 @@ export function Sheet({ open, onClose, title, sub, eyebrow, children, headExtra,
             {sub && <span class="sub">{sub}</span>}
           </h2>
           {headExtra}
-          <button class="close-btn" aria-label="閉じる" onClick={onClose}>
+          <button class="close-btn" aria-label={t("閉じる")} onClick={onClose}>
             <X size={14} strokeWidth={2.2} />
           </button>
         </div>

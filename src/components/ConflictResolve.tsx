@@ -1,3 +1,4 @@
+import { t, tv } from "../lib/i18n";
 import { useState } from "preact/hooks";
 import { CATEGORY_LABEL, EVAL_TAGS, roomOf, type Category } from "../lib/data";
 import { slotText, type ResolveOption } from "../lib/resolve";
@@ -20,7 +21,7 @@ export function ConflictResolve({ a, b, options, planned, category, isRequired, 
   const chosen = options[pick];
   return (
     <>
-      <p class="resolve-lead">どちらかを残すか、別の時限に移せます。</p>
+      <p class="resolve-lead">{t("どちらかを残すか、別の時限に移せます。")}</p>
       <div class="cmp">
         <CmpCard c={a} cat={category(a)} required={isRequired(a)} alt={altOf(a)} />
         <span class="cmp-vs" aria-hidden="true">
@@ -28,23 +29,23 @@ export function ConflictResolve({ a, b, options, planned, category, isRequired, 
         </span>
         <CmpCard c={b} cat={category(b)} required={isRequired(b)} alt={altOf(b)} />
       </div>
-      <div class="section-label">解決方法</div>
-      <ul class="opts" role="radiogroup" aria-label="解決方法">
+      <div class="section-label">{t("解決方法")}</div>
+      <ul class="opts" role="radiogroup" aria-label={t("解決方法")}>
         {options.map((o, i) => (
           <li key={i} class={`opt ${pick === i ? "is-picked" : ""} ${o.kind === "keep" && o.dropRequired ? "is-warn" : ""}`}>
             <button role="radio" aria-checked={pick === i} class="opt-btn" onClick={() => setPick(i)}>
               <span class="radio" aria-hidden="true" />
               <span>
                 <b>
-                  {o.kind === "move" ? `${o.from.name}を${slotText(o.to.slots)}のクラスへ移す` : `${o.keep.name}だけを残す`}
-                  {o.kind === "move" && <i class="badge">おすすめ</i>}
+                  {o.kind === "move" ? t("{name}を{slot}のクラスへ移す", { name: o.from.name, slot: slotText(o.to.slots) }) : t("{name}だけを残す", { name: o.keep.name })}
+                  {o.kind === "move" && <i class="badge">{t("おすすめ")}</i>}
                 </b>
                 <small>
                   {o.kind === "move"
-                    ? "両方とも履修できます · 単位の変化なし"
+                    ? t("両方とも履修できます · 単位の変化なし")
                     : o.dropRequired
-                      ? `必修の${o.drop.name}が未履修になります · 取得予定 ${planned} → ${planned - o.drop.credits}`
-                      : `${o.drop.name}を外す · 取得予定 ${planned} → ${planned - o.drop.credits}`}
+                      ? t("必修の{name}が未履修になります · 取得予定 {a} → {b}", { name: o.drop.name, a: planned, b: planned - o.drop.credits })
+                      : t("{name}を外す · 取得予定 {a} → {b}", { name: o.drop.name, a: planned, b: planned - o.drop.credits })}
                 </small>
               </span>
             </button>
@@ -54,7 +55,7 @@ export function ConflictResolve({ a, b, options, planned, category, isRequired, 
       {chosen && (
         <div class="sheet-cta">
           <button class="btn primary cta" onClick={() => onApply(chosen)}>
-            <span class="cta-name">{chosen.kind === "move" ? `${slotText(chosen.to.slots)}に移して解決` : `${chosen.keep.name}だけを残して解決`}</span>
+            <span class="cta-name">{chosen.kind === "move" ? t("{slot}に移して解決", { slot: slotText(chosen.to.slots) }) : t("{name}だけを残して解決", { name: chosen.keep.name })}</span>
           </button>
         </div>
       )}
@@ -64,36 +65,36 @@ export function ConflictResolve({ a, b, options, planned, category, isRequired, 
 
 function CmpCard({ c, cat, required, alt }: { c: Course; cat: Category; required: boolean; alt: Course | null }) {
   const top = [...c.evaluation.parts].sort((x, y) => y.percent - x.percent)[0];
-  const tag = EVAL_TAGS.find((t) => c.evaluation.tags.includes(t.id));
-  const evalText = tag ? tag.label : top ? `${top.label} ${top.percent}%` : "—";
+  const tag = EVAL_TAGS.find((x) => c.evaluation.tags.includes(x.id));
+  const evalText = tag ? tv(tag.label) : top ? `${top.label} ${top.percent}%` : "—";
   return (
     <div class={`cmp-card cat-${cat}`}>
       <div class="cmp-top">
         <span class="dot" />
-        <span>{CATEGORY_LABEL[cat]}</span>
-        <span class="cmp-tag">{required ? "必修" : "選択"}</span>
+        <span>{tv(CATEGORY_LABEL[cat])}</span>
+        <span class="cmp-tag">{tv(required ? "必修" : "選択")}</span>
       </div>
       <b class="cmp-name">{c.name}</b>
       {roomOf(c) && (
         <div class="cmp-who">
           <span class="code">
-            <small>教室</small>
+            <small>{t("教室")}</small>
             {roomOf(c)}
           </span>
         </div>
       )}
       <div class="cmp-who">
-        {c.teachers[0] ?? "—"} · <em class="num">{c.credits}</em>単位
+        {c.teachers[0] ?? "—"} · <em class="num">{c.credits}</em>{t("単位")}
       </div>
       <dl class="cmp-dl">
-        <dt>評価</dt>
+        <dt>{t("評価")}</dt>
         <dd>{evalText}</dd>
-        <dt>別の時限</dt>
-        <dd class={alt ? "is-alt" : ""}>{alt ? `${slotText(alt.slots)}（空き）` : "なし"}</dd>
+        <dt>{t("別の時限")}</dt>
+        <dd class={alt ? "is-alt" : ""}>{alt ? t("{slot}（空き）", { slot: slotText(alt.slots) }) : t("なし")}</dd>
       </dl>
       <p class="cmp-note">
-        {required ? "必修" : "選択"}・{c.grade ? `${c.grade}年` : ""}
-        {c.term}
+        {tv(required ? "必修" : "選択")} · {c.grade ? t("{n}年", { n: c.grade }) + " " : ""}
+        {tv(c.term)}
       </p>
     </div>
   );

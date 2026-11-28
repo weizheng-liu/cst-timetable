@@ -1,4 +1,5 @@
 import type { Course, Session } from "./types";
+import { k } from "./i18n";
 
 /**
  * 試験・オンライン回の目印。シラバスの授業計画から推定し、利用者が回ごとに上書きできる。
@@ -131,7 +132,7 @@ export function upcoming(c: Course, today: string, marks: Marks, day?: number, h
   return out.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind));
 }
 
-export const ALERT_LABEL: Record<Alert["kind"], string> = { exam: "試験", quiz: "小テスト", task: "課題", online: "オンライン", cancel: "休講", note: "メモ" };
+export const ALERT_LABEL: Record<Alert["kind"], string> = { exam: k("試験"), quiz: k("小テスト"), task: k("課題"), online: k("オンライン"), cancel: k("休講"), note: k("メモ") };
 export const md = (d: string) => {
   const x = new Date(d + "T00:00:00");
   return `${x.getMonth() + 1}/${x.getDate()}`;

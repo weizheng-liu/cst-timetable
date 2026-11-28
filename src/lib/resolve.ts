@@ -1,5 +1,5 @@
 import { normName } from "./credits";
-import { DAYS } from "./periods";
+import { dayName, t } from "./i18n";
 import { clashesWith, inTerm } from "./schedule";
 import type { Course, Slot } from "./types";
 
@@ -13,7 +13,7 @@ export function slotText(slots: Slot[]): string {
   for (const s of slots) byDay.set(s.day, [...(byDay.get(s.day) ?? []), s.period]);
   return [...byDay.entries()]
     .sort((a, b) => a[0] - b[0])
-    .map(([d, ps]) => `${DAYS[d - 1]}曜 ${ps.sort((a, b) => a - b).join("・")}限`)
+    .map(([d, ps]) => t("{day}曜 {p}限", { day: dayName(d), p: ps.sort((a, b) => a - b).join("・") }))
     .join("・");
 }
 

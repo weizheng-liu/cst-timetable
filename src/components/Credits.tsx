@@ -2,6 +2,7 @@ import { AlertTriangle, Info } from "lucide-preact";
 import { inputGroups, normName, progress } from "../lib/credits";
 import type { Course, Requirements } from "../lib/types";
 import type { GradeSummary } from "../lib/grades";
+import { t, tv } from "../lib/i18n";
 
 interface Props {
   req: Requirements | null;
@@ -23,12 +24,12 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
       <>
         <div class="big">
           {planned}
-          <span class="small muted"> 単位（全学年の計画）</span>
+          <span class="small muted"> {t("単位（全学年の計画）")}</span>
         </div>
         <div class="banner" style={{ marginTop: 16 }}>
           <Info size={16} />
           <div>
-            {deptName}・{entryYear}年度入学の卒業要件データはまだ登録されていません。現在は電子工学科・精密機械工学科（2025年度入学）に対応しています。
+            {t("{dept}・{year}年度入学の卒業要件データはまだ登録されていません。現在は電子工学科・精密機械工学科（2025年度入学）に対応しています。", { dept: deptName, year: entryYear })}
           </div>
         </div>
       </>
@@ -46,19 +47,19 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
         <div class="banner warn">
           <AlertTriangle size={16} />
           <div>
-            <b>未確認</b>：この卒業要件は学部要覧PDFから自動抽出したもので、まだ人の目で確認されていません。必ず
+            <b>{t("未確認")}</b>{t("：この卒業要件は学部要覧PDFから自動抽出したもので、まだ人の目で確認されていません。必ず")}
             <a href={req.source.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>
-              学部要覧（p.{req.source.pages.join(", ")}）
+              {t("学部要覧（p.{p}）", { p: req.source.pages.join(", ") })}
             </a>
-            と照合してください。
+            {t("と照合してください。")}
           </div>
         </div>
       )}
       <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
         <div class="big">{total}</div>
-        <div class="muted">/ {req.totalCredits} 単位</div>
+        <div class="muted">/ {t("{n} 単位", { n: req.totalCredits })}</div>
         <div class="small" style={{ marginLeft: "auto", color: missingTotal ? "var(--ink-2)" : "var(--cat-elective-ink)" }}>
-          {missingTotal ? `あと ${missingTotal} 単位` : "合計は充足"}
+          {missingTotal ? t("あと {n} 単位", { n: missingTotal }) : t("合計は充足")}
         </div>
       </div>
       <div class="meter">
@@ -66,7 +67,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
         <i class="plan" style={{ width: `${Math.min(100, (pr.plannedTotal / req.totalCredits) * 100)}%` }} />
       </div>
       <p class="small muted" style={{ margin: "8px 0 4px" }}>
-        全学年の計画 {pr.plannedTotal} 単位 + 修得済み {earnedTotal} 単位。
+        {t("全学年の計画 {a} 単位 + 修得済み {b} 単位。", { a: pr.plannedTotal, b: earnedTotal })}
       </p>
       <button class="gpa-link" onClick={onGrades}>
         <span>
@@ -74,17 +75,17 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
           <b class="num">{summary.gpa != null ? summary.gpa.toFixed(2) : "—"}</b>
         </span>
         <span class="gpa-link-text">
-          {summary.gpa != null ? `成績から 修得 ${summary.earned} 単位` : "成績を入力すると GPA と修得単位を自動で計算します"}
-          {summary.failedRequired.length > 0 && <b class="fail-text"> · 必修 {summary.failedRequired.length} 科目が不合格</b>}
+          {summary.gpa != null ? t("成績から 修得 {n} 単位", { n: summary.earned }) : t("成績を入力すると GPA と修得単位を自動で計算します")}
+          {summary.failedRequired.length > 0 && <b class="fail-text"> · {t("必修 {n} 科目が不合格", { n: summary.failedRequired.length })}</b>}
         </span>
-        <span class="cb-more">成績</span>
+        <span class="cb-more">{t("成績")}</span>
       </button>
 
-      <div class="block-title">区分別</div>
+      <div class="block-title">{t("区分別")}</div>
       {pr.groups.map((g) => (
         <div key={g.group.id} class={`greq ${g.depth ? "sub" : ""}`}>
           <div class="top">
-            <span class="label">{g.group.label}</span>
+            <span class="label">{tv(g.group.label)}</span>
             <span class="val">
               {g.total}
               <span class="faint"> / {g.group.minCredits}</span>
@@ -94,7 +95,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
             <i class={g.missing ? "" : "done"} style={{ width: `${g.group.minCredits ? Math.min(100, (g.total / g.group.minCredits) * 100) : 100}%` }} />
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
-            <span class={`gap ${g.missing ? "" : "ok"}`}>{g.missing ? `不足 ${g.missing} 単位` : "充足"}</span>
+            <span class={`gap ${g.missing ? "" : "ok"}`}>{g.missing ? t("不足 {n} 単位", { n: g.missing }) : t("充足")}</span>
             <span class="faint small" style={{ marginLeft: "auto" }}>
               p.{g.group.page}
             </span>
@@ -102,12 +103,12 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
           {g.group.note && <div class="small muted" style={{ marginTop: 2 }}>{g.group.note}</div>}
           {g.requiredLeft.length > 0 && leaves.has(g.group.id) && (
             <div class="small" style={{ marginTop: 4, color: "var(--ink-2)" }}>
-              未選択の必修：{g.requiredLeft.map((r) => r.name).join("、")}
+              {t("未選択の必修：")}{g.requiredLeft.map((r) => r.name).join("、")}
             </div>
           )}
           {leaves.has(g.group.id) && (
             <label class="earned">
-              成績未入力の修得分
+              {t("成績未入力の修得分")}
               <input
                 type="number"
                 inputMode="numeric"
@@ -116,7 +117,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
                 value={earned[g.group.id] ?? ""}
                 onInput={(e) => onEarned(g.group.id, Math.max(0, Number((e.target as HTMLInputElement).value) || 0))}
               />
-              単位
+              {t("単位")}
             </label>
           )}
         </div>
@@ -124,7 +125,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
 
       {(req.choiceRules ?? []).length > 0 && (
         <>
-          <div class="block-title">選択必修</div>
+          <div class="block-title">{tv("選択必修")}</div>
           {req.choiceRules!.map((ch) => {
             const names = new Set(ch.courses.map(normName));
             const seen = new Set<string>();
@@ -145,7 +146,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
                     <span class="faint"> / {ch.minCredits}</span>
                   </span>
                 </div>
-                <div class="small muted">全学年の計画で判定 · p.{ch.page}</div>
+                <div class="small muted">{t("全学年の計画で判定")} · p.{ch.page}</div>
               </div>
             );
           })}
@@ -154,13 +155,13 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
 
       {pr.unmatched.length > 0 && (
         <>
-          <div class="block-title">区分を判定できなかった科目</div>
+          <div class="block-title">{t("区分を判定できなかった科目")}</div>
           <p class="small muted" style={{ marginTop: 0 }}>
-            授業科目配置表に名前が見つからない科目です（共通科目配置表の科目など）。合計には含めていますが、区分別には含めていません。
+            {t("授業科目配置表に名前が見つからない科目です（共通科目配置表の科目など）。合計には含めていますが、区分別には含めていません。")}
           </p>
           {pr.unmatched.map((c) => (
             <div key={c.id} class="small">
-              {c.name}（{c.credits}単位）
+              {c.name}（{t("{n}単位", { n: c.credits })}）
             </div>
           ))}
         </>

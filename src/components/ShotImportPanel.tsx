@@ -2,10 +2,11 @@ import { ImagePlus, RotateCcw } from "lucide-preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { readScreenshot, type ShotRead } from "../lib/ocr";
 import { chosenIds, gradeForYear, matchCells, type CellMatch } from "../lib/screenshot";
-import { dayLabel } from "../lib/periods";
+
 import { isUnscheduled } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import type { CustomCourse } from "../lib/custom";
+import { dayName, slotName, t, tv } from "../lib/i18n";
 
 const MY = "__my"; // 自分の科目として追加
 const KEEP = "__keep"; // 照合した科目を、画像の時間のまま自分で追加
@@ -48,7 +49,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
     setBusy([0, 1]);
     try {
       const r = await readScreenshot(f, starts, (d, t) => setBusy([d, t]));
-      if (!r) setFail("時間割の格子が見つかりませんでした。曜日と時限が並んだ画面全体の写真を選んでください。");
+      if (!r) setFail(t("時間割の格子が見つかりませんでした。曜日と時限が並んだ画面全体の写真を選んでください。"));
       else {
         setShot(r);
         if (r.term) setTerm(r.term);
@@ -57,7 +58,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
       }
     } catch (e) {
       console.error(e);
-      setFail("読み取りに失敗しました。通信が切れていないか（初回だけ日本語データ 2MB を読み込みます）確かめて、もう一度試してください。");
+      setFail(t("読み取りに失敗しました。通信が切れていないか（初回だけ日本語データ 2MB を読み込みます）確かめて、もう一度試してください。"));
     } finally {
       setBusy(null);
     }
@@ -99,26 +100,26 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
       {!busy && !shot && (
         <>
           <ol class="steps">
-            <li>他の時間割アプリで、曜日と時限が並んだ週の画面を開く</li>
-            <li>スクリーンショットを撮る（氏名や学生番号が写らない画面で）</li>
-            <li>下のボタンからその画像を選ぶ</li>
+            <li>{t("他の時間割アプリで、曜日と時限が並んだ週の画面を開く")}</li>
+            <li>{t("スクリーンショットを撮る（氏名や学生番号が写らない画面で）")}</li>
+            <li>{t("下のボタンからその画像を選ぶ")}</li>
           </ol>
           <label class="btn primary block shot-pick">
-            <ImagePlus size={16} /> 画像を選ぶ
+            <ImagePlus size={16} /> {t("画像を選ぶ")}
             <input type="file" accept="image/*" onChange={(e) => onFile((e.target as HTMLInputElement).files?.[0])} />
           </label>
-          <p class="fine">画像はこの端末の中だけで読み取ります。送信も保存もしません。初回だけ文字認識用の日本語データ（約 2MB）をこのサイトから読み込みます。</p>
+          <p class="fine">{t("画像はこの端末の中だけで読み取ります。送信も保存もしません。初回だけ文字認識用の日本語データ（約 2MB）をこのサイトから読み込みます。")}</p>
           {fail && <div class="note miss">{fail}</div>}
         </>
       )}
 
       {busy && (
         <div class="shot-busy">
-          <b>読み取り中… {busy[1] > 1 ? `${busy[0]} / ${busy[1]}` : "準備しています"}</b>
+          <b>{t("読み取り中…")} {busy[1] > 1 ? `${busy[0]} / ${busy[1]}` : t("準備しています")}</b>
           <span class="shot-bar">
             <i style={{ width: `${(100 * busy[0]) / Math.max(1, busy[1])}%` }} />
           </span>
-          <span class="fine">1 マスずつ文字を読んでいます。スマホでは 30 秒ほどかかることがあります。</span>
+          <span class="fine">{t("1 マスずつ文字を読んでいます。スマホでは 30 秒ほどかかることがあります。")}</span>
         </div>
       )}
 
@@ -139,35 +140,35 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
             </figure>
             <div class="shot-opts">
               <label class="field">
-                <span>取り込む学年</span>
+                <span>{t("取り込む学年")}</span>
                 <select value={grade} onChange={(e) => setGrade(+(e.target as HTMLSelectElement).value)}>
                   {[1, 2, 3, 4].map((g) => (
-                    <option value={g}>{g}年の計画</option>
+                    <option value={g}>{t("{n}年の計画", { n: g })}</option>
                   ))}
                 </select>
               </label>
               <label class="field">
-                <span>学期</span>
+                <span>{t("学期")}</span>
                 <select value={term} onChange={(e) => setTerm((e.target as HTMLSelectElement).value as Term)}>
-                  <option value="前期">前期</option>
-                  <option value="後期">後期</option>
+                  <option value="前期">{t("前期")}</option>
+                  <option value="後期">{t("後期")}</option>
                 </select>
               </label>
               {shot.year && (
                 <p class="fine">
-                  画像の見出し：{shot.year}年{shot.term ? ` ${shot.term}` : ""}
+                  {t("画像の見出し：{y}年", { y: shot.year })}{shot.term ? ` ${tv(shot.term)}` : ""}
                 </p>
               )}
               <button class="btn ghost block" onClick={() => { setShot(null); setUrl(null); }}>
-                <RotateCcw size={14} /> 別の画像
+                <RotateCcw size={14} /> {t("別の画像")}
               </button>
             </div>
           </div>
 
           <h3 class="sec-label">
-            読み取った科目 <span class="num">{count}</span>
-            {extra.length > 0 && <span class="dim"> ／ うち自分で追加 {extra.length}</span>}
-            {unread > 0 && <span class="dim"> ／ 読めなかったマス {unread}</span>}
+            {t("読み取った科目")} <span class="num">{count}</span>
+            {extra.length > 0 && <span class="dim"> ／ {t("うち自分で追加 {n}", { n: extra.length })}</span>}
+            {unread > 0 && <span class="dim"> ／ {t("読めなかったマス {n}", { n: unread })}</span>}
           </h3>
           <ul class="pick-list shot-list">
             {final.map((m) => {
@@ -178,15 +179,15 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
               return (
                 <li key={keyOf(m)} class={`pick shot-row${m.value ? "" : " off"}`}>
                   <span class="shot-slot mono">
-                    {dayLabel(m.day)}
+                    {dayName(m.day)}
                     {m.period}
                   </span>
                   <span class="shot-main">
-                    <span class="shot-read">読み取り：{m.name || "—"}</span>
+                    <span class="shot-read">{t("読み取り：")}{m.name || "—"}</span>
                     <span class="shot-sel">
                       <select
                         value={m.value}
-                        aria-label={`${dayLabel(m.day)}${m.period}限の科目`}
+                        aria-label={t("{slot}限の科目", { slot: slotName(m.day, m.period) })}
                         onChange={(e) => setPick((p) => ({ ...p, [keyOf(m)]: (e.target as HTMLSelectElement).value }))}
                       >
                         {opts.map((c) => (
@@ -197,11 +198,11 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                         ))}
                         {orig.course && differs(orig) && (
                           <option value={KEEP}>
-                            画像の時間のまま追加（{orig.course.name}・{orig.course.credits}単位）
+                            {t("画像の時間のまま追加（{name}・{n}単位）", { name: orig.course.name, n: orig.course.credits })}
                           </option>
                         )}
-                        <option value={MY}>自分の科目として追加（データに無い科目）</option>
-                        <option value="">取り込まない</option>
+                        <option value={MY}>{t("自分の科目として追加（データに無い科目）")}</option>
+                        <option value="">{t("取り込まない")}</option>
                       </select>
                     </span>
                     {m.value === MY && (
@@ -209,37 +210,37 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                         class="shot-name"
                         value={names[keyOf(m)] ?? m.name}
                         maxLength={60}
-                        aria-label="追加する科目の名前"
-                        placeholder="科目名"
+                        aria-label={t("追加する科目の名前")}
+                        placeholder={t("科目名")}
                         onInput={(e) => setNames((n) => ({ ...n, [keyOf(m)]: (e.target as HTMLInputElement).value }))}
                       />
                     )}
                     <span class="tags">
-                      {m.value === MY && <span class="tag amber">{orig.options.length ? "候補に無いので自分で追加" : "この時間に候補なし · 自分で追加"}（単位 0・名前は直せます）</span>}
-                      {!m.value && <span class="tag">取り込まない</span>}
-                      {unsure && !orig.moved && <span class="tag amber">名前が近い科目 · 確かめて</span>}
-                      {unsure && orig.moved && <span class="tag amber">今年は別の時間 · 確かめて</span>}
-                      {m.value === KEEP && orig.course && <span class="tag amber">画像の時間のまま · 今年度は{isUnscheduled(orig.course) ? "時間外・オンデマンド" : "別の時間"}</span>}
+                      {m.value === MY && <span class="tag amber">{t(orig.options.length ? "候補に無いので自分で追加" : "この時間に候補なし · 自分で追加")}{t("（単位 0・名前は直せます）")}</span>}
+                      {!m.value && <span class="tag">{t("取り込まない")}</span>}
+                      {unsure && !orig.moved && <span class="tag amber">{t("名前が近い科目 · 確かめて")}</span>}
+                      {unsure && orig.moved && <span class="tag amber">{t("今年は別の時間 · 確かめて")}</span>}
+                      {m.value === KEEP && orig.course && <span class="tag amber">{t(isUnscheduled(orig.course) ? "画像の時間のまま · 今年度は時間外・オンデマンド" : "画像の時間のまま · 今年度は別の時間")}</span>}
                     </span>
                   </span>
                 </li>
               );
             })}
           </ul>
-          {!final.length && <div class="note miss">マスの文字が読めませんでした。画面を拡大してから撮り直すと読めることがあります。</div>}
+          {!final.length && <div class="note miss">{t("マスの文字が読めませんでした。画面を拡大してから撮り直すと読めることがあります。")}</div>}
           <p class="fine">
-            時間割のデータは {dataYear ?? "今"}年度のものです。昔の画面なら、今年度の同じ名前の科目に置き換えて取り込みます。候補に無い科目は「自分の科目として追加」で入ります（単位 0、あとで詳細から消せます）。
+            {t("時間割のデータは {y}年度のものです。昔の画面なら、今年度の同じ名前の科目に置き換えて取り込みます。候補に無い科目は「自分の科目として追加」で入ります（単位 0、あとで詳細から消せます）。", { y: dataYear ?? "—" })}
           </p>
           {count > 0 && (
             <div class="sheet-cta col">
               <button class="btn primary cta" onClick={() => onApply(ids, extra, grade, term, "replace")}>
                 <span class="cta-name">
-                  {grade}年の{term}をこの内容にする
+                  {t("{n}年の{term}をこの内容にする", { n: grade, term: tv(term) })}
                 </span>
-                <span class="cta-cr">{count}科目</span>
+                <span class="cta-cr">{t("{n}科目", { n: count })}</span>
               </button>
               <button class="btn ghost block" onClick={() => onApply(ids, extra, grade, term, "append")}>
-                {grade}年の{term}に追加する
+                {t("{n}年の{term}に追加する", { n: grade, term: tv(term) })}
               </button>
             </div>
           )}
