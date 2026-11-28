@@ -1,0 +1,14 @@
+[
+ {
+  "entryYear": 2025,
+  "dept": "09",
+  "file": "2025_electronics.json",
+  "verified": false
+ },
+ {
+  "entryYear": 2025,
+  "dept": "06",
+  "file": "2025_precision.json",
+  "verified": false
+ }
+]
