@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { Profile } from "./types";
 import { validRange } from "./periods";
 import { GRADE_LIST, type Grades } from "./grades";
-import { MARK_KEY_RE, type Marks } from "./alerts";
+import { MARK_KEY_RE, NOTE_MAX, type Marks } from "./alerts";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -86,9 +86,9 @@ export function sanitize(x: any): SavedState {
     for (const [k, v] of Object.entries<any>(x.marks)) {
       if (Object.keys(marks).length >= 500) break;
       if (!MARK_KEY_RE.test(k) || !v || typeof v !== "object") continue;
-      const m: { exam?: boolean; online?: boolean } = {};
-      if (typeof v.exam === "boolean") m.exam = v.exam;
-      if (typeof v.online === "boolean") m.online = v.online;
+      const m: Marks[string] = {};
+      for (const f of ["exam", "online", "cancel", "task"] as const) if (typeof v[f] === "boolean") m[f] = v[f];
+      if (typeof v.note === "string" && v.note.trim()) m.note = v.note.trim().slice(0, NOTE_MAX);
       if (Object.keys(m).length) marks[k] = m;
     }
   }

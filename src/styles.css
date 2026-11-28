@@ -8,6 +8,7 @@
 :root {
   --exam: #c98500; --exam-bg: #fbecc4; --exam-ink: #6b4300; --on-exam: #1f1500;
   --online: #2e8550; --online-bg: #dcefe2; --online-ink: #1b5a35; --on-online: #ffffff;
+  --task: #5a4ba8; --task-bg: #e8e4f6; --task-ink: #3d317d; --on-task: #ffffff;
   --bg: #f8f6f1;
   --surface: #fffdf9;
   --surface-2: #ffffff;
@@ -61,6 +62,7 @@
 :root[data-theme="dark"] {
   --exam: #f0b43c; --exam-bg: #3a2c10; --exam-ink: #f6cf7d; --on-exam: #1a1203;
   --online: #5cc183; --online-bg: #14301f; --online-ink: #95dcb0; --on-online: #07160d;
+  --task: #a597ee; --task-bg: #252038; --task-ink: #cbc2f7; --on-task: #120e24;
   --bg: #151412;
   --surface: #1c1b18;
   --surface-2: #26241f;
@@ -858,8 +860,8 @@ button.tag.fail { cursor: pointer; }
 .agenda-row small { font-size: 10px; color: var(--ink-3); }
 .agenda li + li { border-top: 1px solid var(--line); }
 .sessions li.is-exam { background: linear-gradient(90deg, var(--exam-bg), transparent 70%); }
-.mark-row { display: flex; gap: 6px; margin-top: 6px; }
-.mk { display: inline-flex; align-items: center; gap: 4px; min-height: 30px; padding: 2px 9px; border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.mark-row { display: flex; gap: 5px; margin-top: 6px; }
+.mk { display: inline-flex; align-items: center; gap: 4px; min-height: 30px; padding: 2px 8px; border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
 .mk small { font-size: 9.5px; opacity: 0.8; }
 .mk-exam.on { background: var(--exam); color: var(--on-exam); box-shadow: none; }
 .mk-online.on { background: var(--online); color: var(--on-online); box-shadow: none; }
@@ -886,3 +888,28 @@ button.tag.fail { cursor: pointer; }
   .al { font-size: 9px; line-height: 11px; padding: 1px 3px; }
   .cell.clash .name { font-size: 10.5px; line-height: 13px; }
 }
+
+/* ---------------------------------------------------------- 課題（藤）・休講・メモ */
+.al-task { background: var(--task); color: var(--on-task); }
+.mk-task.on { background: var(--task); color: var(--on-task); box-shadow: none; }
+.mk-cancel.on { background: var(--ink-2); color: var(--bg); box-shadow: none; text-decoration: line-through; }
+.mk-note { border-style: dashed; color: var(--ink-2); }
+.mk.on-ink { background: var(--ink); color: var(--bg); box-shadow: none; }
+.mark-row { flex-wrap: wrap; }
+.sessions li.is-task:not(.is-exam) { background: linear-gradient(90deg, var(--task-bg), transparent 70%); }
+.note-edit { display: grid; gap: 6px; margin-top: 8px; }
+.note-edit textarea { width: 100%; resize: vertical; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--cell); color: var(--ink); font: 13.5px/19px var(--font-sans); }
+.note-edit textarea:focus { outline: none; border-color: var(--accent); }
+.note-acts { display: flex; gap: 6px; }
+.note-view { display: block; width: 100%; margin-top: 8px; padding: 7px 10px; border-radius: var(--radius-sm); background: var(--cell); box-shadow: inset 3px 0 0 var(--ink-2); text-align: left; font-size: 13px; line-height: 18px; color: var(--ink); white-space: pre-wrap; }
+.note-view b { margin-right: 6px; font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.04em; }
+/* マスの右上の折り返し＝メモあり */
+.cell.filled.has-note::before { content: ""; position: absolute; top: 0; right: 0; z-index: 2; width: 0; height: 0; border-style: solid; border-width: 0 12px 12px 0; border-color: transparent var(--ink-2) transparent transparent; }
+.agenda-note { display: block; font-weight: 500; font-size: 11.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.al-note { background: transparent; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* ---------------------------------------------------------- ホーム画面に追加 */
+.install-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.install-steps li { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: center; padding: 12px; border-radius: var(--radius-md); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; line-height: 20px; }
+.install-steps .ico { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
+.install-steps b { color: var(--ink); }

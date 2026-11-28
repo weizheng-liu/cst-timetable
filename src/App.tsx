@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, ClipboardList, LayoutList, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
 import { CatalogPanel } from "./components/CatalogPanel";
+import { InstallPanel } from "./components/InstallPanel";
+import { useInstall } from "./lib/pwa";
 import { codesFromHash } from "./lib/importer";
-import { ALERT_LABEL, md as mdShort, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
+import { ALERT_LABEL, md as mdShort, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
@@ -26,7 +28,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } fr
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" } | { kind: "install" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -38,6 +40,7 @@ export function App() {
   const [stack, setStack] = useState<Panel[]>([]);
   const [toast, setToast] = useState<Toast | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const install = useInstall();
 
   const say = (msg: string, extra: Omit<Toast, "msg"> = {}) => {
     const t: Toast = { msg, ...extra };
@@ -166,9 +169,9 @@ export function App() {
     const soon = todayIso(new Date(Date.now() + 7 * 864e5));
     return selected
       .flatMap((c) => upcoming(c, today, st.marks))
-      .filter((a) => a.kind === "exam" || a.kind === "quiz" || a.date <= soon)
+      .filter((a) => a.kind === "exam" || a.kind === "quiz" || a.kind === "task" || a.kind === "note" || a.date <= soon)
       .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 6);
+      .slice(0, 8);
   }, [selected, st.marks, today, showAlerts]);
   const failedOpen = gs.failedRequired.filter((r) => !selected.some((c) => gradeKey(c.name) === gradeKey(r.name)));
 
@@ -299,8 +302,11 @@ export function App() {
                 <span class="num">
                   {mdShort(a.date)}({"日月火水木金土"[new Date(a.date + "T00:00:00").getDay()]})
                 </span>
-                <b>{a.course.name}</b>
-                <small>{a.byUser ? "自分で設定" : "シラバスより"}</small>
+                <b>
+                  {a.course.name}
+                  {a.text && <span class="agenda-note">{a.text}</span>}
+                </b>
+                <small>{a.kind === "note" ? "メモ" : a.byUser ? "自分で設定" : "シラバスより"}</small>
               </button>
             </li>
           ))}
@@ -532,6 +538,8 @@ export function App() {
         return { title: "その他" };
       case "grades":
         return { eyebrow: "GRADES · GPA", title: "成績と GPA", sub: "修得した科目に評価を付けると、GPA と単位を計算します" };
+      case "install":
+        return { eyebrow: "INSTALL", title: "ホーム画面に追加", sub: "アプリのようにアイコンからすぐ開けます" };
       case "catalog":
         return { eyebrow: `CATALOG · ${viewGrade}年 ${view}`, title: "今学期の科目一覧", sub: `取れる科目 ${new Set(catalogCourses.map((c) => normName(c.name))).size}件 · 時間のボタンで追加` };
       case "import":
@@ -592,7 +600,7 @@ export function App() {
       case "detail": {
         const c = byId.get(top.id);
         if (!c) return null;
-        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} />;
+        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
       }
       case "credits":
         return (
@@ -633,6 +641,8 @@ export function App() {
             }}
           />
         );
+      case "install":
+        return <InstallPanel ios={install.ios} />;
       case "catalog":
         return (
           <CatalogPanel
@@ -713,6 +723,19 @@ export function App() {
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
+            {!install.installed && (
+              <MenuItem
+                icon={<Smartphone size={18} />}
+                title="ホーム画面に追加"
+                sub={install.canPrompt ? "ワンタップでアプリとしてインストール" : install.ios ? "iPhone・iPad：共有ボタンから追加（手順を表示）" : "アイコンからすぐ開けるようにする"}
+                onClick={async () => {
+                  if (install.canPrompt) {
+                    close();
+                    if (await install.prompt()) say("ホーム画面に追加しました");
+                  } else push({ kind: "install" });
+                }}
+              />
+            )}
             <MenuItem icon={<LayoutList size={18} />} title="今学期の科目一覧" sub="区分別・曜日時限・キャンパス付き" onClick={() => push({ kind: "catalog" })} />
             <MenuItem icon={<ClipboardList size={18} />} title="履修届確認表から取り込む" sub="学校で登録した科目を貼り付けて一括で時間割に" onClick={() => push({ kind: "import", codes: null })} />
             <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />

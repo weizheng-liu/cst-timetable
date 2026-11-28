@@ -3,7 +3,7 @@ import { buildCells, clashesWith, findConflicts } from "./schedule";
 import { progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
-import { examOf, toggleMark, upcoming } from "./alerts";
+import { examOf, setNote, toggleMark, upcoming } from "./alerts";
 import { buildCatalog } from "./catalog";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
@@ -372,5 +372,27 @@ describe("試験・オンラインの目印", () => {
     expect(upcoming(c, "2026-11-28", m).map((x) => `${x.kind}@${x.date}`)).toEqual(["exam@2026-12-01"]);
     m = toggleMark(toggleMark(m, c, c.sessions[1], "online"), c, c.sessions[1], "exam");
     expect(m).toEqual({});
+  });
+});
+
+describe("課題・休講・メモ", () => {
+  const c = { id: "J22D", name: "論理回路", sessions: [
+    { no: 1, kind: "regular", date: "2026-12-01", mode: "face", content: "順序回路" },
+    { no: 2, kind: "regular", date: "2026-12-08", mode: "face", content: "まとめ" },
+  ] } as any;
+  it("adds a task, a cancellation and a note, and removes them", () => {
+    let m = toggleMark({}, c, c.sessions[1], "task");
+    m = setNote(m, c, c.sessions[1], "  レポート第3回を提出  ");
+    m = toggleMark(m, c, c.sessions[0], "cancel");
+    const a = upcoming(c, "2026-11-28", m);
+    expect(a.map((x) => `${x.kind}@${x.date}`)).toEqual(["task@2026-12-08", "cancel@2026-12-01", "note@2026-12-08"]);
+    expect(a.find((x) => x.kind === "note")!.text).toBe("レポート第3回を提出");
+    m = setNote(toggleMark(toggleMark(m, c, c.sessions[1], "task"), c, c.sessions[0], "cancel"), c, c.sessions[1], "");
+    expect(m).toEqual({});
+  });
+  it("keeps notes through save and load", () => {
+    const s = sanitize({ marks: { "J22D@2026-12-08": { task: true, note: "x".repeat(500) }, "bad key": { task: true } } });
+    expect(Object.keys(s.marks)).toEqual(["J22D@2026-12-08"]);
+    expect(s.marks["J22D@2026-12-08"].note!.length).toBe(200);
   });
 });

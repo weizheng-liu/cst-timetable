@@ -3,7 +3,8 @@ import { EVAL_CATEGORY, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
-import { flagsOf, type Marks } from "../lib/alerts";
+import { flagsOf, NOTE_MAX, type Flag, type Flags, type Marks } from "../lib/alerts";
+import { useState } from "preact/hooks";
 import type { Session } from "../lib/types";
 
 interface Props {
@@ -14,7 +15,8 @@ interface Props {
   status?: Eligible;
   onToggle: (c: Course) => void;
   marks?: Marks;
-  onMark?: (s: Session, what: "exam" | "online") => void;
+  onMark?: (s: Session, what: Flag) => void;
+  onNote?: (s: Session, text: string) => void;
 }
 
 const md = (d: string | null | undefined) => {
@@ -23,7 +25,7 @@ const md = (d: string | null | undefined) => {
   return `${x.getMonth() + 1}/${x.getDate()}(${"日月火水木金土"[x.getDay()]})`;
 };
 
-export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote }: Props) {
   const parts = c.evaluation.parts;
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -152,23 +154,12 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
           {regular.map((s, i) => {
             const f = flagsOf(c, s, marks);
             return (
-              <li key={`r${i}`} class={f.exam ? "is-exam" : ""}>
+              <li key={`r${i}`} class={`${f.exam ? "is-exam" : ""} ${f.task ? "is-task" : ""}`}>
                 <span class="n">{s.no}</span>
                 <span class="d">{md(s.date)}</span>
-                <span class={s.cancelled ? "cancel" : ""}>
-                  {s.content || "—"}
-                  {s.date && onMark && !s.cancelled && (
-                    <span class="mark-row">
-                      <button class={`mk mk-exam ${f.exam ? "on" : ""}`} aria-pressed={!!f.exam} onClick={() => onMark(s, "exam")}>
-                        {f.exam === "quiz" ? "小テスト" : "試験"}
-                        {f.examByUser && <small>自分で</small>}
-                      </button>
-                      <button class={`mk mk-online ${f.online ? "on" : ""}`} aria-pressed={f.online} onClick={() => onMark(s, "online")}>
-                        オンライン
-                        {f.onlineByUser && <small>自分で</small>}
-                      </button>
-                    </span>
-                  )}
+                <span>
+                  <span class={f.cancel ? "cancel" : ""}>{s.content || "—"}</span>
+                  {s.date && onMark && onNote && <SessionMarks f={f} onMark={(w) => onMark(s, w)} onNote={(t) => onNote(s, t)} />}
                 </span>
               </li>
             );
@@ -213,6 +204,61 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
       <a class="btn ghost block" style={{ marginTop: 24, textDecoration: "none" }} href={c.url} target="_blank" rel="noopener noreferrer">
         公式シラバスで見る <ExternalLink size={16} />
       </a>
+    </>
+  );
+}
+
+/** 1 回分の目印（試験・課題・オンライン・休講）と自分のメモ */
+function SessionMarks({ f, onMark, onNote }: { f: Flags; onMark: (w: Flag) => void; onNote: (t: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(f.note);
+  const btn = (w: Flag, label: string, on: boolean) => (
+    <button class={`mk mk-${w} ${on ? "on" : ""}`} aria-pressed={on} onClick={() => onMark(w)}>
+      {label}
+      {f.byUser[w] && <small>自分で</small>}
+    </button>
+  );
+  const save = () => {
+    onNote(draft);
+    setEditing(false);
+  };
+  return (
+    <>
+      <span class="mark-row">
+        {btn("exam", f.exam === "quiz" ? "小テスト" : "試験", !!f.exam)}
+        {btn("task", "課題", f.task)}
+        {btn("online", "オンライン", f.online)}
+        {btn("cancel", "休講", f.cancel)}
+        {!editing && !f.note && (
+          <button class="mk mk-note" onClick={() => (setDraft(""), setEditing(true))}>
+            ＋メモ
+          </button>
+        )}
+      </span>
+      {editing ? (
+        <span class="note-edit">
+          <textarea
+            rows={2}
+            maxLength={NOTE_MAX}
+            placeholder="例：レポート第3回を提出、教科書p.40まで読む"
+            value={draft}
+            onInput={(e) => setDraft((e.target as HTMLTextAreaElement).value)}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), save())}
+            autoFocus
+          />
+          <span class="note-acts">
+            <button class="mk on-ink" onClick={save}>保存</button>
+            <button class="mk" onClick={() => setEditing(false)}>やめる</button>
+          </span>
+        </span>
+      ) : (
+        f.note && (
+          <button class="note-view" onClick={() => (setDraft(f.note), setEditing(true))} aria-label={`メモ：${f.note}（編集）`}>
+            <b>メモ</b>
+            {f.note}
+          </button>
+        )
+      )}
     </>
   );
 }

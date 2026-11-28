@@ -93,14 +93,16 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
       if (single(d, p - 1)?.id === c.id) continue; // 上のマスにまとめて描いた
       let span = 1;
       while (p + span <= periods && single(d, p + span)?.id === c.id) span++;
-      const al = alertsOf?.(c, d) ?? [];
+      const all = alertsOf?.(c, d) ?? [];
+      const hasNote = all.some((a) => a.kind === "note");
+      const al = all.filter((a) => a.kind !== "note").slice(0, 2); // マスには大事な順に 2 つまで
       const ex = al.find((a) => a.kind === "exam" || a.kind === "quiz");
       items.push(
         <button
           key={`${d}-${p}`}
-          class={`cell filled cat-${category(c)} ${moved === c.id ? "is-moved" : ""} ${ex ? "has-exam" : ""} ${al.length ? "has-alert" : ""}`}
+          class={`cell filled cat-${category(c)} ${moved === c.id ? "is-moved" : ""} ${ex ? "has-exam" : ""} ${al.length ? "has-alert" : ""} ${hasNote ? "has-note" : ""}`}
           style={{ gridColumn: d + 1, gridRow: `${p + 1} / span ${span}` }}
-          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}${isRequired?.(c) ? "（必修）" : ""}${al.map((a) => `、${md(a.date)} ${ALERT_LABEL[a.kind]}`).join("")}`}
+          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}${isRequired?.(c) ? "（必修）" : ""}${all.map((a) => `、${md(a.date)} ${ALERT_LABEL[a.kind]}${a.text ? `：${a.text}` : ""}`).join("")}`}
           onClick={() => onCell(d, p)}
         >
           <b class="name">{c.name}</b>
@@ -108,7 +110,7 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
             <span class="alerts" aria-hidden="true">
               {al.map((a) => (
                 <i key={a.kind} class={`al al-${a.kind}`}>
-                  {a.kind === "exam" || a.kind === "quiz" ? `${md(a.date)} ` : ""}
+                  {a.kind === "exam" || a.kind === "quiz" || a.kind === "task" ? `${md(a.date)} ` : ""}
                   {ALERT_LABEL[a.kind]}
                 </i>
               ))}
