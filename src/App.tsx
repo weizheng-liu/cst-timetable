@@ -25,7 +25,7 @@ import { normName, progress, reqIndex } from "./lib/credits";
 import { alternativesFor, resolveOptions, slotText, type ResolveOption } from "./lib/resolve";
 import { buildIcs } from "./lib/ics";
 import { DAYS, resolveTimes } from "./lib/periods";
-import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } from "./lib/schedule";
+import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm, isUnscheduled } from "./lib/schedule";
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
@@ -178,7 +178,8 @@ export function App() {
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
   // 土曜は授業を入れていなければ畳んで、平日の列を広くする（ボタンで出せる）
-  const satUsed = selected.some((c) => inTerm(c, view) && c.slots.some((x) => x.day === 6));
+  const satUsed = selected.some((c) => inTerm(c, view) && !isUnscheduled(c) && c.slots.some((x) => x.day === 6));
+  const floating = selected.filter((c) => inTerm(c, view) && isUnscheduled(c));
   const days = satUsed || st.showSat ? 6 : 5;
 
   const toggle = (c: Course) => {
@@ -341,6 +342,18 @@ export function App() {
         />
       ) : (
         <GridSkeleton days={days} periods={6} />
+      )}
+
+      {floating.length > 0 && (
+        <div class="floating">
+          <span class="floating-h">時間外・オンデマンド</span>
+          {floating.map((c) => (
+            <button key={c.id} class="floating-chip" onClick={() => push({ kind: "detail", id: c.id })}>
+              {c.name}
+              <small>{c.onlineMethod ?? (c.classFormat === "オンライン" ? "オンライン" : "時間割外")} · {c.credits}単位</small>
+            </button>
+          ))}
+        </div>
       )}
 
       {groupConflicts(termConflicts).map((g) => (

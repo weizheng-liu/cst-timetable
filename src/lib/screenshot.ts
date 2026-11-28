@@ -1,7 +1,7 @@
 // 他の時間割アプリの画面写真から「曜日 × 時限」の格子を見つけ、各マスの科目名を候補と照合する。
 // ここは純粋な計算だけ（画像はブラウザ内の ImageData のまま。外へは出さない）。
 import type { Course } from "./types";
-import { inTerm } from "./schedule";
+import { inTerm, isUnscheduled } from "./schedule";
 
 export interface Pixels {
   width: number;
@@ -227,7 +227,10 @@ export function parseCell(text: string): { name: string; rooms: string[] } {
     // 教室の札（数字だけ、未登録、両課、…）は名前に入れない
     const rest = l.replace(ROOM_RE, "").replace(/[教室実験…\.・,、\s]/g, "");
     if (r && rest.length <= 2) continue;
-    if (/^(未登録|両課|未定|オンライン)$/.test(l.replace(/\s/g, ""))) continue;
+    const flat = l.replace(/\s/g, "");
+    if (/^(未登録|両課|未定|オンライン|オンデマンド)$/.test(flat)) continue;
+    // 末尾が「…」の行は省略された教室の札（「オンラ…」「スポー…」）なので名前に入れない
+    if (/(…|⋯|\.{2,})$/.test(flat) && nameLines.length) continue;
     nameLines.push(l);
   }
   const name = nameLines
@@ -324,7 +327,7 @@ export function matchCells(cells: CellRead[], all: Course[], term: "前期" | "�
       }
       if (best) {
         ({ course, score } = best);
-        moved = true;
+        moved = !isUnscheduled(best.course); // オンデマンドは元から時間がないので「別の時間」ではない
       }
     }
     out.push({ day: cell.day, period: cell.period, name, rooms, course, score: Math.min(1, score), options: ranked.slice(0, 8), moved });

@@ -8,10 +8,18 @@ export function inTerm(c: Course, view: "前期" | "後期"): boolean {
 export const cellKey = (day: number, period: number) => `${day}-${period}`;
 
 /** Map "day-period" -> courses occupying that cell (for one term view). */
+/**
+ * 曜日・時限の決まっていない科目（オンデマンド・卒業研究など）。
+ * 学校のデータではこれらが「土曜 6 限・教室 0000」という仮の枠で入っているので、時間割のマスには置かない。
+ */
+export function isUnscheduled(c: Course): boolean {
+  return c.slots.length > 0 && c.slots.every((s) => s.day === 6 && s.period === 6) && (!c.room || /^0+$/.test(c.room));
+}
+
 export function buildCells(courses: Course[], view: "前期" | "後期"): Map<string, Course[]> {
   const m = new Map<string, Course[]>();
   for (const c of courses) {
-    if (!inTerm(c, view)) continue;
+    if (!inTerm(c, view) || isUnscheduled(c)) continue;
     for (const s of c.slots) {
       const k = cellKey(s.day, s.period);
       const arr = m.get(k) ?? [];

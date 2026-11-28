@@ -1,6 +1,6 @@
 import precisionReq from "../../data/requirements/2025_precision.json";
 import { describe, expect, it } from "vitest";
-import { buildCells, clashesWith, findConflicts } from "./schedule";
+import { buildCells, clashesWith, findConflicts, isUnscheduled } from "./schedule";
 import { inputGroups, progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
@@ -460,6 +460,8 @@ describe("screenshot import", () => {
     expect(parseCell("電子工学\nインセンティ\nブ\n1141\n")).toEqual({ name: "電子工学インセンティブ", rooms: ["1141"] });
     expect(parseCell("基礎物理\n実験\n144\n").name).toBe("基礎物理実験");
     expect(parseCell("スポーツ\nトレーニ\nング\n未登録").name).toBe("スポーツトレーニング");
+    expect(parseCell("日 本 語\nオン ラバ …\n").name).toBe("日本語");
+    expect(parseCell("スポ ー ツ\n2\nスポ ー…\n").name).toBe("スポーツ2");
     expect(similarity("英語IA", "英語ⅠA")).toBe(1);
     expect(similarity("英語2A", "英語ⅡA")).toBe(1);
     expect(similarity("数学演習", "数学演習Ⅰ")).toBeGreaterThan(0.8);
@@ -494,5 +496,20 @@ describe("screenshot import", () => {
     expect(gradeForYear(2026, 2026, 2)).toBe(2);
     expect(gradeForYear(2019, 2026, 2)).toBeNull();
     expect(gradeForYear(null, 2026, 2)).toBeNull();
+  });
+});
+
+describe("unscheduled (on-demand) courses", () => {
+  it("keeps 土6・教室0000 placeholders out of the grid and conflicts", () => {
+    const a = mk("Z1", "日本語Ⅱ(留）", "後期", [[6, 6]], { room: "0000" });
+    const b = mk("Z2", "日本の文化(留）", "後期", [[6, 6]], { room: "0000" });
+    const real = mk("S", "土曜の授業", "後期", [[6, 6]], { room: "1431" });
+    expect(isUnscheduled(a)).toBe(true);
+    expect(isUnscheduled(real)).toBe(false);
+    expect(buildCells([a, b], "後期").size).toBe(0);
+    expect(findConflicts([a, b])).toEqual([]);
+    const ms = matchCells([{ day: 4, period: 6, text: "日本語\nオンラ…" }], [a, b], "後期");
+    expect(ms[0].course?.id).toBe("Z1");
+    expect(ms[0].moved).toBe(false);
   });
 });
