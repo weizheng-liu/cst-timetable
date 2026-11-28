@@ -676,7 +676,7 @@ export function App() {
             />
           );
         const fc = top.focus;
-        return <CourseDetail focus={!!fc && viewGrade === nowGrade} onOthers={fc ? () => push({ kind: "slot", day: fc.day, period: fc.period }) : undefined} c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
+        return <CourseDetail rotation={st.rotation} onRotation={(v) => setSt((x) => ({ ...x, rotation: { ...x.rotation, [c.id]: v } }))} focus={!!fc && viewGrade === nowGrade} onOthers={fc ? () => push({ kind: "slot", day: fc.day, period: fc.period }) : undefined} c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
       }
       case "credits":
         return (

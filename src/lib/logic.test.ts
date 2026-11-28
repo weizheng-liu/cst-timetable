@@ -4,7 +4,7 @@ import { buildCells, clashesWith, findConflicts, isUnscheduled } from "./schedul
 import { inputGroups, progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
-import { currentSession, examOf, setNote, toggleMark, upcoming } from "./alerts";
+import { currentSession, examOf, isRotation, setNote, toggleMark, upcoming } from "./alerts";
 import { buildCatalog } from "./catalog";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
@@ -624,5 +624,16 @@ describe("evaluation breakdown", () => {
     expect(evalParts(ok).complete).toBe(true);
     const bad = mk("G", "x", "後期", [[1, 1]], { evaluation: { text: "総合的に評価する", parts: [], tags: [] } });
     expect(evalParts(bad).complete).toBe(false);
+  });
+});
+
+describe("group-rotation labs", () => {
+  const th = (no: number) => ({ no, kind: "regular" as const, date: null, mode: "face" as const, content: `●テーマ${no}:測定` });
+  it("detects labs by name or テーマN plans, and respects the user's override", () => {
+    expect(isRotation(mk("L", "電子工学実験Ⅱ", "年間", [[4, 3]]))).toBe(true);
+    expect(isRotation(mk("T", "自主創造の基礎２", "前期", [[1, 1]], { sessions: [th(1), th(2), th(3)] }))).toBe(true);
+    expect(isRotation(mk("K", "回路理論Ⅱ", "後期", [[2, 2]]))).toBe(false);
+    expect(isRotation(mk("L", "電子工学実験Ⅱ", "年間", [[4, 3]]), { L: false })).toBe(false);
+    expect(sanitize({ rotation: { J23A: true, "bad key!": true, J11A: "yes" } }).rotation).toEqual({ J23A: true });
   });
 });

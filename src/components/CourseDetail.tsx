@@ -3,7 +3,7 @@ import { EVAL_CATEGORY, evalParts, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
-import { currentSession, flagsOf, NOTE_MAX, tokyoToday, type Flag, type Flags, type Marks } from "../lib/alerts";
+import { currentSession, flagsOf, isRotation, NOTE_MAX, tokyoToday, type Flag, type Flags, type Marks } from "../lib/alerts";
 import { useState } from "preact/hooks";
 import type { Session } from "../lib/types";
 
@@ -21,6 +21,8 @@ interface Props {
   focus?: boolean;
   /** 同じ時間の他の科目を見る */
   onOthers?: () => void;
+  rotation?: Record<string, boolean>;
+  onRotation?: (v: boolean) => void;
 }
 
 const md = (d: string | null | undefined) => {
@@ -29,7 +31,7 @@ const md = (d: string | null | undefined) => {
   return `${x.getMonth() + 1}/${x.getDate()}(${"日月火水木金土"[x.getDay()]})`;
 };
 
-export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers, rotation, onRotation }: Props) {
   const { parts, complete } = evalParts(c);
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -39,6 +41,7 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
 
   const cur = focus ? currentSession(c, tokyoToday()) : null;
   const curFlags = cur ? flagsOf(c, cur.s, marks) : null;
+  const rot = isRotation(c, rotation);
 
   return (
     <>
@@ -54,7 +57,16 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
                 {curFlags.exam && <span class="tag amber">{curFlags.exam === "quiz" ? "小テスト" : "試験"}</span>}
                 {curFlags.cancel && <span class="tag coral">休講</span>}
               </div>
-              <p class={`now-content ${curFlags.cancel ? "cancel" : ""}`}>{cur.s.content || "（内容の記載なし）"}</p>
+              {rot ? (
+                <p class="now-content muted small">班ごとにテーマが入れ替わる科目なので、回ごとの内容は出していません（自分の班の予定で確認してください）。</p>
+              ) : (
+                <p class={`now-content ${curFlags.cancel ? "cancel" : ""}`}>{cur.s.content || "（内容の記載なし）"}</p>
+              )}
+              {onRotation && (
+                <button class="now-rot" onClick={() => onRotation(!rot)}>
+                  {rot ? "この回の内容を表示する" : "班ごとに内容が違う科目として隠す"}
+                </button>
+              )}
               {onMark && onNote && <SessionMarks f={curFlags} onMark={(w) => onMark(cur.s, w)} onNote={(t) => onNote(cur.s, t)} />}
             </>
           ) : (

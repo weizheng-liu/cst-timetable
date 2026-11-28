@@ -148,3 +148,14 @@ export function currentSession(c: Course, today: string): { s: Session; when: "t
   if (next) return { s: next, when: next.date === today ? "today" : "next" };
   return { s: dated[dated.length - 1], when: "last" };
 }
+
+/**
+ * 班（グループ）ごとに回のテーマが入れ替わる実験か。
+ * そういう科目はシラバスの「第 N 回の内容」が自分の班とは限らないので、今回カードでは内容を出さない。
+ * 自動判定：科目名に「実験・実習」、または授業計画に「テーマN」が 3 回以上。利用者が科目ごとに上書きできる。
+ */
+export function isRotation(c: Course, override?: Record<string, boolean>): boolean {
+  if (override && typeof override[c.id] === "boolean") return override[c.id];
+  if (/実験|実習/.test(c.name)) return true;
+  return c.sessions.filter((s) => /テーマ\s*[0-9０-９]+/.test(s.content || "")).length >= 3;
+}
