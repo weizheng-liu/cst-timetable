@@ -1,17 +1,22 @@
 import { AlertTriangle, Info } from "lucide-preact";
 import { leafGroups, normName, progress } from "../lib/credits";
 import type { Course, Requirements } from "../lib/types";
+import type { GradeSummary } from "../lib/grades";
 
 interface Props {
   req: Requirements | null;
   selected: Course[];
-  earned: Record<string, number>;
+  earned: Record<string, number>; // 手入力分（成績未入力の修得分）
+  earnedAll: Record<string, number>; // 手入力分 + 成績から出した分
+  passed: Set<string>;
+  summary: GradeSummary;
+  onGrades: () => void;
   onEarned: (id: string, v: number) => void;
   deptName: string;
   entryYear: number;
 }
 
-export function Credits({ req, selected, earned, onEarned, deptName, entryYear }: Props) {
+export function Credits({ req, selected, earned, earnedAll, passed, summary, onGrades, onEarned, deptName, entryYear }: Props) {
   const planned = selected.reduce((s, c) => s + (c.credits || 0), 0);
   if (!req) {
     return (
@@ -29,7 +34,11 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
       </>
     );
   }
-  const pr = progress(req, selected, earned);
+  const counted = selected.filter((c) => !passed.has(normName(c.name)));
+  const pr = progress(req, counted, earnedAll, passed);
+  const earnedTotal = pr.earnedTotal + summary.earnedUnmatched;
+  const total = pr.plannedTotal + earnedTotal;
+  const missingTotal = Math.max(0, req.totalCredits - total);
   const leaves = new Set(leafGroups(req.groups).map((g) => g.id));
   return (
     <>
@@ -46,19 +55,30 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
         </div>
       )}
       <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-        <div class="big">{pr.total}</div>
+        <div class="big">{total}</div>
         <div class="muted">/ {req.totalCredits} 単位</div>
-        <div class="small" style={{ marginLeft: "auto", color: pr.missingTotal ? "var(--ink-2)" : "var(--cat-elective-ink)" }}>
-          {pr.missingTotal ? `あと ${pr.missingTotal} 単位` : "合計は充足"}
+        <div class="small" style={{ marginLeft: "auto", color: missingTotal ? "var(--ink-2)" : "var(--cat-elective-ink)" }}>
+          {missingTotal ? `あと ${missingTotal} 単位` : "合計は充足"}
         </div>
       </div>
       <div class="meter">
-        <i style={{ width: `${Math.min(100, (pr.earnedTotal / req.totalCredits) * 100)}%` }} />
+        <i style={{ width: `${Math.min(100, (earnedTotal / req.totalCredits) * 100)}%` }} />
         <i class="plan" style={{ width: `${Math.min(100, (pr.plannedTotal / req.totalCredits) * 100)}%` }} />
       </div>
       <p class="small muted" style={{ margin: "8px 0 4px" }}>
-        今年度の選択 {pr.plannedTotal} 単位 + 修得済み {pr.earnedTotal} 単位。修得済み単位は区分ごとに入力できます（この端末にのみ保存）。
+        今年度の選択 {pr.plannedTotal} 単位 + 修得済み {earnedTotal} 単位。
       </p>
+      <button class="gpa-link" onClick={onGrades}>
+        <span>
+          <span class="eyebrow">GPA</span>
+          <b class="num">{summary.gpa != null ? summary.gpa.toFixed(2) : "—"}</b>
+        </span>
+        <span class="gpa-link-text">
+          {summary.gpa != null ? `成績から 修得 ${summary.earned} 単位` : "成績を入力すると GPA と修得単位を自動で計算します"}
+          {summary.failedRequired.length > 0 && <b class="fail-text"> · 必修 {summary.failedRequired.length} 科目が不合格</b>}
+        </span>
+        <span class="cb-more">成績</span>
+      </button>
 
       <div class="block-title">区分別</div>
       {pr.groups.map((g) => (
@@ -87,7 +107,7 @@ export function Credits({ req, selected, earned, onEarned, deptName, entryYear }
           )}
           {leaves.has(g.group.id) && (
             <label class="earned">
-              修得済み
+              成績未入力の修得分
               <input
                 type="number"
                 inputMode="numeric"

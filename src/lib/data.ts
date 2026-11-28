@@ -64,7 +64,8 @@ export function categoryOf(c: Course, req?: { group: string; required: boolean }
   if (LANG_RE.test(c.name)) return "lang";
   if (LAB_RE.test(c.name)) return "lab";
   if (req) {
-    if (req.group.startsWith("major") || req.group.startsWith("basic")) return req.required ? "core" : "elective";
+    if (req.group.startsWith("major")) return req.required ? "core" : "elective";
+    if (req.group.startsWith("basic")) return req.required ? "core" : "general"; // 基礎教育の選択科目は専門ではない
     return "general";
   }
   if (c.syllabusDepartment && c.syllabusDepartment !== "99" && c.syllabusDepartment === c.department) return "elective";

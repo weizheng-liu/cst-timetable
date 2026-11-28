@@ -52,7 +52,7 @@ function depthOf(groups: ReqGroup[], g: ReqGroup): number {
  * (matched by name). Unmatched courses are reported separately.
  * Each 科目 counts once even if several sections were selected.
  */
-export function progress(req: Requirements, selected: Course[], earned: Record<string, number> = {}) {
+export function progress(req: Requirements, selected: Course[], earned: Record<string, number> = {}, passed: Set<string> = new Set()) {
   const idx = reqIndex(req);
   const counted = new Map<string, { rc: ReqCourse; credits: number }>();
   const unmatched: Course[] = [];
@@ -71,7 +71,7 @@ export function progress(req: Requirements, selected: Course[], earned: Record<s
     for (const { rc, credits } of counted.values()) if (ids.has(rc.group)) planned += credits;
     const e = [...ids].reduce((s, id) => s + (Number(earned[id]) || 0), 0);
     const total = planned + e;
-    const requiredLeft = req.courses.filter((rc) => rc.required && ids.has(rc.group) && !selectedNames.has(normName(rc.name)));
+    const requiredLeft = req.courses.filter((rc) => rc.required && ids.has(rc.group) && !selectedNames.has(normName(rc.name)) && !passed.has(normName(rc.name)));
     return { group: g, depth: depthOf(req.groups, g), planned, earned: e, total, missing: Math.max(0, g.minCredits - total), requiredLeft };
   });
   const plannedTotal = [...counted.values()].reduce((s, x) => s + x.credits, 0) + unmatched.reduce((s, c) => s + (c.credits || 0), 0);

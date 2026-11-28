@@ -16,13 +16,14 @@ interface Props {
   onCell: (day: number, period: number) => void;
   target?: { day: number; period: number } | null; // 選択シートを開いている空きコマ
   moved?: string | null; // 直前に移動した科目（toast が消えるまで強調）
+  isRequired?: (c: Course) => boolean; // 必修は「必」の印を付ける
 }
 
 /**
  * 「緋と方眼」の時間割。方眼紙の上にマスを明示配置し、同じ科目が連続する時限は 1 枚の色块にまとめる。
  * 四隅には製図の対位十字。重複は「斜線 + 1.5px 枠 + 角の点」を必ずセットで出す。
  */
-export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved }: Props) {
+export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired }: Props) {
   const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
   const items = [];
   for (let d = 1; d <= days; d++)
@@ -92,11 +93,14 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
           key={`${d}-${p}`}
           class={`cell filled cat-${category(c)} ${moved === c.id ? "is-moved" : ""}`}
           style={{ gridColumn: d + 1, gridRow: `${p + 1} / span ${span}` }}
-          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}`}
+          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}${isRequired?.(c) ? "（必修）" : ""}`}
           onClick={() => onCell(d, p)}
         >
           <b class="name">{c.name}</b>
-          <small class="meta">{roomOf(c) ?? c.teachers[0] ?? ""}</small>
+          <small class="meta">
+            {isRequired?.(c) && <b class="must">必</b>}
+            {roomOf(c) ?? c.teachers[0] ?? ""}
+          </small>
         </button>,
       );
     }

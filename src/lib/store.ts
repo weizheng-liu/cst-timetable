@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import type { Profile } from "./types";
 import { validRange } from "./periods";
+import { GRADE_LIST, type Grades } from "./grades";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -16,6 +17,7 @@ export interface SavedState {
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
   periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
   theme: Theme;
+  grades: Grades; // 自分で入力した成績（この端末にのみ保存。サーバーへは送らない）
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
 
@@ -24,7 +26,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system", photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system", grades: {}, photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -67,6 +69,14 @@ export function sanitize(x: any): SavedState {
   if (x.periodTimes && typeof x.periodTimes === "object") {
     for (const [k, v] of Object.entries(x.periodTimes)) if (/^[1-7]$/.test(k) && validRange(v)) periodTimes[k] = [v[0], v[1]];
   }
+  const grades: Grades = {};
+  if (x.grades && typeof x.grades === "object") {
+    for (const [k, v] of Object.entries<any>(x.grades)) {
+      if (Object.keys(grades).length >= 400) break;
+      if (typeof k === "string" && k.length <= 80 && v && typeof v.name === "string" && v.name.length <= 80 && GRADE_LIST.includes(v.grade) && typeof v.credits === "number" && v.credits >= 0 && v.credits <= 20)
+        grades[k] = { name: v.name, credits: v.credits, grade: v.grade };
+    }
+  }
   return {
     version: 1,
     profile,
@@ -76,6 +86,7 @@ export function sanitize(x: any): SavedState {
     earned,
     periodTimes,
     theme: THEMES.includes(x.theme) ? x.theme : "system",
+    grades,
     photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
   };
 }

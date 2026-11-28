@@ -9,6 +9,8 @@ import { tracePath } from "../components/Grid";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 import { resolveOptions, slotText } from "./resolve";
+import { gradeKey, groupTag, summarize } from "./grades";
+import { planRequired } from "./autoplan";
 import { categoryOf } from "./data";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
@@ -217,5 +219,54 @@ describe("conflict resolution (緋と方眼 ConflictResolve)", () => {
     expect(categoryOf(mk("x", "電子回路Ⅰ", "前期", []), { group: "major", required: true })).toBe("core");
     expect(categoryOf(mk("x", "電子物性", "前期", []), { group: "major", required: false })).toBe("elective");
     expect(categoryOf(mk("x", "倫理学", "前期", [], { syllabusDepartment: "99" }))).toBe("general");
+  });
+});
+
+describe("grades / GPA (日本大学の成績評価)", () => {
+  const req = {
+    entryYear: 2025, department: { code: "09", name: "電子工学科" }, verified: false, source: { url: "", title: "", pages: [] }, totalCredits: 126,
+    groups: [{ id: "major", label: "専門教育科目", minCredits: 86, page: 74, parent: null }, { id: "liberal", label: "教養教育科目", minCredits: 16, page: 74, parent: null }, { id: "liberal.g1", label: "多文化と社会の理解（Ⅰ群）", parent: "liberal", minCredits: 6, page: 74 }],
+    courses: [
+      { name: "回路理論Ⅰ", credits: 2, year: 1, required: true, group: "major", page: 75 },
+      { name: "電磁気学Ⅰ", credits: 2, year: 1, required: true, group: "major", page: 75 },
+      { name: "倫理学", credits: 2, year: 1, required: false, group: "liberal.g1", page: 75 },
+      { name: "電子回路Ⅰ", credits: 2, year: 2, required: true, group: "major", page: 75 },
+    ],
+  } as unknown as Requirements;
+
+  it("computes GPA with D/E in the denominator and N excluded", () => {
+    const s = summarize({
+      [gradeKey("回路理論Ⅰ")]: { name: "回路理論Ⅰ", credits: 2, grade: "S" },
+      [gradeKey("電磁気学Ⅰ")]: { name: "電磁気学Ⅰ", credits: 2, grade: "D" },
+      [gradeKey("倫理学")]: { name: "倫理学", credits: 2, grade: "B" },
+      [gradeKey("留学認定")]: { name: "留学認定", credits: 4, grade: "N" },
+    }, req);
+    expect(s.gpa).toBe(2); // (4*2 + 0*2 + 2*2) / 6
+    expect(s.earned).toBe(8); // S + B + N
+    expect(s.earnedByGroup).toEqual({ major: 2, "liberal.g1": 2 });
+    expect(s.earnedUnmatched).toBe(4);
+    expect(s.failedRequired.map((r) => r.name)).toEqual(["電磁気学Ⅰ"]);
+  });
+
+  it("labels groups for tags", () => {
+    expect(groupTag(req.courses[2], req)).toBe("教養 Ⅰ群");
+    expect(groupTag(req.courses[0], req)).toBe("専門");
+  });
+
+  it("plans required courses for the grade plus failed ones, avoiding clashes", () => {
+    const own = mk("J1", "電子回路Ⅰ", "前期", [[4, 2]]);
+    const retakeBusy = mk("J2", "電磁気学Ⅰ", "前期", [[4, 2]]);
+    const retakeFree = mk("J3", "電磁気学Ⅰ", "後期", [[1, 1]]);
+    const plan = planRequired(req, [own, retakeBusy, retakeFree], [], 2, "09", () => true, new Set([gradeKey("回路理論Ⅰ")]), new Set([gradeKey("電磁気学Ⅰ")]));
+    expect(plan.add.map((c) => c.id).sort()).toEqual(["J1", "J3"]);
+    expect(plan.missing).toEqual([]);
+  });
+
+  it("does not add a required course whose every section clashes", () => {
+    const busy = mk("X", "他の科目", "前期", [[4, 2]]);
+    const only = mk("J1", "電子回路Ⅰ", "前期", [[4, 2]]);
+    const plan = planRequired(req, [only], [busy], 2, "09", () => true, new Set(), new Set());
+    expect(plan.add).toEqual([]);
+    expect(plan.clashing.map((r) => r.name)).toEqual(["電子回路Ⅰ"]);
   });
 });

@@ -724,3 +724,45 @@ label.btn { cursor: pointer; }
 :root[data-theme="blueprint"] .title, :root[data-theme="blueprint"] .term { font-family: var(--font-mono); letter-spacing: 0.04em; }
 :root[data-theme="blueprint"] .reg::before, :root[data-theme="blueprint"] .reg::after { background: var(--accent); }
 :root[data-theme="blueprint"], :root[data-theme="scope"] { --hd: 34px; }
+
+/* ------------------------------------------------------------------ 必修・成績・検索 */
+/* 必修の印：類別色のまま、枠付きの「必」。緋は使わない（強調色の場所を増やさない） */
+.cell .meta .must { display: inline-block; margin-right: 3px; padding: 0 2px; border-radius: 2px; box-shadow: inset 0 0 0 1px currentColor; font: 700 8px/10px var(--font-sans); vertical-align: 1px; }
+.tag.must { background: transparent; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink); font-weight: 700; }
+/* 不合格の必修＝再履修：珊瑚の斜線で、重複と同じ「見落とせない」扱い */
+.tag.fail { background: repeating-linear-gradient(135deg, var(--conflict-soft) 0 3px, var(--surface) 3px 6px); box-shadow: inset 0 0 0 1.5px var(--conflict); color: var(--conflict-ink); font-weight: 700; }
+button.tag.fail { cursor: pointer; }
+.note.fail { background: repeating-linear-gradient(135deg, var(--conflict-soft) 0 4px, var(--surface) 4px 8px); box-shadow: inset 0 0 0 1.5px var(--conflict); }
+
+.bulk-btn { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-md); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); text-align: left; }
+.bulk-btn b { display: block; font-size: 13.5px; line-height: 19px; }
+.bulk-btn small { display: block; font-size: 11.5px; line-height: 16px; color: var(--ink-2); }
+.bulk-plus { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--accent); color: var(--on-accent); font-weight: 700; }
+
+.search { display: flex; align-items: center; gap: 8px; height: 44px; margin: 0 0 10px; padding: 0 12px; border-radius: var(--radius-sm); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-2); }
+.search input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: none; color: var(--ink); font-size: 16px; }
+.more-btn { display: block; width: 100%; min-height: 44px; margin-top: 8px; border-radius: var(--radius-md); border: 1px dashed var(--line-strong); color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+.pick-btn.plain { grid-template-columns: minmax(0, 1fr); }
+
+.gpa-card { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; border-radius: var(--radius-md); overflow: hidden; background: var(--line); box-shadow: inset 0 0 0 1px var(--line); }
+.gpa-card > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: var(--surface); }
+.gpa-card small { font-size: 11px; }
+.big.is-fail, .fail-text { color: var(--conflict-ink); }
+.gpa-link { display: flex; align-items: center; gap: 12px; width: 100%; margin: 4px 0 8px; padding: 10px 12px; border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); text-align: left; }
+.gpa-link b.num { display: block; font: 600 22px/26px var(--font-num); }
+.gpa-link-text { flex: 1; min-width: 0; font-size: 12px; line-height: 16px; color: var(--ink-2); }
+
+.grade-list { list-style: none; margin: 0 0 4px; padding: 0; }
+.grade-row { padding: 10px 0; border-top: 1px solid var(--line); }
+.grade-row:first-child { border-top: 0; }
+.grade-row.is-fail { margin: 0 -10px; padding: 10px; border-radius: var(--radius-md); border-top-color: transparent; background: repeating-linear-gradient(135deg, var(--conflict-soft) 0 4px, transparent 4px 8px); box-shadow: inset 0 0 0 1.5px var(--conflict); }
+.grade-row.is-fail + .grade-row { border-top-color: transparent; }
+.grade-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.grade-top b { font-size: 14px; line-height: 20px; }
+.grade-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.grade-meta:empty { display: none; }
+.grade-pick { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
+.gbtn { position: relative; height: 32px; border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line); font: 600 13px/1 var(--font-mono); color: var(--ink-2); }
+.gbtn::after { content: ""; position: absolute; inset: -6px -2px; }
+.gbtn.on { background: var(--ink); color: var(--bg); box-shadow: none; }
+.gbtn.bad.on { background: var(--conflict); color: var(--on-accent); }

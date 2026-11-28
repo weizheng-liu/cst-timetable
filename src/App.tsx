@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
+import { GradesPanel } from "./components/Grades";
+import { SearchPanel } from "./components/SearchPanel";
+import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
+import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
 import { Grid, GridSkeleton, ScopeTrace } from "./components/Grid";
 import { Sheet } from "./components/Sheet";
@@ -18,7 +22,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } fr
 import { download, exportJson, loadPhoto, sanitize, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -90,8 +94,28 @@ export function App() {
   const conflicts = useMemo(() => findConflicts(selected), [selected]);
   const termConflicts = conflicts.filter((c) => c.term === view);
   const termCredits = selected.filter((c) => inTerm(c, view)).reduce((s, c) => s + (c.credits || 0), 0);
-  const plannedYear = selected.reduce((s, c) => s + (c.credits || 0), 0);
-  const pr = req ? progress(req, selected, st.earned) : null;
+  // 成績（端末内のみ）。合格済みの科目は「取得予定」から外し、区分別の修得単位に足す
+  const gs = useMemo(() => summarize(st.grades, req), [st.grades, req]);
+  const retake = useMemo(() => new Set(gs.failedRequired.map((r) => gradeKey(r.name))), [gs]);
+  const isRetake = (c: Course) => retake.has(gradeKey(c.name));
+  const countSelected = selected.filter((c) => !gs.passed.has(gradeKey(c.name)));
+  const earnedAll = useMemo(() => mergeEarned(st.earned, gs.earnedByGroup), [st.earned, gs]);
+  const plannedYear = countSelected.reduce((s, c) => s + (c.credits || 0), 0);
+  const pr = req ? progress(req, countSelected, earnedAll, gs.passed) : null;
+  const earnedTotal = (pr?.earnedTotal ?? 0) + gs.earnedUnmatched;
+  const groupOf = (c: Course) => {
+    const rc = reqOf(c);
+    return rc ? groupTag(rc, req) : null;
+  };
+  // 必修の一括追加（卒業要件データがある学科だけ。現在は電子工学科 2025 年度入学）
+  const reqPlan = useMemo(
+    () =>
+      req && profile
+        ? planRequired(req, allCourses, selected, profile.grade, profile.dept, (c) => statusOf(c) === "yes" || (statusOf(c) === "otherGrade" && retake.has(gradeKey(c.name))), gs.passed, retake)
+        : null,
+    [req, profile?.grade, allCourses, selected, statusOf, gs, retake],
+  );
+  const failedOpen = gs.failedRequired.filter((r) => !selected.some((c) => gradeKey(c.name) === gradeKey(r.name)));
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
   const days = 6;
@@ -191,6 +215,7 @@ export function App() {
           cells={cells}
           offered={offered}
           category={category}
+          isRequired={isRequired}
           target={top?.kind === "slot" && !(cells.get(cellKey(top.day, top.period)) ?? []).length ? top : null}
           moved={toast?.moved ?? null}
           onCell={(d, p) => setStack([(cells.get(cellKey(d, p)) ?? []).length > 1 ? { kind: "resolve", day: d, period: p } : { kind: "slot", day: d, period: p }])}
@@ -217,6 +242,32 @@ export function App() {
           </button>
         </div>
       ))}
+
+      {failedOpen.map((r) => (
+        <div key={r.name} class="note fail" role="status">
+          <span class="note-dot" aria-hidden="true" />
+          <span>
+            必修の<b>{r.name}</b>が不合格（{st.grades[gradeKey(r.name)]?.grade}）· 再履修が必要
+          </span>
+          <button class="note-act" onClick={() => setStack([{ kind: "search", q: r.name }])}>
+            クラスを探す
+          </button>
+        </div>
+      ))}
+
+      {dept && reqPlan && reqPlan.add.length > 0 && (
+        <button class="bulk-btn" onClick={addRequired}>
+          <span class="bulk-plus" aria-hidden="true">
+            ＋
+          </span>
+          <span>
+            <b>{profile?.grade}年の必修をまとめて追加</b>
+            <small>
+              {reqPlan.add.length}科目 · 学部要覧の授業科目配置表より{retake.size ? `（再履修 ${[...retake].filter((k) => reqPlan.add.some((c) => gradeKey(c.name) === k)).length}科目を含む）` : ""}
+            </small>
+          </span>
+        </button>
+      )}
 
       {dept && selected.length === 0 && <p class="muted" style={{ textAlign: "center", marginTop: 20 }}>マスをタップすると、その時間に開講される科目が表示されます。</p>}
 
@@ -251,7 +302,7 @@ export function App() {
           <b class="num">1 : 1</b>
         </div>
       </div>
-      <CreditBar planned={plannedYear} earned={pr?.earnedTotal ?? 0} total={req?.totalCredits ?? null} onOpen={() => push({ kind: "credits" })} />
+      <CreditBar planned={plannedYear} earned={earnedTotal} total={req?.totalCredits ?? null} onOpen={() => push({ kind: "credits" })} />
 
       <input
         ref={fileRef}
@@ -295,6 +346,15 @@ export function App() {
     </div>
   );
 
+  function addRequired() {
+    if (!reqPlan || !reqPlan.add.length) return;
+    const before = st.selected;
+    const ids = reqPlan.add.map((c) => c.id);
+    setSt((s) => ({ ...s, selected: [...new Set([...s.selected, ...ids])], dataYear: index?.year ?? s.dataYear }));
+    const rest = [reqPlan.clashing.length ? `重複のため未追加 ${reqPlan.clashing.length}` : "", reqPlan.missing.length ? `開講なし ${reqPlan.missing.length}` : ""].filter(Boolean).join("・");
+    say(`必修 ${ids.length} 科目を追加しました${rest ? `（${rest}）` : ""}`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
+  }
+
   function applyResolve(o: ResolveOption) {
     const before = st.selected;
     const undo = () => setSt((s) => ({ ...s, selected: before }));
@@ -335,6 +395,10 @@ export function App() {
         return { eyebrow: "CREDITS", title: "単位と卒業要件", sub: `${deptName} · ${profile?.entryYear}年度入学` };
       case "menu":
         return { title: "その他" };
+      case "grades":
+        return { eyebrow: "GRADES · GPA", title: "成績と GPA", sub: "修得した科目に評価を付けると、GPA と単位を計算します" };
+      case "search":
+        return { eyebrow: "SEARCH", title: "科目を探す", sub: "全学年・全時限から（再履修のクラス探しなど）" };
       case "profile":
         return { title: "学科・学年" };
       case "times":
@@ -356,6 +420,9 @@ export function App() {
             grade={profile?.grade ?? 1}
             reqOf={reqOf}
             category={category}
+            groupOf={groupOf}
+            isRetake={isRetake}
+            passedGrade={(c) => (gs.passed.has(gradeKey(c.name)) ? st.grades[gradeKey(c.name)]?.grade ?? null : null)}
             onToggle={(c) => {
               const adding = !st.selected.includes(c.id);
               toggle(c);
@@ -394,9 +461,48 @@ export function App() {
             req={req}
             selected={selected}
             earned={st.earned}
+            earnedAll={earnedAll}
+            passed={gs.passed}
+            summary={gs}
+            onGrades={() => push({ kind: "grades" })}
             onEarned={(id, v) => setSt((s) => ({ ...s, earned: { ...s.earned, [id]: v } }))}
             deptName={deptName}
             entryYear={profile?.entryYear ?? 0}
+          />
+        );
+      case "grades":
+        return (
+          <GradesPanel
+            req={req}
+            grades={st.grades}
+            summary={gs}
+            grade={profile?.grade ?? 1}
+            allCourses={allCourses}
+            onSet={(k, e) =>
+              setSt((s) => {
+                const g = { ...s.grades };
+                if (e) g[k] = e;
+                else delete g[k];
+                return { ...s, grades: g };
+              })
+            }
+            onRetake={(name) => push({ kind: "search", q: name })}
+            onClear={() => {
+              const before = st.grades;
+              setSt((s) => ({ ...s, grades: {} }));
+              say("成績を消しました", { undo: () => setSt((s) => ({ ...s, grades: before })) });
+            }}
+          />
+        );
+      case "search":
+        return (
+          <SearchPanel
+            key={top.q}
+            initial={top.q}
+            all={allCourses}
+            selectedIds={new Set(st.selected)}
+            canShow={(c) => statusOf(c) !== "no" || st.selected.includes(c.id)}
+            onOpen={(c) => push({ kind: "detail", id: c.id })}
           />
         );
       case "profile":
@@ -440,6 +546,8 @@ export function App() {
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
+            <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />
+            <MenuItem icon={<Search size={18} />} title="科目を探す" sub="全学年・全時限から（再履修など）" onClick={() => push({ kind: "search", q: "" })} />
             <MenuItem icon={<Palette size={18} />} title="テーマ" sub={THEME_LABEL[st.theme]} onClick={() => push({ kind: "theme" })} />
             <MenuItem
               icon={<Clock size={18} />}
