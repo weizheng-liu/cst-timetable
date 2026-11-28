@@ -3,6 +3,7 @@ import type { Profile } from "./types";
 import { validRange } from "./periods";
 import { GRADE_LIST, type Grades } from "./grades";
 import { MARK_KEY_RE, NOTE_MAX, type Marks } from "./alerts";
+import { sanitizeCustom, type CustomCourse } from "./custom";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -23,6 +24,7 @@ export interface SavedState {
   showSat: boolean; // 土曜の列を常に出す（土曜に授業があれば自動で出る）
   marks: Marks; // 試験・オンライン回の手動の目印（科目id@日付）。この端末と JSON 保存のみ
   grades: Grades; // 自分で入力した成績（この端末にのみ保存。サーバーへは送らない）
+  custom: CustomCourse[]; // 自分で追加した科目（id は "my:…"）。この端末と JSON 保存のみ
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
 
@@ -31,7 +33,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, custom: [], photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -65,8 +67,8 @@ export function sanitize(x: any): SavedState {
     p && typeof p.dept === "string" && Number.isInteger(p.grade) && Number.isInteger(p.entryYear)
       ? { dept: p.dept.slice(0, 4), grade: Math.min(6, Math.max(1, p.grade)), entryYear: p.entryYear }
       : null;
-  const selected = Array.isArray(x.selected) ? x.selected.filter((s: unknown) => typeof s === "string" && /^[0-9A-Za-z]{1,12}$/.test(s)) : [];
-  const okId = (v: unknown) => typeof v === "string" && /^[0-9A-Za-z]{1,12}$/.test(v);
+  const selected = Array.isArray(x.selected) ? x.selected.filter((s: unknown) => typeof s === "string" && /^(?:[0-9A-Za-z]{1,12}|my:[a-z0-9]{1,16})$/.test(s)) : [];
+  const okId = (v: unknown) => typeof v === "string" && /^(?:[0-9A-Za-z]{1,12}|my:[a-z0-9]{1,16})$/.test(v);
   const plans: Record<string, string[]> = {};
   if (x.plans && typeof x.plans === "object") {
     for (const [k, v] of Object.entries<any>(x.plans)) if (/^[1-6]$/.test(k) && Array.isArray(v)) plans[k] = [...new Set<string>(v.filter(okId))].slice(0, 120);
@@ -114,6 +116,7 @@ export function sanitize(x: any): SavedState {
     showSat: x.showSat === true,
     marks,
     grades,
+    custom: sanitizeCustom(x.custom),
     photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
   };
 }

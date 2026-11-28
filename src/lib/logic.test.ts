@@ -16,6 +16,7 @@ import { bookmarklet, codesFromHash, parseCodes } from "./importer";
 import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf } from "./data";
+import { customToCourse, sanitizeCustom } from "./custom";
 import { chosenIds, dayOf, detectGrid, gradeForYear, headerInfo, inkRatio, matchCells, parseCell, periodOf, sequence, similarity } from "./screenshot";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
@@ -511,5 +512,23 @@ describe("unscheduled (on-demand) courses", () => {
     const ms = matchCells([{ day: 4, period: 6, text: "日本語\nオンラ…" }], [a, b], "後期");
     expect(ms[0].course?.id).toBe("Z1");
     expect(ms[0].moved).toBe(false);
+  });
+});
+
+describe("custom courses", () => {
+  it("sanitizes and survives a save/load round trip", () => {
+    const raw = [
+      { id: "my:abc123", name: " スポーツトレーニング ", term: "前期", slots: [{ day: 5, period: 2 }, { day: 9, period: 1 }], room: null, credits: 1 },
+      { id: "J11A", name: "偽物", term: "前期", slots: [] },
+      { id: "my:x", name: "", term: "後期", slots: [] },
+    ];
+    const cs = sanitizeCustom(raw);
+    expect(cs).toEqual([{ id: "my:abc123", name: "スポーツトレーニング", term: "前期", slots: [{ day: 5, period: 2 }], room: null, credits: 1 }]);
+    const st = sanitize({ selected: ["J11A", "my:abc123", "bad id!"], custom: raw, plans: { 1: ["my:abc123"] } });
+    expect(st.selected).toEqual(["J11A", "my:abc123"]);
+    expect(st.plans["1"]).toEqual(["my:abc123"]);
+    expect(st.custom.length).toBe(1);
+    const c = customToCourse(cs[0]);
+    expect(buildCells([c], "前期").get("5-2")?.[0].name).toBe("スポーツトレーニング");
   });
 });

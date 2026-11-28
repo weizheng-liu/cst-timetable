@@ -6,8 +6,10 @@ import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
 import { CatalogPanel } from "./components/CatalogPanel";
 import { InstallPanel } from "./components/InstallPanel";
+import { CustomDetail } from "./components/CustomDetail";
 import { ShotImportPanel } from "./components/ShotImportPanel";
 import { useInstall } from "./lib/pwa";
+import { customToCourse, isCustomId, newCustomId, type CustomCourse } from "./lib/custom";
 import { codesFromHash } from "./lib/importer";
 import { ALERT_LABEL, md as mdShort, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
@@ -78,8 +80,8 @@ export function App() {
   const allCourses = useMemo(() => {
     const own = dept?.courses ?? [];
     const ids = new Set(own.map((c) => c.id));
-    return [...own, ...common.filter((c) => !ids.has(c.id))];
-  }, [dept, common]);
+    return [...own, ...common.filter((c) => !ids.has(c.id)), ...st.custom.map(customToCourse)];
+  }, [dept, common, st.custom]);
   // 4 年計画：表示中の学年（在籍学年とは別に 1〜4 年を切り替えられる）
   const viewGrade = viewGradeOf(st);
   const nowGrade = profile?.grade ?? 1;
@@ -87,7 +89,7 @@ export function App() {
   const homeCampus = useMemo(() => homeCampusOf(dept?.courses ?? [], viewGrade), [dept, viewGrade]);
   const statusOf = useMemo(() => {
     const m = new Map<string, Eligible>();
-    for (const c of allCourses) m.set(c.id, profile ? eligibleFor(c, profile.dept, viewGrade, homeCampus) : "yes");
+    for (const c of allCourses) m.set(c.id, profile && !isCustomId(c.id) ? eligibleFor(c, profile.dept, viewGrade, homeCampus) : "yes");
     return (c: Course) => m.get(c.id) ?? "no";
   }, [allCourses, profile?.dept, viewGrade, homeCampus]);
   const byId = useMemo(() => new Map(allCourses.map((c) => [c.id, c])), [allCourses]);
@@ -510,16 +512,26 @@ export function App() {
     say(mode === "replace" ? `確認表の ${ids.length} 科目で時間割を置き換えました` : `${added} 科目を追加しました`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
   }
 
-  function applyShot(ids: string[], g: number, term: "前期" | "後期", mode: "replace" | "append") {
+  function applyShot(ids: string[], extra: Omit<CustomCourse, "id">[], g: number, term: "前期" | "後期", mode: "replace" | "append") {
     const before = st;
+    // 照合できなかったマスは「自分で追加した科目」として作る（同じ名前・同じ学期のものは使い回す）
+    const made: CustomCourse[] = [];
+    const reuse: string[] = [];
+    for (const e of extra) {
+      const old = st.custom.find((c) => c.name === e.name && c.term === e.term && JSON.stringify(c.slots) === JSON.stringify(e.slots));
+      if (old) reuse.push(old.id);
+      else made.push({ ...e, id: newCustomId() });
+    }
+    const all = [...ids, ...reuse, ...made.map((c) => c.id)];
     setSt((s) => {
       const n = switchPlan(s, g);
       // 置き換えはその学年・その学期の科目だけ（通年や反対の学期は残す）
-      const keep = mode === "replace" ? n.selected.filter((id) => byId.get(id)?.term !== term) : n.selected;
-      return { ...n, selected: [...new Set([...keep, ...ids])], view: term, dataYear: index?.year ?? n.dataYear };
+      const termOf = (id: string) => byId.get(id)?.term ?? s.custom.find((c) => c.id === id)?.term;
+      const keep = mode === "replace" ? n.selected.filter((id) => termOf(id) !== term) : n.selected;
+      return { ...n, custom: [...n.custom, ...made].slice(-60), selected: [...new Set([...keep, ...all])], view: term, dataYear: index?.year ?? n.dataYear };
     });
     close();
-    say(`${g}年の${term}に ${ids.length} 科目を取り込みました`, { undo: () => setSt(() => before) });
+    say(`${g}年の${term}に ${all.length} 科目を取り込みました${extra.length ? `（自分で追加 ${extra.length}）` : ""}`, { undo: () => setSt(() => before) });
   }
 
   function applyResolve(o: ResolveOption) {
@@ -556,6 +568,7 @@ export function App() {
         return { eyebrow: `CONFLICT ${EN_DAY[top.day - 1]}-${top.period} · ${times[top.period]?.[0]}–${times[top.period]?.[1]}`, title: `${DAYS[top.day - 1]}曜 ${top.period}限が重複しています` };
       case "detail": {
         const c = byId.get(top.id);
+        if (c && isCustomId(c.id)) return { eyebrow: "MY COURSE", title: c.name, sub: `自分で追加 · ${c.term} · ${c.credits}単位` };
         return { eyebrow: c?.code ? `COURSE ${c.code}` : undefined, title: c?.name, sub: c?.subtitle || (c ? `${c.term} · ${c.credits}単位` : undefined) };
       }
       case "credits":
@@ -628,6 +641,23 @@ export function App() {
       case "detail": {
         const c = byId.get(top.id);
         if (!c) return null;
+        const my = st.custom.find((x) => x.id === c.id);
+        if (my)
+          return (
+            <CustomDetail
+              c={my}
+              on={st.selected.includes(c.id)}
+              onToggle={() => toggle(c)}
+              onChange={(n) => setSt((s) => ({ ...s, custom: s.custom.map((x) => (x.id === n.id ? n : x)) }))}
+              onDelete={() => {
+                const before = st;
+                const drop = (ids: string[]) => ids.filter((id) => id !== c.id);
+                setSt((s) => ({ ...s, custom: s.custom.filter((x) => x.id !== c.id), selected: drop(s.selected), plans: Object.fromEntries(Object.entries(s.plans).map(([k, v]) => [k, drop(v)])) }));
+                close();
+                say(`${c.name}を消しました`, { undo: () => setSt(() => before) });
+              }}
+            />
+          );
         return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
       }
       case "credits":

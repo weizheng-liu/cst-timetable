@@ -4,6 +4,9 @@ import { readScreenshot, type ShotRead } from "../lib/ocr";
 import { chosenIds, gradeForYear, matchCells, type CellMatch } from "../lib/screenshot";
 import { dayLabel } from "../lib/periods";
 import type { Course } from "../lib/types";
+import type { CustomCourse } from "../lib/custom";
+
+const MY = "__my"; // 自分の科目として追加
 
 type Term = "前期" | "後期";
 
@@ -14,7 +17,7 @@ interface Props {
   view: Term;
   dataYear: number | null;
   nowGrade: number | null;
-  onApply: (ids: string[], grade: number, term: Term, mode: "replace" | "append") => void;
+  onApply: (ids: string[], extra: Omit<CustomCourse, "id">[], grade: number, term: Term, mode: "replace" | "append") => void;
 }
 
 /**
@@ -28,7 +31,8 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
   const [fail, setFail] = useState<string | null>(null);
   const [grade, setGrade] = useState(viewGrade);
   const [term, setTerm] = useState<Term>(view);
-  const [pick, setPick] = useState<Record<string, string>>({}); // "曜-限" → 科目 id（"" は取り込まない）
+  const [pick, setPick] = useState<Record<string, string>>({}); // "曜-限" → 科目 id（"" は取り込まない、MY は自分で追加）
+  const [names, setNames] = useState<Record<string, string>>({}); // 自分で追加する科目の名前（直したもの）
 
   useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url]);
 
@@ -37,6 +41,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
     setFail(null);
     setShot(null);
     setPick({});
+    setNames({});
     setUrl(URL.createObjectURL(f));
     setBusy([0, 1]);
     try {
@@ -58,13 +63,23 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
 
   const matches = useMemo(() => (shot ? matchCells(shot.cells, all, term) : []), [shot, all, term]);
   const keyOf = (m: CellMatch) => `${m.day}-${m.period}`;
-  const chosen = (m: CellMatch): Course | null => {
-    const id = pick[keyOf(m)];
-    if (id === undefined) return m.course;
-    return id ? (all.find((c) => c.id === id) ?? null) : null;
-  };
-  const final = matches.map((m) => ({ ...m, course: chosen(m) }));
+  // 照合できなかったマスは、はじめから「自分の科目として追加」にしておく
+  const valueOf = (m: CellMatch): string => pick[keyOf(m)] ?? (m.course ? m.course.id : MY);
+  const final = matches.map((m) => {
+    const v = valueOf(m);
+    return { ...m, value: v, course: v === MY || !v ? null : (m.course?.id === v ? m.course : (all.find((c) => c.id === v) ?? null)) };
+  });
   const ids = chosenIds(final);
+  const nameOf = (m: CellMatch) => (names[keyOf(m)] ?? m.name).trim();
+  const extra: Omit<CustomCourse, "id">[] = [];
+  for (const m of final) {
+    if (m.value !== MY || !nameOf(m)) continue;
+    const name = nameOf(m);
+    const e = extra.find((x) => x.name === name);
+    if (e) e.slots.push({ day: m.day, period: m.period });
+    else extra.push({ name, term, slots: [{ day: m.day, period: m.period }], room: m.rooms[0] ?? null, credits: 0 });
+  }
+  const count = ids.length + extra.length;
   const unread = shot ? shot.filled.length - matches.length : 0;
 
   return (
@@ -105,7 +120,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                   const c = shot.grid.cols[ci];
                   const r = shot.grid.rows[ri];
                   const m = final.find((x) => x.day === shot.days[ci] && x.period === shot.periods[ri]);
-                  const cls = !m?.course ? "miss" : m.score < 0.6 || m.moved ? "low" : "ok";
+                  const cls = !m?.course ? (m?.value === MY ? "low" : "miss") : m.score < 0.6 || m.moved ? "low" : "ok";
                   return <rect key={`${ci}-${ri}`} class={cls} x={c.start} y={r.start} width={c.end - c.start} height={r.end - r.start} rx={12} />;
                 })}
               </svg>
@@ -138,7 +153,8 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
           </div>
 
           <h3 class="sec-label">
-            読み取った科目 <span class="num">{ids.length}</span>
+            読み取った科目 <span class="num">{count}</span>
+            {extra.length > 0 && <span class="dim"> ／ うち自分で追加 {extra.length}</span>}
             {unread > 0 && <span class="dim"> ／ 読めなかったマス {unread}</span>}
           </h3>
           <ul class="pick-list shot-list">
@@ -148,7 +164,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
               if (orig.course && !opts.some((c) => c.id === orig.course!.id)) opts.unshift(orig.course);
               const unsure = m.course && pick[keyOf(m)] === undefined && (m.score < 0.6 || m.moved);
               return (
-                <li key={keyOf(m)} class={`pick shot-row${m.course ? "" : " off"}`}>
+                <li key={keyOf(m)} class={`pick shot-row${m.course || m.value === MY ? "" : " off"}`}>
                   <span class="shot-slot mono">
                     {dayLabel(m.day)}
                     {m.period}
@@ -157,7 +173,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                     <span class="shot-read">読み取り：{m.name || "—"}</span>
                     <span class="shot-sel">
                       <select
-                        value={m.course?.id ?? ""}
+                        value={m.value}
                         aria-label={`${dayLabel(m.day)}${m.period}限の科目`}
                         onChange={(e) => setPick((p) => ({ ...p, [keyOf(m)]: (e.target as HTMLSelectElement).value }))}
                       >
@@ -167,11 +183,23 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                             {c.classGroup ? `（${c.classGroup}）` : ""} · {c.teachers[0] ?? ""}
                           </option>
                         ))}
+                        <option value={MY}>自分の科目として追加（データに無い科目）</option>
                         <option value="">取り込まない</option>
                       </select>
                     </span>
+                    {m.value === MY && (
+                      <input
+                        class="shot-name"
+                        value={names[keyOf(m)] ?? m.name}
+                        maxLength={60}
+                        aria-label="追加する科目の名前"
+                        placeholder="科目名"
+                        onInput={(e) => setNames((n) => ({ ...n, [keyOf(m)]: (e.target as HTMLInputElement).value }))}
+                      />
+                    )}
                     <span class="tags">
-                      {!m.course && <span class="tag">{orig.options.length ? "取り込まない" : "この時間に候補なし"}</span>}
+                      {m.value === MY && <span class="tag amber">{orig.options.length ? "候補に無いので自分で追加" : "この時間に候補なし · 自分で追加"}（単位 0・名前は直せます）</span>}
+                      {!m.value && <span class="tag">取り込まない</span>}
                       {unsure && !orig.moved && <span class="tag amber">名前が近い科目 · 確かめて</span>}
                       {unsure && orig.moved && <span class="tag amber">今年は別の時間 · 確かめて</span>}
                     </span>
@@ -182,17 +210,17 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
           </ul>
           {!final.length && <div class="note miss">マスの文字が読めませんでした。画面を拡大してから撮り直すと読めることがあります。</div>}
           <p class="fine">
-            時間割のデータは {dataYear ?? "今"}年度のものです。昔の画面なら、今年度の同じ名前の科目に置き換えて取り込みます。留学生科目・体育など、名前が違う科目は手で選び直してください。
+            時間割のデータは {dataYear ?? "今"}年度のものです。昔の画面なら、今年度の同じ名前の科目に置き換えて取り込みます。候補に無い科目は「自分の科目として追加」で入ります（単位 0、あとで詳細から消せます）。
           </p>
-          {ids.length > 0 && (
+          {count > 0 && (
             <div class="sheet-cta col">
-              <button class="btn primary cta" onClick={() => onApply(ids, grade, term, "replace")}>
+              <button class="btn primary cta" onClick={() => onApply(ids, extra, grade, term, "replace")}>
                 <span class="cta-name">
                   {grade}年の{term}をこの内容にする
                 </span>
-                <span class="cta-cr">{ids.length}科目</span>
+                <span class="cta-cr">{count}科目</span>
               </button>
-              <button class="btn ghost block" onClick={() => onApply(ids, grade, term, "append")}>
+              <button class="btn ghost block" onClick={() => onApply(ids, extra, grade, term, "append")}>
                 {grade}年の{term}に追加する
               </button>
             </div>
