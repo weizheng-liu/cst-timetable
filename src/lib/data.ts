@@ -87,12 +87,12 @@ export const EVAL_TAGS: { id: string; label: string }[] = [
 ];
 
 export const EVAL_CATEGORY: Record<string, { label: string; color: string }> = {
-  exam: { label: k("試験"), color: "var(--cat-core-ink)" },
-  quiz: { label: k("小テスト"), color: "var(--cat-lang-ink)" },
-  report: { label: k("レポート・課題"), color: "var(--cat-elective-ink)" },
-  attendance: { label: k("出席・平常点"), color: "var(--cat-general-ink)" },
-  presentation: { label: k("発表"), color: "var(--ink-3)" },
-  other: { label: k("その他"), color: "var(--cat-lab-ink)" },
+  exam: { label: k("試験"), color: "var(--ev-exam)" },
+  quiz: { label: k("小テスト"), color: "var(--ev-quiz)" },
+  report: { label: k("レポート・課題"), color: "var(--ev-report)" },
+  attendance: { label: k("出席・平常点"), color: "var(--ev-attend)" },
+  presentation: { label: k("発表"), color: "var(--ev-present)" },
+  other: { label: k("その他"), color: "var(--ev-other)" },
 };
 
 function guessEvalCategory(label: string): string {
@@ -110,8 +110,11 @@ function guessEvalCategory(label: string): string {
  * 原文の「○○：20点」「○○ 40%」の行を読み直して、合計 100 になればそちらを使う。
  * どちらも 100 にならなければ complete=false（画面では原文を必ず併記する）。
  */
+const GENERIC_LABEL = /^(成績評価|評価|総合評価|成績|全体|合計|総合)(の|は|を|で)?$/;
+
 export function evalParts(c: Course): { parts: EvalPart[]; complete: boolean } {
-  const given = c.evaluation.parts;
+  // 「成績評価の 20% に TOEIC が反映」の「成績評価の」のような、項目名でない語は内訳から外す
+  const given = c.evaluation.parts.filter((p) => !GENERIC_LABEL.test(p.label.normalize("NFKC").trim()));
   const total = (ps: EvalPart[]) => ps.reduce((s, p) => s + p.percent, 0);
   if (given.length && Math.abs(total(given) - 100) <= 1) return { parts: given, complete: true };
   const re = /^[\s・●○■□◆◇\-－\d.．)）]*([^:：\d%％]{1,30}?)\s*[:：]?\s*(\d{1,3}(?:\.\d+)?)\s*(?:点|%|％)/;
@@ -121,7 +124,7 @@ export function evalParts(c: Course): { parts: EvalPart[]; complete: boolean } {
     const m = line.match(re);
     if (!m) continue;
     const label = m[1].replace(/[「」『』]/g, "").replace(/[(（\s]+$/, "").trim();
-    if (!label) continue;
+    if (!label || GENERIC_LABEL.test(label)) continue;
     found.push({ label, percent: +m[2], category: guessEvalCategory(label) });
   }
   if (found.length && Math.abs(total(found) - 100) <= 1) return { parts: found, complete: true };

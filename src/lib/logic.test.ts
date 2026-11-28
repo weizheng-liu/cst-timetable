@@ -17,7 +17,7 @@ import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf, evalParts } from "./data";
 import { customToCourse, sanitizeCustom } from "./custom";
-import { conditionsOf, focusOf, planGrades, strategyOf } from "./strategy";
+import { conditionsOf, focusOf, mentionsOf, planGrades, strategyOf } from "./strategy";
 import { chosenIds, dayOf, detectGrid, gradeForYear, headerInfo, inkRatio, matchCells, parseCell, periodOf, sequence, similarity } from "./screenshot";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
@@ -671,7 +671,16 @@ describe("攻略（strategy）", () => {
   it("重点：必修・出席の配点・出席の条件なら「出席が効く」、出席が配点にない科目は決め手の項目", () => {
     expect(focusOf(exam70, true)).toMatchObject({ kind: "attend", reasons: ["required", "weight"] });
     const examOnly = mk("S4", "数学", "前期", [[1, 2]], ev("期末試験100%", [{ label: "期末試験", percent: 100, category: "exam" }]));
-    expect(focusOf(examOnly, false)).toMatchObject({ kind: "score", key: { label: "期末試験", percent: 100 } });
+    expect(focusOf(examOnly, false)).toMatchObject({ kind: "score", decider: { by: "test", pct: 100 } });
+    // 電子物性工学：小テスト 20 + 中間テスト 40 + 理解度確認テスト 40 → 試験が決め手 100%（最大の 1 項目ではなく合計で見る）
+    const tests = mk("S7", "電子物性工学", "後期", [[1, 2]], ev("", [
+      { label: "小テスト", percent: 20, category: "quiz" },
+      { label: "自宅中間テスト", percent: 40, category: "exam" },
+      { label: "理解度確認テスト", percent: 40, category: "exam" },
+    ]));
+    expect(focusOf(tests, false)).toMatchObject({ kind: "score", decider: { by: "test", pct: 100 } });
+    const reps = mk("S8", "設計", "後期", [[1, 2]], ev("", [{ label: "課題", percent: 60, category: "report" }, { label: "平常点", percent: 10, category: "attendance" }, { label: "試験", percent: 30, category: "exam" }]));
+    expect(focusOf(reps, false)).toMatchObject({ kind: "score", weight: 10, decider: { by: "report", pct: 60 } });
     const rule = mk("S5", "演習", "前期", [[1, 3]], ev("授業を5回以上欠席した場合は成績評価の対象外とします。期末試験100%", [{ label: "期末試験", percent: 100, category: "exam" }]));
     expect(focusOf(rule, false)).toMatchObject({ kind: "attend", reasons: ["rule"] });
     expect(focusOf(mk("S6", "不明", "前期", [[1, 4]]), false)).toBeNull();
@@ -691,5 +700,25 @@ describe("攻略（strategy）", () => {
     expect(fixed.reachable).toBe(false);
     // 目標 1.0 なら全部 C のまま
     expect(planGrades(cs, 1.0).grades).toEqual({ E: "C", H: "C" });
+  });
+
+  it("配点が読めない科目は、評価に使うと書かれているものを出てくる順に挙げる", () => {
+    expect(mentionsOf("*成績評価の20%にTOEIC L&R IP のスコアが反映されます。小テストと期末試験、課題の提出状況で評価する。")).toEqual(["TOEIC のスコア", "小テスト", "試験", "レポート・課題"]);
+    expect(mentionsOf("")).toEqual([]);
+  });
+});
+
+describe("成績評価の内訳", () => {
+  it("「成績評価の 20%」のような項目名でない語は内訳から外す（英語ⅡB）", () => {
+    const c = mk("Q32A", "英語ⅡB", "後期", [[3, 2]], { evaluation: { text: "", tags: [], parts: [
+      { label: "宿題", percent: 10, category: "report" },
+      { label: "小テスト", percent: 60, category: "quiz" },
+      { label: "授業点", percent: 10, category: "attendance" },
+      { label: "TOEIC", percent: 20, category: "other" },
+      { label: "成績評価の", percent: 20, category: "other" },
+    ] } });
+    const { parts, complete } = evalParts(c);
+    expect(complete).toBe(true);
+    expect(parts.map((p) => p.label)).toEqual(["宿題", "小テスト", "授業点", "TOEIC"]);
   });
 });

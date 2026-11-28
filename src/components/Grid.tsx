@@ -123,7 +123,7 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
             {isRequired?.(c) && <b class="must">{t("必")}</b>}
             {(() => {
               const f = focusOf?.(c);
-              return f?.kind === "attend" ? <b class="fx-dot att" title={t("出席が効く")}>{t("出")}</b> : f?.kind === "score" ? <b class="fx-dot score" title={t("決め手：{label} {pct}%", { label: f.key.label, pct: f.key.percent })}>{f.key.category === "exam" || f.key.category === "quiz" ? t("試") : f.key.category === "report" ? t("レ") : t("点")}</b> : null;
+              return f?.kind === "attend" ? <b class="fx-dot att" title={t("出席が効く")}>{t("出")}</b> : f?.kind === "score" ? <b class="fx-dot score">{f.decider.by === "test" ? t("試") : f.decider.by === "report" ? t("レ") : t("点")}</b> : null;
             })()}
             {roomOf(c) ?? tv(c.teachers[0]) ?? ""}
           </small>

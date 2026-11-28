@@ -11,6 +11,8 @@
   --task: #5a4ba8; --task-bg: #e8e4f6; --task-ink: #3d317d; --on-task: #ffffff;
   /* 重点：出席が効く科目は「藍」の塗り。点数の決め手型は墨の点線枠（色ではなく形で区別） */
   --attend: #1d5fa6; --attend-bg: #e1ebf7; --attend-ink: #153f6e; --on-attend: #ffffff;
+  /* 成績評価の内訳の色：色覚に配慮した Okabe–Ito 系。明るさも互いに離す。出席・平常点は「出席が効く」と同じ藍 */
+  --ev-exam: #c4501a; --ev-quiz: #e8a33a; --ev-report: #1e8a6a; --ev-attend: #1d5fa6; --ev-present: #b8679a; --ev-other: #8f8a80;
   --bg: #f8f6f1;
   --surface: #fffdf9;
   --surface-2: #ffffff;
@@ -66,6 +68,7 @@
   --online: #5cc183; --online-bg: #14301f; --online-ink: #95dcb0; --on-online: #07160d;
   --task: #a597ee; --task-bg: #252038; --task-ink: #cbc2f7; --on-task: #120e24;
   --attend: #78aef0; --attend-bg: #16263a; --attend-ink: #b9d4f6; --on-attend: #07121f;
+  --ev-exam: #f07a45; --ev-quiz: #f3c162; --ev-report: #4cc09a; --ev-attend: #78aef0; --ev-present: #e09ac6; --ev-other: #9d978c;
   --bg: #151412;
   --surface: #1c1b18;
   --surface-2: #26241f;
@@ -384,6 +387,7 @@ input, select { font: inherit; color: inherit; }
 .prose { white-space: pre-wrap; color: var(--ink); font-size: 14px; }
 .evalbar { display: flex; height: 6px; overflow: hidden; background: var(--fill); margin: 4px 0 10px; }
 .evalbar i { display: block; height: 100%; }
+.evalbar i + i { box-shadow: inset 2px 0 0 var(--sheet-bg, var(--surface)); } /* 隣の項目との境目 */
 .evalrows { display: flex; flex-direction: column; gap: 4px; }
 .evalrows div { display: flex; align-items: center; gap: 8px; font-size: 14px; }
 .evalrows .dot { width: 8px; height: 8px; margin: 0; border-radius: 50%; flex: none; }

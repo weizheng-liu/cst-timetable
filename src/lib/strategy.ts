@@ -5,6 +5,7 @@
 //   3. シラバス原文から、出席・提出・最低点・評価対象外などの条件の文をそのまま抜き出す
 // 原文に書いていないことは言わない。割合が取れない科目は条件の文だけを出す。
 import { evalParts } from "./data";
+import { k } from "./i18n";
 import type { Course, EvalPart } from "./types";
 
 /** 日本大学の成績基準（全学部共通、GPA 制度） */
@@ -84,11 +85,24 @@ export function strategyOf(c: Course): Strategy {
 
 // ── 重点の種類 ───────────────────────────────────────────────
 // attend：出席が成績・合否に効く（必修、出席・平常点の割合が大きい、出席の条件がある）
-// score ：シラバス上、点数に出席が入らない。決め手の 1 項目（期末試験 70% など）を示す
+// score ：出席・平常点が配点の 20% 未満（0 なら「配点に出席なし」）。点数の決め手（試験・小テスト合計、レポート・課題合計、または最大の 1 項目）を示す
+export type Decider = { by: "test" | "report" | "part"; pct: number; label: string };
 export type Focus =
-  | { kind: "attend"; reasons: ("required" | "weight" | "rule")[]; weight: number }
-  | { kind: "score"; key: EvalPart }
+  | { kind: "attend"; reasons: ("required" | "weight" | "rule")[]; weight: number; decider: Decider | null }
+  | { kind: "score"; decider: Decider; weight: number }
   | null;
+
+/** 点数の決め手：試験・小テストの合計が半分以上なら「試験」、レポート・課題・発表が半分以上なら「課題」、ほかは最大の項目 */
+export function deciderOf(st: Strategy): Decider | null {
+  if (!st.complete || !st.parts.length) return null;
+  const sum = (cats: string[]) => st.parts.filter((p) => cats.includes(p.category)).reduce((a, p) => a + p.percent, 0);
+  const test = sum(["exam", "quiz"]);
+  const rep = sum(["report", "presentation"]);
+  if (test >= 50) return { by: "test", pct: test, label: "" };
+  if (rep >= 50) return { by: "report", pct: rep, label: "" };
+  const key = [...st.parts].sort((a, b) => b.percent - a.percent)[0];
+  return { by: "part", pct: key.percent, label: key.label };
+}
 
 export function focusOf(c: Course, required: boolean, st: Strategy = strategyOf(c)): Focus {
   const weight = st.complete ? st.parts.filter((p) => p.category === "attendance").reduce((s, p) => s + p.percent, 0) : 0;
@@ -96,12 +110,28 @@ export function focusOf(c: Course, required: boolean, st: Strategy = strategyOf(
   if (required) reasons.push("required");
   if (weight >= 20 || (!st.complete && c.evaluation.tags.includes("attendance-heavy"))) reasons.push("weight");
   if (st.conditions.some((x) => x.kind === "attendance")) reasons.push("rule");
-  if (reasons.length) return { kind: "attend", reasons, weight };
-  if (st.complete && weight === 0 && st.parts.length) {
-    const key = [...st.parts].sort((a, b) => b.percent - a.percent)[0];
-    return { kind: "score", key };
-  }
+  const decider = deciderOf(st);
+  if (reasons.length) return { kind: "attend", reasons, weight, decider };
+  if (decider) return { kind: "score", decider, weight };
   return null;
+}
+
+/** 配点が読み取れない科目：原文が評価に使うと書いているもの（出てくる順） */
+export const MENTIONS: { id: string; label: string; re: RegExp }[] = [
+  { id: "exam", label: k("試験"), re: /試験|考査|(?<!小|ミニ)テスト/ },
+  { id: "quiz", label: k("小テスト"), re: /小テスト|ミニテスト|小試験|クイズ|確認問題/ },
+  { id: "report", label: k("レポート・課題"), re: /レポート|課題|提出物|宿題|報告書/ },
+  { id: "attendance", label: k("出席・平常点"), re: /出席|平常点|授業態度|参加|取り組み|取組/ },
+  { id: "presentation", label: k("発表"), re: /発表|プレゼン/ },
+  { id: "practical", label: k("実験・実技"), re: /実験|実技|口頭試問|実習/ },
+  { id: "toeic", label: k("TOEIC のスコア"), re: /TOEIC/i },
+];
+export function mentionsOf(text: string): string[] {
+  const x = text.normalize("NFKC");
+  return MENTIONS.map((m) => ({ m, at: x.search(m.re) }))
+    .filter((v) => v.at >= 0)
+    .sort((a, b) => a.at - b.at)
+    .map((v) => v.m.label);
 }
 
 // ── 目標 GPA から各科目の目標評価を割り振る ──────────────────────
