@@ -31,7 +31,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm, isU
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string; focus?: { day: number; period: number } } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -340,7 +340,11 @@ export function App() {
           alertsOf={alertsOf}
           target={top?.kind === "slot" && !(cells.get(cellKey(top.day, top.period)) ?? []).length ? top : null}
           moved={toast?.moved ?? null}
-          onCell={(d, p) => setStack([(cells.get(cellKey(d, p)) ?? []).length > 1 ? { kind: "resolve", day: d, period: p } : { kind: "slot", day: d, period: p }])}
+          onCell={(d, p) => {
+            const here = cells.get(cellKey(d, p)) ?? [];
+            // 選んだ科目が 1 つあるマスは、その科目の「今回」の内容と評価を開く（他の科目はそこから見られる）
+            setStack([here.length > 1 ? { kind: "resolve", day: d, period: p } : here.length === 1 ? { kind: "detail", id: here[0].id, focus: { day: d, period: p } } : { kind: "slot", day: d, period: p }]);
+          }}
         />
       ) : (
         <GridSkeleton days={days} periods={6} />
@@ -671,7 +675,8 @@ export function App() {
               }}
             />
           );
-        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
+        const fc = top.focus;
+        return <CourseDetail focus={!!fc && viewGrade === nowGrade} onOthers={fc ? () => push({ kind: "slot", day: fc.day, period: fc.period }) : undefined} c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
       }
       case "credits":
         return (

@@ -1,9 +1,9 @@
-import { ExternalLink, Plus, Check, AlertTriangle, MonitorPlay } from "lucide-preact";
+import { ExternalLink, Plus, Check, AlertTriangle, MonitorPlay, LayoutList } from "lucide-preact";
 import { EVAL_CATEGORY, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
-import { flagsOf, NOTE_MAX, type Flag, type Flags, type Marks } from "../lib/alerts";
+import { currentSession, flagsOf, NOTE_MAX, tokyoToday, type Flag, type Flags, type Marks } from "../lib/alerts";
 import { useState } from "preact/hooks";
 import type { Session } from "../lib/types";
 
@@ -17,6 +17,10 @@ interface Props {
   marks?: Marks;
   onMark?: (s: Session, what: Flag) => void;
   onNote?: (s: Session, text: string) => void;
+  /** 時間割のマスから開いたとき：今回の授業と評価を先頭に出す */
+  focus?: boolean;
+  /** 同じ時間の他の科目を見る */
+  onOthers?: () => void;
 }
 
 const md = (d: string | null | undefined) => {
@@ -25,7 +29,7 @@ const md = (d: string | null | undefined) => {
   return `${x.getMonth() + 1}/${x.getDate()}(${"日月火水木金土"[x.getDay()]})`;
 };
 
-export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers }: Props) {
   const parts = c.evaluation.parts;
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -33,8 +37,58 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
   const online = c.sessions.filter((s) => s.mode !== "face" && s.kind === "regular");
   const cancelled = c.sessions.filter((s) => s.cancelled);
 
+  const cur = focus ? currentSession(c, tokyoToday()) : null;
+  const curFlags = cur ? flagsOf(c, cur.s, marks) : null;
+
   return (
     <>
+      {focus && (
+        <section class="now-card">
+          {cur && curFlags ? (
+            <>
+              <div class="now-head">
+                <span class={`now-when ${cur.when}`}>{cur.when === "today" ? "今日" : cur.when === "next" ? "次回" : "最終回（終了）"}</span>
+                <b>第{cur.s.no ?? "?"}回</b>
+                <span class="now-date">{md(cur.s.date)}</span>
+                {cur.s.mode !== "face" && <span class="tag">オンライン</span>}
+                {curFlags.exam && <span class="tag amber">{curFlags.exam === "quiz" ? "小テスト" : "試験"}</span>}
+                {curFlags.cancel && <span class="tag coral">休講</span>}
+              </div>
+              <p class={`now-content ${curFlags.cancel ? "cancel" : ""}`}>{cur.s.content || "（内容の記載なし）"}</p>
+              {onMark && onNote && <SessionMarks f={curFlags} onMark={(w) => onMark(cur.s, w)} onNote={(t) => onNote(cur.s, t)} />}
+            </>
+          ) : (
+            <p class="now-content muted">授業の日程がシラバスに掲載されていません。下の授業計画を見てください。</p>
+          )}
+          <div class="now-eval">
+            <span class="now-eval-h">成績評価</span>
+            {parts.length > 0 ? (
+              <>
+                <div class="evalbar" aria-hidden="true">
+                  {parts.map((p, i) => (
+                    <i key={i} style={{ width: `${(p.percent / sum) * 100}%`, background: EVAL_CATEGORY[p.category]?.color }} />
+                  ))}
+                </div>
+                <span class="now-eval-list">
+                  {parts.map((p, i) => (
+                    <span key={i}>
+                      <span class="dot" style={{ background: EVAL_CATEGORY[p.category]?.color }} />
+                      {p.label} <b class="num">{p.percent}%</b>
+                    </span>
+                  ))}
+                </span>
+              </>
+            ) : (
+              <span class="now-eval-list muted">{c.evaluation.text ? c.evaluation.text.slice(0, 120) + (c.evaluation.text.length > 120 ? "…" : "") : "記載なし"}</span>
+            )}
+          </div>
+          {onOthers && (
+            <button class="now-others" onClick={onOthers}>
+              <LayoutList size={14} /> この時間の他の科目を見る
+            </button>
+          )}
+        </section>
+      )}
       {clash.length > 0 && (
         <div class="note" style={{ marginTop: 0, marginBottom: 12 }}>
           <span class="note-dot" aria-hidden="true" />

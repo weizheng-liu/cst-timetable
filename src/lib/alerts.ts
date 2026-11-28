@@ -136,3 +136,15 @@ export const md = (d: string) => {
   const x = new Date(d + "T00:00:00");
   return `${x.getMonth() + 1}/${x.getDate()}`;
 };
+
+/**
+ * 「今回」の授業：今日あれば今日の回、なければ次の回。学期が終わっていれば最後の回。
+ * 日付のない計画（シラバスに日程なし）なら null。
+ */
+export function currentSession(c: Course, today: string): { s: Session; when: "today" | "next" | "last" } | null {
+  const dated = c.sessions.filter((s) => s.kind === "regular" && s.date).sort((a, b) => (a.date! < b.date! ? -1 : 1));
+  if (!dated.length) return null;
+  const next = dated.find((s) => s.date! >= today);
+  if (next) return { s: next, when: next.date === today ? "today" : "next" };
+  return { s: dated[dated.length - 1], when: "last" };
+}

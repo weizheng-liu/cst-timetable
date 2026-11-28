@@ -4,7 +4,7 @@ import { buildCells, clashesWith, findConflicts, isUnscheduled } from "./schedul
 import { inputGroups, progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
-import { examOf, setNote, toggleMark, upcoming } from "./alerts";
+import { currentSession, examOf, setNote, toggleMark, upcoming } from "./alerts";
 import { buildCatalog } from "./catalog";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
@@ -588,5 +588,16 @@ describe("履修届確認表 from an earlier year", () => {
     fn({ body: { innerText: "氏名:TEST 学生番号:0000\n" + old } }, { open: (u: string) => ((opened = u), {}) }, {}, () => {});
     expect(entriesFromHash(opened.slice(opened.indexOf("#")))).toEqual(parseEntries(old));
     expect(opened).not.toContain("TEST");
+  });
+});
+
+describe("current session", () => {
+  const ses = (no: number, date: string) => ({ no, kind: "regular" as const, date, mode: "face" as const, content: `第${no}回の内容` });
+  const c = mk("A", "回路理論Ⅱ", "後期", [[2, 2]], { sessions: [ses(8, "2026-11-17"), ses(9, "2026-11-24"), ses(10, "2026-12-01")] });
+  it("picks today's, else the next, else the last session", () => {
+    expect(currentSession(c, "2026-11-24")).toMatchObject({ when: "today", s: { no: 9 } });
+    expect(currentSession(c, "2026-11-28")).toMatchObject({ when: "next", s: { no: 10 } });
+    expect(currentSession(c, "2027-01-30")).toMatchObject({ when: "last", s: { no: 10 } });
+    expect(currentSession(mk("B", "x", "後期", [[1, 1]]), "2026-11-28")).toBeNull();
   });
 });
