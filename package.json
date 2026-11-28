@@ -17,7 +17,9 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
+    "@tesseract.js-data/jpn": "1.0.0",
     "lucide-preact": "^0.460.0",
-    "preact": "^10.25.1"
+    "preact": "^10.25.1",
+    "tesseract.js": "5.1.1"
   }
 }

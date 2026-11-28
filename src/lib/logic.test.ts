@@ -16,6 +16,7 @@ import { bookmarklet, codesFromHash, parseCodes } from "./importer";
 import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf } from "./data";
+import { chosenIds, dayOf, detectGrid, gradeForYear, headerInfo, inkRatio, matchCells, parseCell, periodOf, sequence, similarity } from "./screenshot";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
   id, pageId: 1, code: id, name, subtitle: "", teachers: ["教員 太郎"], department: "09", syllabusDepartment: "09", grade: 2,
@@ -416,5 +417,82 @@ describe("精密機械工学科 2025 の卒業要件", () => {
   it("tags series courses as 選択必修 with the series name", () => {
     const rc = req.courses.find((c: any) => c.name === "工業力学I");
     expect(groupTag(rc, req)).toBe("選択必修 力学系列");
+  });
+});
+
+describe("screenshot import", () => {
+  // 薄い背景に角丸でない白／青のマスを 5 列 × 4 行描いた合成画像（実際の写真は使わない）
+  function fake(): { width: number; height: number; data: Uint8ClampedArray } {
+    const W = 600, H = 900;
+    const d = new Uint8ClampedArray(W * H * 4);
+    const put = (x: number, y: number, [r, g, b]: number[]) => { const i = (y * W + x) * 4; d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255; };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) put(x, y, [239, 246, 254]);
+    for (let c = 0; c < 5; c++) for (let r = 0; r < 4; r++) {
+      const x0 = 60 + c * 105, y0 = 150 + r * 170, blue = (c + r) % 2 === 0;
+      for (let y = y0; y < y0 + 160; y++) for (let x = x0; x < x0 + 97; x++) put(x, y, blue ? [194, 220, 253] : [255, 255, 255]);
+      if (blue) for (let y = y0 + 40; y < y0 + 60; y++) for (let x = x0 + 20; x < x0 + 70; x++) if ((x + y) % 3) put(x, y, [30, 40, 60]);
+    }
+    return { width: W, height: H, data: d };
+  }
+  it("finds the day × period grid and which cells have text", () => {
+    const px = fake();
+    const g = detectGrid(px)!;
+    expect(g.cols.length).toBe(5);
+    expect(g.rows.length).toBe(4);
+    expect(Math.abs(g.cols[0].start - 60)).toBeLessThan(4);
+    expect(Math.abs(g.cols[0].end - 157)).toBeLessThan(4);
+    expect(Math.abs(g.rows[1].start - 320)).toBeLessThan(4);
+    expect(Math.abs(g.rows[1].end - 480)).toBeLessThan(4);
+    const ink = (c: number, r: number) => inkRatio(px, g.cols[c].start + 5, g.rows[r].start + 5, g.cols[c].end - 5, g.rows[r].end - 5);
+    expect(ink(0, 0)).toBeGreaterThan(0.01);
+    expect(ink(1, 0)).toBe(0);
+  });
+  it("reads headers, periods and cells", () => {
+    expect(dayOf("ヘー 一\n金\n")).toBe(5);
+    expect(dayOf("ーー")).toBeNull();
+    expect(periodOf("1\n09:00\n10:40")).toBe(1);
+    expect(periodOf("09:00\n|\n10:40", { 1: "09:00", 2: "10:50" })).toBe(1);
+    expect(periodOf("10:50\n|\n12:30", { 1: "09:00", 2: "10:50" })).toBe(2);
+    expect(sequence([1, 2, null, 4, 5, null], 1)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(sequence([null, null], 1)).toEqual([1, 2]);
+    expect(headerInfo("19:53\n2025 年 1 学期\n月 火")).toEqual({ year: 2025, term: "前期" });
+    expect(headerInfo("2024年度 後期")).toEqual({ year: 2024, term: "後期" });
+    expect(parseCell("電子工学\nインセンティ\nブ\n1141\n")).toEqual({ name: "電子工学インセンティブ", rooms: ["1141"] });
+    expect(parseCell("基礎物理\n実験\n144\n").name).toBe("基礎物理実験");
+    expect(parseCell("スポーツ\nトレーニ\nング\n未登録").name).toBe("スポーツトレーニング");
+    expect(similarity("英語IA", "英語ⅠA")).toBe(1);
+    expect(similarity("英語2A", "英語ⅡA")).toBe(1);
+    expect(similarity("数学演習", "数学演習Ⅰ")).toBeGreaterThan(0.8);
+  });
+  it("matches cells against courses at that slot, flags moved ones, merges 2-period labs", () => {
+    const all = [
+      mk("E1", "英語ⅠA", "前期", [[1, 4]], { room: "1233" }),
+      mk("E2", "英語ⅠA", "前期", [[1, 4]], { room: "1234" }),
+      mk("L", "電子工学実験Ⅰ", "前期", [[4, 3], [4, 4]]),
+      mk("M", "回路理論のための基礎数学", "前期", [[3, 5]]),
+      mk("X", "英語ⅠA", "後期", [[1, 4]]),
+    ];
+    const ms = matchCells(
+      [
+        { day: 1, period: 4, text: "英語IA\n1234" },
+        { day: 4, period: 3, text: "電子工学\n実験I\n1102" },
+        { day: 4, period: 4, text: "電子工学\n実験I\n1102" },
+        { day: 2, period: 5, text: "回路理論の\nための\n基礎数学\n1022" },
+        { day: 5, period: 1, text: "謎の科目\n999" },
+      ],
+      all,
+      "前期",
+    );
+    expect(ms[0].course?.id).toBe("E2"); // 教室番号が合う方
+    expect(ms[3].course?.id).toBe("M");
+    expect(ms[3].moved).toBe(true);
+    expect(ms[4].course).toBeNull();
+    expect(chosenIds(ms)).toEqual(["E2", "L", "M"]);
+  });
+  it("guesses the plan grade from the screenshot year", () => {
+    expect(gradeForYear(2025, 2026, 2)).toBe(1);
+    expect(gradeForYear(2026, 2026, 2)).toBe(2);
+    expect(gradeForYear(2019, 2026, 2)).toBeNull();
+    expect(gradeForYear(null, 2026, 2)).toBeNull();
   });
 });

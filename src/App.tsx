@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, ClipboardList, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, ImagePlus, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
 import { CatalogPanel } from "./components/CatalogPanel";
 import { InstallPanel } from "./components/InstallPanel";
+import { ShotImportPanel } from "./components/ShotImportPanel";
 import { useInstall } from "./lib/pwa";
 import { codesFromHash } from "./lib/importer";
 import { ALERT_LABEL, md as mdShort, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
@@ -28,7 +29,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } fr
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" } | { kind: "install" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -496,6 +497,18 @@ export function App() {
     say(mode === "replace" ? `確認表の ${ids.length} 科目で時間割を置き換えました` : `${added} 科目を追加しました`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
   }
 
+  function applyShot(ids: string[], g: number, term: "前期" | "後期", mode: "replace" | "append") {
+    const before = st;
+    setSt((s) => {
+      const n = switchPlan(s, g);
+      // 置き換えはその学年・その学期の科目だけ（通年や反対の学期は残す）
+      const keep = mode === "replace" ? n.selected.filter((id) => byId.get(id)?.term !== term) : n.selected;
+      return { ...n, selected: [...new Set([...keep, ...ids])], view: term, dataYear: index?.year ?? n.dataYear };
+    });
+    close();
+    say(`${g}年の${term}に ${ids.length} 科目を取り込みました`, { undo: () => setSt(() => before) });
+  }
+
   function applyResolve(o: ResolveOption) {
     const before = st.selected;
     const undo = () => setSt((s) => ({ ...s, selected: before }));
@@ -542,6 +555,8 @@ export function App() {
         return { eyebrow: "INSTALL", title: "ホーム画面に追加", sub: "アプリのようにアイコンからすぐ開けます" };
       case "catalog":
         return { eyebrow: `CATALOG · ${viewGrade}年 ${view}`, title: "今学期の科目一覧", sub: `取れる科目 ${new Set(catalogCourses.map((c) => normName(c.name))).size}件 · 時間のボタンで追加` };
+      case "shot":
+        return { eyebrow: "IMPORT", title: "画面写真から取り込む", sub: "他の時間割アプリのスクリーンショットを読み取って、学年ごとの計画に並べます" };
       case "import":
         return { eyebrow: "IMPORT", title: "履修届確認表から取り込む", sub: top.codes ? "ブックマークレットで読み取った時間割CD" : "学校の確認表を貼り付けると、登録済みの科目を時間割に並べます" };
       case "search":
@@ -656,6 +671,18 @@ export function App() {
             homeCampus={homeCampus}
           />
         );
+      case "shot":
+        return (
+          <ShotImportPanel
+            all={allCourses}
+            starts={Object.fromEntries(Object.entries(times).map(([p, t]) => [p, t[0]]))}
+            viewGrade={viewGrade}
+            view={view}
+            dataYear={index?.year ?? null}
+            nowGrade={profile?.grade ?? null}
+            onApply={applyShot}
+          />
+        );
       case "import":
         return (
           <ImportPanel
@@ -738,6 +765,7 @@ export function App() {
             )}
             <MenuItem icon={<LayoutList size={18} />} title="今学期の科目一覧" sub="区分別・曜日時限・キャンパス付き" onClick={() => push({ kind: "catalog" })} />
             <MenuItem icon={<ClipboardList size={18} />} title="履修届確認表から取り込む" sub="学校で登録した科目を貼り付けて一括で時間割に" onClick={() => push({ kind: "import", codes: null })} />
+            <MenuItem icon={<ImagePlus size={18} />} title="他のアプリの時間割を写真から取り込む" sub="スクリーンショットを端末の中で読み取り、学年を選んで並べる" onClick={() => push({ kind: "shot" })} />
             <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />
             <MenuItem icon={<Search size={18} />} title="科目を探す" sub="全学年・全時限から（再履修など）" onClick={() => push({ kind: "search", q: "" })} />
             <MenuItem icon={<Palette size={18} />} title="テーマ" sub={THEME_LABEL[st.theme]} onClick={() => push({ kind: "theme" })} />
