@@ -75,7 +75,7 @@ export function progress(req: Requirements, selected: Course[], earned: Record<s
     return { group: g, depth: depthOf(req.groups, g), planned, earned: e, total, missing: Math.max(0, g.minCredits - total), requiredLeft };
   });
   const plannedTotal = [...counted.values()].reduce((s, x) => s + x.credits, 0) + unmatched.reduce((s, c) => s + (c.credits || 0), 0);
-  const earnedTotal = leafGroups(req.groups).reduce((s, g) => s + (Number(earned[g.id]) || 0), 0);
+  const earnedTotal = inputGroups(req).reduce((s, g) => s + (Number(earned[g.id]) || 0), 0);
   return {
     groups,
     unmatched,
@@ -89,4 +89,13 @@ export function progress(req: Requirements, selected: Course[], earned: Record<s
 /** Groups without children: the only ones where "already earned" credits can be entered. */
 export function leafGroups(groups: ReqGroup[]): ReqGroup[] {
   return groups.filter((g) => !groups.some((x) => x.parent === g.id));
+}
+
+/**
+ * 修得単位を入れられる区分：子のない区分と、子があっても科目が直接属する区分
+ * （例：精密機械の「専門教育科目」は系列の子区分を持ちつつ、必修・選択の科目が直接属する）
+ */
+export function inputGroups(req: Requirements): ReqGroup[] {
+  const direct = new Set(req.courses.map((c) => c.group));
+  return req.groups.filter((g) => !req.groups.some((x) => x.parent === g.id) || direct.has(g.id));
 }

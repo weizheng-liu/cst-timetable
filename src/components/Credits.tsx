@@ -1,5 +1,5 @@
 import { AlertTriangle, Info } from "lucide-preact";
-import { leafGroups, normName, progress } from "../lib/credits";
+import { inputGroups, normName, progress } from "../lib/credits";
 import type { Course, Requirements } from "../lib/types";
 import type { GradeSummary } from "../lib/grades";
 
@@ -28,7 +28,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
         <div class="banner" style={{ marginTop: 16 }}>
           <Info size={16} />
           <div>
-            {deptName}・{entryYear}年度入学の卒業要件データはまだ登録されていません。現在は電子工学科（2025年度入学）のみ対応しています。
+            {deptName}・{entryYear}年度入学の卒業要件データはまだ登録されていません。現在は電子工学科・精密機械工学科（2025年度入学）に対応しています。
           </div>
         </div>
       </>
@@ -39,7 +39,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
   const earnedTotal = pr.earnedTotal + summary.earnedUnmatched;
   const total = pr.plannedTotal + earnedTotal;
   const missingTotal = Math.max(0, req.totalCredits - total);
-  const leaves = new Set(leafGroups(req.groups).map((g) => g.id));
+  const leaves = new Set(inputGroups(req).map((g) => g.id));
   return (
     <>
       {!req.verified && (

@@ -1,6 +1,7 @@
+import precisionReq from "../../data/requirements/2025_precision.json";
 import { describe, expect, it } from "vitest";
 import { buildCells, clashesWith, findConflicts } from "./schedule";
-import { progress } from "./credits";
+import { inputGroups, progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
 import { examOf, setNote, toggleMark, upcoming } from "./alerts";
@@ -394,5 +395,26 @@ describe("課題・休講・メモ", () => {
     const s = sanitize({ marks: { "J22D@2026-12-08": { task: true, note: "x".repeat(500) }, "bad key": { task: true } } });
     expect(Object.keys(s.marks)).toEqual(["J22D@2026-12-08"]);
     expect(s.marks["J22D@2026-12-08"].note!.length).toBe(200);
+  });
+});
+
+describe("精密機械工学科 2025 の卒業要件", () => {
+  const req = precisionReq as any;
+  it("has 系列 groups under 専門 and the 必修 total matches 20 credits", () => {
+    expect(req.groups.filter((g: any) => g.parent === "major").map((g: any) => g.label)).toEqual(["基礎系列", "力学系列", "電気系列", "計測・制御系列", "機械系列"]);
+    const must = req.courses.filter((c: any) => c.required && c.group === "major").reduce((s: number, c: any) => s + c.credits, 0);
+    expect(must).toBe(20);
+  });
+  it("counts earned credits of courses that sit directly in 専門 even though it has child groups", () => {
+    const ids = inputGroups(req).map((g) => g.id);
+    expect(ids).toContain("major");
+    expect(ids).toContain("major.series.mechanics");
+    const p = progress(req, [], { major: 10, "major.series.mechanics": 4 });
+    expect(p.earnedTotal).toBe(14);
+    expect(p.groups.find((g) => g.group.id === "major")!.earned).toBe(14);
+  });
+  it("tags series courses as 選択必修 with the series name", () => {
+    const rc = req.courses.find((c: any) => c.name === "工業力学I");
+    expect(groupTag(rc, req)).toBe("選択必修 力学系列");
   });
 });

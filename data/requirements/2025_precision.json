@@ -1,0 +1,1289 @@
+{
+ "entryYear": 2025,
+ "department": {
+  "code": "06",
+  "name": "精密機械工学科"
+ },
+ "verified": false,
+ "source": {
+  "url": "https://www.cst.nihon-u.ac.jp/about/education/pdf/0_3_1_r7.pdf",
+  "title": "令和7年度 理工学部 学部要覧",
+  "pages": [
+   62,
+   63
+  ],
+  "printedPages": [
+   61,
+   62
+  ]
+ },
+ "totalCredits": 126,
+ "groups": [
+  {
+   "id": "common",
+   "label": "全学共通教育科目",
+   "minCredits": 2,
+   "requiredCredits": 2,
+   "page": 62,
+   "parent": null
+  },
+  {
+   "id": "liberal",
+   "label": "教養教育科目",
+   "minCredits": 16,
+   "page": 62,
+   "parent": null
+  },
+  {
+   "id": "liberal.g1",
+   "label": "多文化と社会の理解（Ⅰ群）",
+   "parent": "liberal",
+   "minCredits": 6,
+   "page": 62
+  },
+  {
+   "id": "liberal.g2",
+   "label": "心と身体の表現（Ⅱ群）",
+   "parent": "liberal",
+   "minCredits": 4,
+   "page": 62
+  },
+  {
+   "id": "liberal.g3",
+   "label": "科学・技術のリテラシー（Ⅲ群）",
+   "parent": "liberal",
+   "minCredits": 4,
+   "page": 62
+  },
+  {
+   "id": "liberal.g4",
+   "label": "総合・ゼミナール（Ⅳ群）",
+   "parent": "liberal",
+   "minCredits": 0,
+   "note": "区分ごとの最低単位なし（教養教育科目の合計に算入）",
+   "page": 62
+  },
+  {
+   "id": "basic",
+   "label": "基礎教育科目",
+   "minCredits": 22,
+   "page": 62,
+   "parent": null
+  },
+  {
+   "id": "basic.global",
+   "label": "グローバルスキル分野",
+   "parent": "basic",
+   "minCredits": 7,
+   "requiredCredits": 4,
+   "page": 62
+  },
+  {
+   "id": "basic.science",
+   "label": "基礎科学分野",
+   "parent": "basic",
+   "minCredits": 14,
+   "page": 62
+  },
+  {
+   "id": "basic.science.math",
+   "label": "数学系",
+   "parent": "basic.science",
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "basic.science.physics",
+   "label": "物理学系",
+   "parent": "basic.science",
+   "minCredits": 4,
+   "page": 62
+  },
+  {
+   "id": "basic.science.chem",
+   "label": "化学系",
+   "parent": "basic.science",
+   "minCredits": 2,
+   "page": 62
+  },
+  {
+   "id": "major",
+   "label": "専門教育科目",
+   "minCredits": 86,
+   "requiredCredits": 20,
+   "page": 62,
+   "parent": null
+  },
+  {
+   "id": "major.series.basic",
+   "label": "基礎系列",
+   "parent": "major",
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.mechanics",
+   "label": "力学系列",
+   "parent": "major",
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.electric",
+   "label": "電気系列",
+   "parent": "major",
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.control",
+   "label": "計測・制御系列",
+   "parent": "major",
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.machine",
+   "label": "機械系列",
+   "parent": "major",
+   "minCredits": 8,
+   "page": 62
+  }
+ ],
+ "choiceRules": [
+  {
+   "id": "basic.global.a",
+   "label": "グローバルスキル分野 ②",
+   "courses": [
+    "英語IIIA",
+    "英語IIIB",
+    "EnglishCommunicationI",
+    "EnglishCommunicationII"
+   ],
+   "minCredits": 2,
+   "page": 62
+  },
+  {
+   "id": "basic.global.b",
+   "label": "グローバルスキル分野 ③",
+   "courses": [
+    "英語特殊講義A",
+    "英語特殊講義B"
+   ],
+   "minCredits": 1,
+   "page": 62
+  },
+  {
+   "id": "major.series.basic",
+   "label": "専門 基礎系列",
+   "courses": [
+    "精密機械工学リテラシ",
+    "微分方程式の基礎I",
+    "関数論の基礎I",
+    "コンピュータプログラミング",
+    "微分方程式の基礎II",
+    "関数論の基礎II",
+    "工業数学"
+   ],
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.mechanics",
+   "label": "専門 力学系列",
+   "courses": [
+    "工業力学I",
+    "流体力学",
+    "工業力学II",
+    "熱力学",
+    "材料力学I",
+    "材料力学II"
+   ],
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.electric",
+   "label": "専門 電気系列",
+   "courses": [
+    "電磁気学I",
+    "アナログ回路",
+    "電磁気学II",
+    "デジタル回路",
+    "電気回路I",
+    "電気回路II"
+   ],
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.control",
+   "label": "専門 計測・制御系列",
+   "courses": [
+    "測定値計算法",
+    "機械計測",
+    "ロボット工学I",
+    "制御工学I",
+    "制御工学II",
+    "制御システム"
+   ],
+   "minCredits": 8,
+   "page": 62
+  },
+  {
+   "id": "major.series.machine",
+   "label": "専門 機械系列",
+   "courses": [
+    "機械要素",
+    "機構学",
+    "機械加工学II",
+    "材料学",
+    "機械材料",
+    "機械加工学I"
+   ],
+   "minCredits": 8,
+   "page": 62
+  }
+ ],
+ "thesisPrerequisites": [
+  {
+   "rule": "修業年数が3年以上",
+   "years": 3,
+   "page": 62
+  },
+  {
+   "rule": "卒業に必要な単位から94単位以上を修得",
+   "minCredits": 94,
+   "page": 62
+  },
+  {
+   "rule": "専門教育科目から56単位以上を修得",
+   "minCredits": 56,
+   "group": "major",
+   "page": 62
+  },
+  {
+   "rule": "微分積分学I,微分積分学II,線形代数学I,線形代数学II,物理学I及び物理学IIの6科目12単位をすべて修得",
+   "page": 62
+  },
+  {
+   "rule": "工作実習実験I,工作実習実験II,機械実験I,機械実験II,電気電子実験I,電気電子実験II,機械設計製図IA,機械設計製図IB,機械設計製図IIA,機械設計製図IIBから8単位以上修得",
+   "page": 62
+  }
+ ],
+ "courses": [
+  {
+   "name": "自主創造の基礎",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "common",
+   "page": 63
+  },
+  {
+   "name": "倫理学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "社会学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "ドイツ語I",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "中国語I",
+   "credits": 1,
+   "year": 4,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "歴史学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "経済学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "ドイツ語II",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "中国語II",
+   "credits": 1,
+   "year": 4,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "文学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "日本国憲法",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "フランス語I",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "法学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "ことばと文化",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "フランス語II",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g1",
+   "page": 63
+  },
+  {
+   "name": "スポーツI",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "哲学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "スポーツIII",
+   "credits": 1,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "日本語表現の基礎",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "クリティカル・シンキング",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "感性芸術学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "心理学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "スポーツII",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "健康の科学",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g2",
+   "page": 63
+  },
+  {
+   "name": "技術者倫理",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "知的財産権論",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "地球環境化学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "科学技術と人間",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "科学技術史",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "自然環境論",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "科学技術と経済",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "現代物理学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "地理学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "liberal.g3",
+   "page": 63
+  },
+  {
+   "name": "総合講座",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g4",
+   "page": 63
+  },
+  {
+   "name": "教養基礎ゼミナール",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g4",
+   "page": 63
+  },
+  {
+   "name": "データサイエンスの世界",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "liberal.g4",
+   "page": 63
+  },
+  {
+   "name": "英語IA",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "basic.global",
+   "page": 63
+  },
+  {
+   "name": "英語IB",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "basic.global",
+   "page": 63
+  },
+  {
+   "name": "英語IIA",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "basic.global",
+   "page": 63
+  },
+  {
+   "name": "英語IIB",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "basic.global",
+   "page": 63
+  },
+  {
+   "name": "英語IIIA",
+   "credits": 1,
+   "year": 2,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.a",
+   "page": 63
+  },
+  {
+   "name": "英語特殊講義A",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.b",
+   "page": 63
+  },
+  {
+   "name": "英語IIIB",
+   "credits": 1,
+   "year": 2,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.a",
+   "page": 63
+  },
+  {
+   "name": "英語特殊講義B",
+   "credits": 1,
+   "year": 3,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.b",
+   "page": 63
+  },
+  {
+   "name": "English Communication I",
+   "credits": 1,
+   "year": 2,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.a",
+   "page": 63
+  },
+  {
+   "name": "English Communication II",
+   "credits": 1,
+   "year": 2,
+   "required": false,
+   "group": "basic.global",
+   "choice": "basic.global.a",
+   "page": 63
+  },
+  {
+   "name": "微分積分学I",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "微分積分学II",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "線形代数学I",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "線形代数学II",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "数学演習I",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "数理統計学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "数学演習II",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.math",
+   "page": 63
+  },
+  {
+   "name": "物理学I",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.physics",
+   "page": 63
+  },
+  {
+   "name": "物理学II",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "basic.science.physics",
+   "page": 63
+  },
+  {
+   "name": "物理学I演習",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.physics",
+   "page": 63
+  },
+  {
+   "name": "物理学II演習",
+   "credits": 1,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.physics",
+   "page": 63
+  },
+  {
+   "name": "基礎物理学実験",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.physics",
+   "page": 63
+  },
+  {
+   "name": "基礎化学実験",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "basic.science.chem",
+   "page": 63
+  },
+  {
+   "name": "精密機械工学インセンティブ",
+   "credits": 2,
+   "year": 1,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械実験I",
+   "credits": 1,
+   "year": 2,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械実験II",
+   "credits": 1,
+   "year": 3,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "精密機械工学総合演習",
+   "credits": 1,
+   "year": 4,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "工作実習実験I",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "電気電子実験I",
+   "credits": 1,
+   "year": 2,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "電気電子実験II",
+   "credits": 1,
+   "year": 3,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "卒業研究",
+   "credits": 6,
+   "year": 4,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "工作実習実験II",
+   "credits": 1,
+   "year": 1,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械設計製図IA",
+   "credits": 1,
+   "year": 2,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械設計製図IIA",
+   "credits": 1,
+   "year": 3,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械設計製図IB",
+   "credits": 1,
+   "year": 2,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "機械設計製図IIB",
+   "credits": 1,
+   "year": 3,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "精密機械工学キャリアデザイン",
+   "credits": 1,
+   "year": 3,
+   "required": true,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "精密機械工学リテラシ",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "微分方程式の基礎I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "関数論の基礎I",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "コンピュータプログラミング",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "微分方程式の基礎II",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "関数論の基礎II",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "工業数学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.basic",
+   "choice": "major.series.basic",
+   "page": 63
+  },
+  {
+   "name": "工業力学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "流体力学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "工業力学II",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "熱力学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "材料力学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "材料力学II",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.mechanics",
+   "choice": "major.series.mechanics",
+   "page": 63
+  },
+  {
+   "name": "電磁気学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "アナログ回路",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "電磁気学II",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "デジタル回路",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "電気回路I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "電気回路II",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.electric",
+   "choice": "major.series.electric",
+   "page": 63
+  },
+  {
+   "name": "測定値計算法",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "機械計測",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "ロボット工学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "制御工学I",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "制御工学II",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "制御システム",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.control",
+   "choice": "major.series.control",
+   "page": 63
+  },
+  {
+   "name": "機械要素",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "機構学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "機械加工学II",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "材料学",
+   "credits": 2,
+   "year": 1,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "機械材料",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "機械加工学I",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major.series.machine",
+   "choice": "major.series.machine",
+   "page": 63
+  },
+  {
+   "name": "半導体工学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "工業熱力学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "マイクロマシニング",
+   "credits": 2,
+   "year": 4,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "コンピュータ工学",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "流体工学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "デジタル制御",
+   "credits": 2,
+   "year": 4,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "メカトロニクス",
+   "credits": 2,
+   "year": 2,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "ロボット工学II",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "人工知能",
+   "credits": 2,
+   "year": 4,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "光工学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "人間工学",
+   "credits": 2,
+   "year": 4,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "振動工学",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "システム工学",
+   "credits": 2,
+   "year": 4,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "コンピュータシミュレーション",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "コンピュータグラフィクス",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "工学解析の方法I",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "工学解析の方法II",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  },
+  {
+   "name": "特別講義",
+   "credits": 2,
+   "year": 3,
+   "required": false,
+   "group": "major",
+   "page": 63
+  }
+ ]
+}

@@ -152,7 +152,7 @@ export function App() {
     const rc = reqOf(c);
     return rc ? groupTag(rc, req) : null;
   };
-  // 必修の一括追加（卒業要件データがある学科だけ。現在は電子工学科 2025 年度入学）
+  // 必修の一括追加（卒業要件データがある学科だけ。現在は電子工学科・精密機械工学科の 2025 年度入学）
   const reqPlan = useMemo(
     () =>
       req && profile

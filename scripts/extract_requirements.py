@@ -110,6 +110,13 @@ def parse_conditions(text: str, page_no: int) -> dict:
     m = re.search(r"(\d)年次までに設置された専門教育科目の必修科目をすべて修得", flat)
     if m:
         out["thesis"].append({"rule": m.group(0), "requiredUpToYear": int(m.group(1)), "group": "major", "page": page_no})
+    # そのほかの着手条件（特定科目の修得など）は文のまま残す（表示と確認用）
+    sec = flat.split("卒業研究着手条件", 1)[-1].split("卒業条件", 1)[0]
+    for m in re.finditer(r"\((\d)\)(.+?)こと。", sec):
+        body = m.group(2)
+        if re.search(r"修業年数|卒業に必要な単位から|専門教育科目から\d+単位|年次までに設置された", body):
+            continue
+        out["thesis"].append({"rule": re.sub(r"(して)?いる$", "", body), "page": page_no})
 
     g = out["groups"]
     v = num(r"全学共通教育科目必修(\d+)単位")
@@ -154,19 +161,28 @@ def parse_conditions(text: str, page_no: int) -> dict:
     sm = re.search(r"「基礎科学分野」(.*?)(専門教育科目|$)", flat)
     if sm:
         blk = sm.group(1)
-        sci_total = num(r"化学系:\d+単位以上(\d+)単位以上", blk) or num(r"(\d+)単位以上$", blk)
-        if sci_total is None:
-            nums = [int(x) for x in re.findall(r"(\d+)単位以上", blk)]
-            sci_total = max(nums) if nums else 0
+        nums = [int(x) for x in re.findall(r"(\d+)単位以上", blk)]
+        sci_total = max(nums) if nums else 0  # 分野全体の最低単位は各系より大きい
         g.append({"id": "basic.science", "label": "基礎科学分野", "parent": "basic", "minCredits": sci_total})
         for gid, key, label in [("basic.science.math", "数学系", "数学系"), ("basic.science.physics", "物理学系", "物理学系"), ("basic.science.chem", "化学系", "化学系")]:
-            vv = num(key + r":(\d+)単位以上", blk)
+            vv = num(key + r":(?:必修を含めて)?(\d+)単位以上", blk)
             if vv is not None:
                 g.append({"id": gid, "label": label, "parent": "basic.science", "minCredits": vv})
 
     mm = re.search(r"専門教育科目必修(\d+)単位を含めて(\d+)単位以上", flat)
     if mm:
         g.append({"id": "major", "label": "専門教育科目", "minCredits": int(mm.group(2)), "requiredCredits": int(mm.group(1))})
+    else:
+        # 例（精密機械）：①必修20単位 ②「基礎系列」から8単位以上 … 専門教育科目 86単位以上
+        mt = num(r"専門教育科目(\d+)単位以上")
+        blk = flat_raw.split("化学系", 1)[-1].split("合計単位数", 1)[0]
+        mr = num(r"<1>必修(\d+)単位", blk)
+        if mt is not None:
+            g.append({"id": "major", "label": "専門教育科目", "minCredits": mt, **({"requiredCredits": mr} if mr is not None else {})})
+        for mark, series, n in re.findall(r"<([2-9])>「([^」]+系列)」から(\d+)単位以上", blk):
+            sid = series_id(series)
+            g.append({"id": sid, "label": series, "parent": "major", "minCredits": int(n)})
+            out["choices"].append({"id": sid, "label": f"専門 {series}", "courses": [], "group": sid, "minCredits": int(n), "page": page_no})
     out["total"] = num(r"合計単位数(\d+)単位以上")
     for x in g:
         x["page"] = page_no
@@ -199,6 +215,19 @@ def _bands(lines: list[float]) -> list[tuple[float, float]]:
     return [(a, b) for a, b in zip(lines, lines[1:]) if b - a > 3]
 
 
+SERIES_IDS = {"基礎系列": "basic", "力学系列": "mechanics", "電気系列": "electric", "計測・制御系列": "control", "機械系列": "machine",
+              "材料系列": "materials", "情報系列": "info", "設計系列": "design", "エネルギー系列": "energy"}
+
+
+def series_id(label: str) -> str:
+    """「力学系列」→ major.series.mechanics。知らない系列は番号付き"""
+    lab = nf(label).replace(" ", "")
+    for k, v in SERIES_IDS.items():
+        if nf(k) == lab:
+            return f"major.series.{v}"
+    return "major.series.s" + str(abs(hash(lab)) % 1000)
+
+
 GROUP_KEYWORDS = [
     ("common", ["全学共通"]),
     ("liberal.g1", ["多文化", "(I群)"]),
@@ -217,6 +246,12 @@ GROUP_KEYWORDS = [
 
 
 def classify_label(label: str) -> str | None:
+    for part in label.split("|"):
+        m = re.search(r"([^|]{1,8}系列)", part)
+        if m and "系列" in part:
+            for k in SERIES_IDS:
+                if nf(k) in part:
+                    return series_id(k)
     for gid, kws in GROUP_KEYWORDS:
         if any(k in label for k in kws):
             return gid
@@ -248,7 +283,7 @@ def parse_table(page, page_no: int) -> list[dict]:
     for x in left_xs:
         if not levels or x - levels[-1] > 15:
             levels.append(x)
-    levels = levels[:3]
+    levels = levels[:4]
     lvl_lines = [_hlines(page, x) for x in levels]
     top_lines = lvl_lines[0]
     header_bottom = max((w["bottom"] for w in heads), default=top_lines[0])
@@ -331,10 +366,15 @@ def extract(pdf_path: str, dept: str, entry_year: int, pdf_url: str, page_offset
         ci, ti = find_pages(pdf, name)
         cpage, tpage = pdf.pages[ci], pdf.pages[ti]
         ci, ti = ci + page_offset, ti + page_offset
-        cond = parse_conditions(cpage.extract_text() or "", ci + 1)
+        cond = parse_conditions(cpage.crop((40, 0, cpage.width - 40, cpage.height)).extract_text() or "", ci + 1)  # 余白の見出しを除く
         courses = parse_table(tpage, ti + 1)
         printed = [printed_page_no(cpage), printed_page_no(tpage)]
 
+    # 系列の選択必修は配置表の区分から科目を集める
+    for ch in cond["choices"]:
+        if ch.get("group"):
+            ch["courses"] = [c["name"] for c in courses if c["group"] == ch["group"]]
+            del ch["group"]
     # choice rules reference course names; mark courses that belong to one
     for ch in cond["choices"]:
         for c in courses:
@@ -470,8 +510,10 @@ def main(argv=None) -> int:
     out = Path(a.out) if a.out else ROOT / "data" / "requirements" / f"{a.entry_year}_{SLUGS[a.dept]}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(req, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    (ROOT / "docs").mkdir(exist_ok=True)
-    (ROOT / "docs" / "REQUIREMENTS_REVIEW.md").write_text(review_markdown(req), encoding="utf-8")
+    # 学科ごとの確認シート（電子工学科の既存シートは docs/REQUIREMENTS_REVIEW.md のまま）
+    rv = ROOT / "docs" / ("REQUIREMENTS_REVIEW.md" if a.dept == "09" and a.entry_year == 2025 else f"requirements/REVIEW_{a.entry_year}_{SLUGS[a.dept]}.md")
+    rv.parent.mkdir(parents=True, exist_ok=True)
+    rv.write_text(review_markdown(req), encoding="utf-8")
     if a.save_fixture:
         from pypdf import PdfReader, PdfWriter
         r, w = PdfReader(a.pdf), PdfWriter()

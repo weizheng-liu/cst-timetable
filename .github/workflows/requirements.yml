@@ -51,14 +51,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           B="debug/requirements-${{ inputs.entry_year }}-${{ inputs.dept }}"
           git checkout -B "$B"
-          for p in data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures; do if [ -e "$p" ]; then git add -f "$p"; fi; done
+          for p in data/requirements docs/REQUIREMENTS_REVIEW.md docs/requirements tests/fixtures; do if [ -e "$p" ]; then git add -f "$p"; fi; done
           git commit -m "debug: requirements ${{ inputs.entry_year }} ${{ inputs.dept }} (validation failed)" || true
           git push -f origin "$B"
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for p in data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures; do if [ -e "$p" ]; then git add "$p"; fi; done
+          for p in data/requirements docs/REQUIREMENTS_REVIEW.md docs/requirements tests/fixtures; do if [ -e "$p" ]; then git add "$p"; fi; done
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
           git commit -m "data: extract requirements ${{ inputs.entry_year }} ${{ inputs.dept }}"
           git pull --rebase origin ${{ github.ref_name }}

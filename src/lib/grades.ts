@@ -75,7 +75,7 @@ export function mergeEarned(manual: Record<string, number>, fromGrades: Record<s
 /** 区分の短い表示名: 「教養 Ⅰ群」「基礎 数学系」「専門」など */
 export function groupTag(rc: ReqCourse, req: Requirements | null): string {
   const choice = (req?.choiceRules ?? []).find((r) => r.courses.map(normName).includes(normName(rc.name)));
-  if (choice) return "選択必修";
+  if (choice) return choice.label.startsWith("専門 ") ? `選択必修 ${choice.label.slice(3)}` : "選択必修";
   const g = req?.groups.find((x) => x.id === rc.group);
   const roman = g?.label.match(/（(.+群)）/)?.[1];
   if (rc.group.startsWith("liberal")) return roman ? `教養 ${roman}` : "教養";

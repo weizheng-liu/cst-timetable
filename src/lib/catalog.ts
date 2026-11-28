@@ -17,7 +17,7 @@ export const KINDS: { id: Kind; label: string; mark: string; tone: string }[] = 
 export function kindOf(c: Course, rc: ReqCourse | undefined, req: Requirements | null): Kind {
   if (rc) {
     const tag = groupTag(rc, req);
-    if (tag === "選択必修") return "choice";
+    if (tag.startsWith("選択必修")) return "choice";
     if (rc.required) return "must";
     if (rc.group.startsWith("major")) return "major";
     if (rc.group.startsWith("liberal") || rc.group === "common") return "liberal";
