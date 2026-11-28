@@ -174,9 +174,8 @@ export function App() {
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
   // 土曜は授業を入れていなければ畳んで、平日の列を広くする（ボタンで出せる）
-  const [showSat, setShowSat] = useState(false);
   const satUsed = selected.some((c) => inTerm(c, view) && c.slots.some((x) => x.day === 6));
-  const days = satUsed || showSat ? 6 : 5;
+  const days = satUsed || st.showSat ? 6 : 5;
 
   const toggle = (c: Course) => {
     const on = st.selected.includes(c.id);
@@ -286,8 +285,8 @@ export function App() {
       )}
 
       {dept && !satUsed && (
-        <button class="sat-btn" onClick={() => setShowSat((v) => !v)}>
-          {showSat ? "土曜日をたたむ" : "土曜日も表示"}
+        <button class="sat-btn" onClick={() => setSt((s) => ({ ...s, showSat: !s.showSat }))}>
+          {st.showSat ? "土曜日をたたむ" : "土曜日も表示"}
         </button>
       )}
 

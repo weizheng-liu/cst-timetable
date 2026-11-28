@@ -20,6 +20,7 @@ export interface SavedState {
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
   periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
   theme: Theme;
+  showSat: boolean; // 土曜の列を常に出す（土曜に授業があれば自動で出る）
   marks: Marks; // 試験・オンライン回の手動の目印（科目id@日付）。この端末と JSON 保存のみ
   grades: Grades; // 自分で入力した成績（この端末にのみ保存。サーバーへは送らない）
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
@@ -30,7 +31,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", marks: {}, grades: {}, photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -110,6 +111,7 @@ export function sanitize(x: any): SavedState {
     earned,
     periodTimes,
     theme: THEMES.includes(x.theme) ? x.theme : "system",
+    showSat: x.showSat === true,
     marks,
     grades,
     photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
