@@ -28,15 +28,18 @@ export interface SavedState {
   lang: Lang; // 画面の言語（日本語・简体中文・English）。初回はブラウザの言語から
   rotation: Record<string, boolean>; // 班ごとにテーマが違う実験か（自動判定の上書き。科目id → true/false）
   custom: CustomCourse[]; // 自分で追加した科目（id は "my:…"）。この端末と JSON 保存のみ
+  goal: Goal; // 目標 GPA（今学期）と、手で決めた科目ごとの目標評価
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
+
+export type Goal = { gpa: number | null; per: Record<string, "S" | "A" | "B" | "C"> };
 
 export type Theme = "system" | "light" | "dark" | "sepia" | "blueprint" | "scope" | "photo";
 export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint", "scope", "photo"];
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, lang: detectLang(), rotation: {}, custom: [], photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", showSat: false, marks: {}, grades: {}, lang: detectLang(), rotation: {}, custom: [], goal: { gpa: null, per: {} }, photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -126,8 +129,18 @@ export function sanitize(x: any): SavedState {
         .slice(0, 200),
     ),
     custom: sanitizeCustom(x.custom),
+    goal: sanitizeGoal(x.goal),
     photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
   };
+}
+
+function sanitizeGoal(g: any): Goal {
+  const gpa = g && typeof g.gpa === "number" && g.gpa >= 1 && g.gpa <= 4 ? Math.round(g.gpa * 10) / 10 : null;
+  const per: Goal["per"] = {};
+  if (g && g.per && typeof g.per === "object")
+    for (const [k, v] of Object.entries<any>(g.per).slice(0, 200))
+      if (/^(?:[0-9A-Za-z]{1,12}|my:[a-z0-9]{1,16})$/.test(k) && ["S", "A", "B", "C"].includes(v)) per[k] = v;
+  return { gpa, per };
 }
 
 export function usePersistentState(): [SavedState, (f: (s: SavedState) => SavedState) => void] {

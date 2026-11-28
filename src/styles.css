@@ -9,6 +9,8 @@
   --exam: #c98500; --exam-bg: #fbecc4; --exam-ink: #6b4300; --on-exam: #1f1500;
   --online: #2e8550; --online-bg: #dcefe2; --online-ink: #1b5a35; --on-online: #ffffff;
   --task: #5a4ba8; --task-bg: #e8e4f6; --task-ink: #3d317d; --on-task: #ffffff;
+  /* 重点：出席が効く科目は「藍」の塗り。点数の決め手型は墨の点線枠（色ではなく形で区別） */
+  --attend: #1d5fa6; --attend-bg: #e1ebf7; --attend-ink: #153f6e; --on-attend: #ffffff;
   --bg: #f8f6f1;
   --surface: #fffdf9;
   --surface-2: #ffffff;
@@ -63,6 +65,7 @@
   --exam: #f0b43c; --exam-bg: #3a2c10; --exam-ink: #f6cf7d; --on-exam: #1a1203;
   --online: #5cc183; --online-bg: #14301f; --online-ink: #95dcb0; --on-online: #07160d;
   --task: #a597ee; --task-bg: #252038; --task-ink: #cbc2f7; --on-task: #120e24;
+  --attend: #78aef0; --attend-bg: #16263a; --attend-ink: #b9d4f6; --on-attend: #07121f;
   --bg: #151412;
   --surface: #1c1b18;
   --surface-2: #26241f;
@@ -967,3 +970,47 @@ button.tag.fail { cursor: pointer; }
 .now-rot { display: block; margin: 2px 0 6px; font-size: 12px; color: var(--ink-3); text-decoration: underline; text-underline-offset: 3px; }
 .lang-row { display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 15px; }
 html:not([lang="ja"]) .cr em { margin-right: 3px; }
+
+/* ── 攻略・重点・目標 GPA ─────────────────────────── */
+.fx { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font: 700 12px/18px var(--font-sans); white-space: nowrap; }
+.fx.sm { font-size: 10.5px; line-height: 15px; padding: 1px 6px; vertical-align: 1px; }
+.fx-att { background: var(--attend); color: var(--on-attend); }
+.fx-att::before { content: "●"; font-size: 0.8em; }
+.fx-score { background: transparent; color: var(--ink); border: 1.5px dashed var(--ink-2); }
+.fx-score::before { content: "◇"; font-size: 0.85em; }
+.cell .meta .fx-dot { display: inline-block; margin-right: 3px; padding: 0 2px; border-radius: 2px; font: 700 8px/10px var(--font-sans); vertical-align: 1px; }
+.cell .meta .fx-dot.att { background: var(--attend); color: var(--on-attend); }
+.cell .meta .fx-dot.score { border: 1px dashed currentColor; line-height: 8px; }
+@media (min-width: 520px) { .cell .meta .fx-dot { font-size: 9px; line-height: 11px; } }
+.cell.filled:has(.fx-dot.att) { box-shadow: inset 3px 0 0 var(--attend); }
+.strategy .block-title .fine { font-weight: 400; margin-left: 6px; }
+.focus-card { display: grid; gap: 6px; padding: 12px 14px; border-radius: var(--radius-md); background: var(--fill); margin-bottom: 8px; }
+.focus-card.is-attend { background: var(--attend-bg); color: var(--attend-ink); }
+.focus-card.is-score { background: transparent; border: 1.5px dashed var(--line-strong); }
+.focus-card p { margin: 0; font-size: 13.5px; line-height: 1.6; }
+.focus-card .fx { justify-self: start; }
+.conds { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 6px; }
+.conds li { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; font-size: 13px; line-height: 1.6; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.cond-k { font: 700 11px/18px var(--font-sans); padding: 0 6px; border-radius: 4px; white-space: nowrap; background: var(--fill); color: var(--ink-2); }
+.cond-k.ck-attendance { background: var(--attend); color: var(--on-attend); }
+.cond-k.ck-submission { background: var(--task-bg); color: var(--task-ink); }
+.cond-k.ck-score, .cond-k.ck-exclude { background: var(--conflict-soft); color: var(--conflict-ink); }
+.needs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.needs li { display: grid; grid-template-columns: 26px 70px 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: var(--radius-sm); font-size: 13px; }
+.needs li.is-goal { background: var(--accent-soft); }
+.needs .gl { font: 700 15px/1 var(--font-mono); text-align: center; }
+.needs .need-min { color: var(--ink-2); font-size: 12px; }
+.goal-head { display: grid; justify-items: center; gap: 6px; padding: 14px; border-radius: var(--radius-md); background: var(--fill); text-align: center; margin-bottom: 8px; }
+.stepper { display: flex; align-items: center; gap: 18px; }
+.stepper .big { font-size: 40px; line-height: 1; min-width: 72px; }
+.goal-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.goal-row { display: grid; gap: 6px; padding: 10px 12px; border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); }
+.goal-row.is-attend { box-shadow: inset 0 0 0 1px var(--line), inset 4px 0 0 var(--attend); }
+.goal-name { display: flex; justify-content: space-between; gap: 8px; text-align: left; align-items: baseline; }
+.goal-name b { font-size: 14.5px; }
+.goal-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.cond-count { font: 600 11px/16px var(--font-sans); color: var(--conflict-ink); }
+.goal-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.gbtn.fixed { box-shadow: inset 0 0 0 2px var(--accent); }
+.gbtn.on.fixed { background: var(--accent); color: var(--on-accent); }
+.goal-need { color: var(--ink-2); }

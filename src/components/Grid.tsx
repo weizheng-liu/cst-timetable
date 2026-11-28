@@ -1,3 +1,4 @@
+import type { Focus } from "../lib/strategy";
 import { type PeriodTimes } from "../lib/periods";
 import { dateLabel, dayName, t, tv } from "../lib/i18n";
 import { cellKey } from "../lib/schedule";
@@ -19,6 +20,7 @@ interface Props {
   target?: { day: number; period: number } | null; // 選択シートを開いている空きコマ
   moved?: string | null; // 直前に移動した科目（toast が消えるまで強調）
   isRequired?: (c: Course) => boolean; // 必修は「必」の印を付ける
+  focusOf?: (c: Course) => Focus; // 出席が効く科目・点数の決め手が 1 つの科目に印
   alertsOf?: (c: Course, day: number) => Alert[]; // 近い試験・次回オンラインなど
 }
 
@@ -26,7 +28,7 @@ interface Props {
  * 「緋と方眼」の時間割。方眼紙の上にマスを明示配置し、同じ科目が連続する時限は 1 枚の色块にまとめる。
  * 四隅には製図の対位十字。重複は「斜線 + 1.5px 枠 + 角の点」を必ずセットで出す。
  */
-export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired, alertsOf }: Props) {
+export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired, focusOf, alertsOf }: Props) {
   const todayIdx = tokyoWeekday() - 1; // 日本時間。月=0、日曜は 6 なので列なし
   const items = [];
   if (todayIdx < days)
@@ -119,6 +121,10 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
           )}
           <small class="meta">
             {isRequired?.(c) && <b class="must">{t("必")}</b>}
+            {(() => {
+              const f = focusOf?.(c);
+              return f?.kind === "attend" ? <b class="fx-dot att" title={t("出席が効く")}>{t("出")}</b> : f?.kind === "score" ? <b class="fx-dot score" title={t("決め手：{label} {pct}%", { label: f.key.label, pct: f.key.percent })}>{f.key.category === "exam" || f.key.category === "quiz" ? t("試") : f.key.category === "report" ? t("レ") : t("点")}</b> : null;
+            })()}
             {roomOf(c) ?? tv(c.teachers[0]) ?? ""}
           </small>
         </button>,

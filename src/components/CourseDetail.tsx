@@ -7,6 +7,8 @@ import { currentSession, flagsOf, isRotation, NOTE_MAX, tokyoToday, type Flag, t
 import { useState } from "preact/hooks";
 import type { Session } from "../lib/types";
 import { dateLabel, t, tv } from "../lib/i18n";
+import { FocusBadge, StrategySection } from "./Strategy";
+import { focusOf, type Letter } from "../lib/strategy";
 
 interface Props {
   c: Course;
@@ -23,12 +25,14 @@ interface Props {
   /** 同じ時間の他の科目を見る */
   onOthers?: () => void;
   rotation?: Record<string, boolean>;
+  goal?: Letter | null;
+  onGoal?: () => void;
   onRotation?: (v: boolean) => void;
 }
 
 const md = dateLabel;
 
-export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers, rotation, onRotation }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers, rotation, onRotation, goal, onGoal }: Props) {
   const { parts, complete } = evalParts(c);
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -70,7 +74,10 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
             <p class="now-content muted">{t("授業の日程がシラバスに掲載されていません。下の授業計画を見てください。")}</p>
           )}
           <div class="now-eval">
-            <span class="now-eval-h">{t("成績評価")}</span>
+            <span class="now-eval-h">
+              {t("成績評価")} <FocusBadge f={focusOf(c, !!req?.required)} small />
+              {goal && <span class="tag on">{t("目標 {g}", { g: goal })}</span>}
+            </span>
             {parts.length > 0 && complete && (
               <>
                 <div class="evalbar" aria-hidden="true">
@@ -191,6 +198,8 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
           <p class="prose small muted">{c.evaluation.text}</p>
         </details>
       )}
+
+      <StrategySection c={c} required={!!req?.required} goal={goal} onGoal={onGoal} />
 
       {c.objectives && (
         <>

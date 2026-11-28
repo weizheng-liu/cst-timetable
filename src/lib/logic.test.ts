@@ -17,6 +17,7 @@ import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf, evalParts } from "./data";
 import { customToCourse, sanitizeCustom } from "./custom";
+import { conditionsOf, focusOf, planGrades, strategyOf } from "./strategy";
 import { chosenIds, dayOf, detectGrid, gradeForYear, headerInfo, inkRatio, matchCells, parseCell, periodOf, sequence, similarity } from "./screenshot";
 
 const mk = (id: string, name: string, term: Course["term"], slots: [number, number][], extra: Partial<Course> = {}): Course => ({
@@ -635,5 +636,60 @@ describe("group-rotation labs", () => {
     expect(isRotation(mk("K", "回路理論Ⅱ", "後期", [[2, 2]]))).toBe(false);
     expect(isRotation(mk("L", "電子工学実験Ⅱ", "年間", [[4, 3]]), { L: false })).toBe(false);
     expect(sanitize({ rotation: { J23A: true, "bad key!": true, J11A: "yes" } }).rotation).toEqual({ J23A: true });
+  });
+});
+
+describe("攻略（strategy）", () => {
+  const ev = (text: string, parts: { label: string; percent: number; category: string }[] = []) => ({ evaluation: { text, parts, tags: [] } });
+  const exam70 = mk("S1", "電磁気学Ⅱ", "後期", [[1, 1]], ev("平常点30%、定期試験70%で評価する。", [
+    { label: "平常点", percent: 30, category: "attendance" },
+    { label: "定期試験", percent: 70, category: "exam" },
+  ]));
+
+  it("試験以外を満点にしたとき、試験で要る得点率", () => {
+    const s = strategyOf(exam70);
+    expect(s.complete).toBe(true);
+    expect(s.examPct).toBe(70);
+    // C: (60-30)/70 = 42.9%、A: (80-30)/70 = 71.4%、S: (90-30)/70 = 85.7%
+    expect(s.examNeed.map((x) => x.need)).toEqual([42.9, 71.4, 85.7]);
+  });
+
+  it("試験のない科目は need が null（平均で判定）、届くなら 0", () => {
+    const rep = mk("S2", "設計演習", "前期", [[2, 3]], ev("", [{ label: "レポート", percent: 100, category: "report" }]));
+    expect(strategyOf(rep).examNeed.every((x) => x.need === null)).toBe(true);
+    const light = mk("S3", "概論", "前期", [[2, 3]], ev("", [{ label: "出席・平常点", percent: 70, category: "attendance" }, { label: "期末試験", percent: 30, category: "exam" }]));
+    expect(strategyOf(light).examNeed[0].need).toBe(0); // 合格は平常点だけで届く
+  });
+
+  it("原文から合否の条件の文だけを抜き出す（内訳だけの文は拾わない）", () => {
+    const text = "平常試験の結果(50%)と出席・レポート及び小テスト(50%)\n授業回数の1/3以上欠席した場合は評価対象外とし、遅刻ついては3回で欠席1回とみなす。\n原則として毎週課される課題の全てを提出することが単位取得条件となる。\nなお、課題の提出率が6割未満の場合は成績評価の対象としない。\n100点満点に換算して60点以上を合格とする。";
+    const cs = conditionsOf(text);
+    expect(cs.map((x) => x.kind)).toEqual(["attendance", "submission", "score"]);
+    expect(cs[0].text).toContain("1/3以上欠席");
+  });
+
+  it("重点：必修・出席の配点・出席の条件なら「出席が効く」、出席が配点にない科目は決め手の項目", () => {
+    expect(focusOf(exam70, true)).toMatchObject({ kind: "attend", reasons: ["required", "weight"] });
+    const examOnly = mk("S4", "数学", "前期", [[1, 2]], ev("期末試験100%", [{ label: "期末試験", percent: 100, category: "exam" }]));
+    expect(focusOf(examOnly, false)).toMatchObject({ kind: "score", key: { label: "期末試験", percent: 100 } });
+    const rule = mk("S5", "演習", "前期", [[1, 3]], ev("授業を5回以上欠席した場合は成績評価の対象外とします。期末試験100%", [{ label: "期末試験", percent: 100, category: "exam" }]));
+    expect(focusOf(rule, false)).toMatchObject({ kind: "attend", reasons: ["rule"] });
+    expect(focusOf(mk("S6", "不明", "前期", [[1, 4]]), false)).toBeNull();
+  });
+
+  it("目標 GPA：単位が大きく取りやすい科目から上げ、手で決めた科目は動かさない", () => {
+    const easy = mk("E", "やさしい", "前期", [[1, 1]], { credits: 4, ...ev("", [{ label: "レポート", percent: 100, category: "report" }]) });
+    const hard = mk("H", "むずかしい", "前期", [[1, 2]], { credits: 2, ...ev("", [{ label: "期末試験", percent: 100, category: "exam" }]) });
+    const cs = [easy, hard].map((c) => ({ id: c.id, credits: c.credits, required: false, st: strategyOf(c) }));
+    const p = planGrades(cs, 3.0);
+    expect(p.reachable).toBe(true);
+    expect(p.gpa).toBeGreaterThanOrEqual(3);
+    expect(["A", "S"]).toContain(p.grades.E);
+    // 全部 S でも届かない目標
+    const fixed = planGrades(cs, 4.0, { H: "C" });
+    expect(fixed.grades.H).toBe("C");
+    expect(fixed.reachable).toBe(false);
+    // 目標 1.0 なら全部 C のまま
+    expect(planGrades(cs, 1.0).grades).toEqual({ E: "C", H: "C" });
   });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, ClipboardList, ImagePlus, Languages, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, ImagePlus, Languages, LayoutList, Smartphone, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Target, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
@@ -8,6 +8,8 @@ import { CatalogPanel } from "./components/CatalogPanel";
 import { InstallPanel } from "./components/InstallPanel";
 import { CustomDetail } from "./components/CustomDetail";
 import { ShotImportPanel } from "./components/ShotImportPanel";
+import { GoalPanel } from "./components/GoalPanel";
+import { focusOf, planGrades, strategyOf } from "./lib/strategy";
 import { useInstall } from "./lib/pwa";
 import { customToCourse, isCustomId, newCustomId, type CustomCourse } from "./lib/custom";
 import { entriesFromHash, type Entry } from "./lib/importer";
@@ -33,7 +35,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm, isU
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string; focus?: { day: number; period: number } } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" } | { kind: "lang" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string; focus?: { day: number; period: number } } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" } | { kind: "lang" } | { kind: "goal" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -134,6 +136,13 @@ export function App() {
   const termCredits = selected.filter((c) => inTerm(c, view)).reduce((s, c) => s + (c.credits || 0), 0);
   // 成績（端末内のみ）。合格済みの科目は「取得予定」から外し、区分別の修得単位に足す
   const gs = useMemo(() => summarize(st.grades, req), [st.grades, req]);
+  // 今学期（表示中の学年・学期）の科目と、目標 GPA からの目標評価
+  const termCourses = selected.filter((c) => inTerm(c, view));
+  const goalPlan = useMemo(
+    () => (st.goal.gpa == null ? null : planGrades(termCourses.map((c) => ({ id: c.id, credits: c.credits, required: isRequired(c), st: strategyOf(c) })), st.goal.gpa, st.goal.per)),
+    [st.goal, termCourses.map((c) => c.id).join(), req],
+  );
+  const focusFor = (c: Course) => focusOf(c, isRequired(c));
   const retake = useMemo(() => new Set(gs.failedRequired.map((r) => gradeKey(r.name))), [gs]);
   const isRetake = (c: Course) => retake.has(gradeKey(c.name));
   // 単位・卒業要件は全学年の計画を合算する（同じ科目名は 1 回だけ数える）
@@ -340,6 +349,7 @@ export function App() {
           offered={offered}
           category={category}
           isRequired={isRequired}
+          focusOf={focusFor}
           alertsOf={alertsOf}
           target={top?.kind === "slot" && !(cells.get(cellKey(top.day, top.period)) ?? []).length ? top : null}
           moved={toast?.moved ?? null}
@@ -613,6 +623,8 @@ export function App() {
         return { title: t("授業時間"), sub: t("時限ごとの開始・終了") };
       case "theme":
         return { title: t("テーマ") };
+      case "goal":
+        return { eyebrow: "GOAL · GPA", title: t("目標 GPA と攻略"), sub: t("目標から、科目ごとの目標評価と必要な点を自動で出します") };
       case "lang":
         return { title: "言語 · 语言", sub: t("科目名・シラバスの本文は日本語のままです") };
     }
@@ -681,7 +693,7 @@ export function App() {
             />
           );
         const fc = top.focus;
-        return <CourseDetail rotation={st.rotation} onRotation={(v) => setSt((x) => ({ ...x, rotation: { ...x.rotation, [c.id]: v } }))} focus={!!fc && viewGrade === nowGrade} onOthers={fc ? () => push({ kind: "slot", day: fc.day, period: fc.period }) : undefined} c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
+        return <CourseDetail goal={goalPlan?.grades[c.id] ?? null} onGoal={st.selected.includes(c.id) ? () => push({ kind: "goal" }) : undefined} rotation={st.rotation} onRotation={(v) => setSt((x) => ({ ...x, rotation: { ...x.rotation, [c.id]: v } }))} focus={!!fc && viewGrade === nowGrade} onOthers={fc ? () => push({ kind: "slot", day: fc.day, period: fc.period }) : undefined} c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} onNote={(s, t) => setSt((x) => ({ ...x, marks: setNote(x.marks, c, s, t) }))} />;
       }
       case "credits":
         return (
@@ -815,6 +827,18 @@ export function App() {
             onDim={(v) => setSt((s) => ({ ...s, photoDim: v }))}
           />
         );
+      case "goal":
+        return (
+          <GoalPanel
+            courses={termCourses}
+            isRequired={isRequired}
+            goal={st.goal}
+            termLabel={`${t("{n}年", { n: viewGrade })} ${tv(view)}`}
+            past={{ gpa: gs.gpa, credits: gs.gpaCredits }}
+            onGoal={(g) => setSt((x) => ({ ...x, goal: g }))}
+            onOpen={(c) => push({ kind: "detail", id: c.id })}
+          />
+        );
       case "lang":
         return (
           <div class="list" style={{ marginTop: 0 }}>
@@ -847,6 +871,7 @@ export function App() {
             <MenuItem icon={<LayoutList size={18} />} title={t("今学期の科目一覧")} sub={t("区分別・曜日時限・キャンパス付き")} onClick={() => push({ kind: "catalog" })} />
             <MenuItem icon={<ClipboardList size={18} />} title={t("履修届確認表から取り込む")} sub={t("学校で登録した科目を貼り付けて一括で時間割に")} onClick={() => push({ kind: "import", codes: null })} />
             <MenuItem icon={<ImagePlus size={18} />} title={t("他のアプリの時間割を写真から取り込む")} sub={t("スクリーンショットを端末の中で読み取り、学年を選んで並べる")} onClick={() => push({ kind: "shot" })} />
+            <MenuItem icon={<Target size={18} />} title={t("目標 GPA と攻略")} sub={st.goal.gpa != null ? t("目標 {g} · 科目ごとの目標評価", { g: st.goal.gpa.toFixed(1) }) : t("目標を決めると、どの科目で何点要るかを出します")} onClick={() => push({ kind: "goal" })} />
             <MenuItem icon={<Award size={18} />} title={t("成績と GPA")} sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · ${t("修得 {n} 単位", { n: gs.earned })}` : t("修得した科目に S〜E を付けて GPA を計算")} onClick={() => push({ kind: "grades" })} />
             <MenuItem icon={<Search size={18} />} title={t("科目を探す")} sub={t("全学年・全時限から（再履修など）")} onClick={() => push({ kind: "search", q: "" })} />
             <MenuItem icon={<Palette size={18} />} title={t("テーマ")} sub={t(THEME_LABEL[st.theme])} onClick={() => push({ kind: "theme" })} />
