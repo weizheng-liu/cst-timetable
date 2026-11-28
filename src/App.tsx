@@ -6,6 +6,7 @@ import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
 import { CatalogPanel } from "./components/CatalogPanel";
 import { codesFromHash } from "./lib/importer";
+import { ALERT_LABEL, md as mdShort, todayIso, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
@@ -156,6 +157,19 @@ export function App() {
         : null,
     [req, viewGrade, allCourses, selected, statusOf, gs, retake],
   );
+  // 試験・次回オンラインの目印（在籍学年の時間割だけ。先の学年は日付が合わない）
+  const today = todayIso();
+  const showAlerts = viewGrade === nowGrade;
+  const alertsOf = (c: Course, d: number): Alert[] => (showAlerts ? upcoming(c, today, st.marks, c.slots.some((s) => s.day !== d) ? d : undefined) : []);
+  const agenda = useMemo(() => {
+    if (!showAlerts) return [];
+    const soon = todayIso(new Date(Date.now() + 7 * 864e5));
+    return selected
+      .flatMap((c) => upcoming(c, today, st.marks))
+      .filter((a) => a.kind === "exam" || a.kind === "quiz" || a.date <= soon)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 6);
+  }, [selected, st.marks, today, showAlerts]);
   const failedOpen = gs.failedRequired.filter((r) => !selected.some((c) => gradeKey(c.name) === gradeKey(r.name)));
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
@@ -268,6 +282,23 @@ export function App() {
         </p>
       )}
 
+      {agenda.length > 0 && (
+        <ul class="agenda" aria-label="近いうちの試験・オンライン授業">
+          {agenda.map((a) => (
+            <li key={a.course.id + a.kind + a.date}>
+              <button class="agenda-row" onClick={() => setStack([{ kind: "detail", id: a.course.id }])}>
+                <i class={`al al-${a.kind}`}>{ALERT_LABEL[a.kind]}</i>
+                <span class="num">
+                  {mdShort(a.date)}({"日月火水木金土"[new Date(a.date + "T00:00:00").getDay()]})
+                </span>
+                <b>{a.course.name}</b>
+                <small>{a.byUser ? "自分で設定" : "シラバスより"}</small>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div class="deco-scope" aria-hidden="true">
         <div class="readout num">
           <span>CH1 {termCredits}単位</span>
@@ -288,6 +319,7 @@ export function App() {
           offered={offered}
           category={category}
           isRequired={isRequired}
+          alertsOf={alertsOf}
           target={top?.kind === "slot" && !(cells.get(cellKey(top.day, top.period)) ?? []).length ? top : null}
           moved={toast?.moved ?? null}
           onCell={(d, p) => setStack([(cells.get(cellKey(d, p)) ?? []).length > 1 ? { kind: "resolve", day: d, period: p } : { kind: "slot", day: d, period: p }])}
@@ -552,7 +584,7 @@ export function App() {
       case "detail": {
         const c = byId.get(top.id);
         if (!c) return null;
-        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} />;
+        return <CourseDetail c={c} status={statusOf(c)} on={st.selected.includes(c.id)} req={reqOf(c)} clash={clashesWith(c, selected)} onToggle={toggle} marks={st.marks} onMark={(s, what) => setSt((x) => ({ ...x, marks: toggleMark(x.marks, c, s, what) }))} />;
       }
       case "credits":
         return (

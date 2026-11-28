@@ -3,6 +3,7 @@ import { buildCells, clashesWith, findConflicts } from "./schedule";
 import { progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
+import { examOf, toggleMark, upcoming } from "./alerts";
 import { buildCatalog } from "./catalog";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
@@ -333,5 +334,43 @@ describe("今学期の科目一覧", () => {
     expect(lr.sections.map((c) => c.id)).toEqual(["A1", "A2"]);
     expect(lr.distinctTimes).toBe(2);
     expect(all.find((e) => e.name === "電気計測")!.distinctTimes).toBe(1);
+  });
+});
+
+describe("試験・オンラインの目印", () => {
+  it("guesses exam sessions from the syllabus text", () => {
+    expect(examOf("理解度確認テスト及び、その解説を行う．")).toBe("exam");
+    expect(examOf("期末試験")).toBe("exam");
+    expect(examOf("小テストと問題の解説（２）")).toBe("quiz");
+    expect(examOf("微分積分学Ⅰの平常試験問題の解説および類題の演習")).toBeNull();
+    expect(examOf("理解度確認テストに向け、復習を行う")).toBeNull();
+    expect(examOf("「テスト形式」による総復習")).toBeNull();
+    expect(examOf("自宅中間テスト第1回～12回の解説")).toBeNull();
+  });
+
+  const c = {
+    id: "J22D",
+    name: "論理回路",
+    sessions: [
+      { no: 13, kind: "regular", date: "2026-11-24", mode: "face", content: "期末試験" },
+      { no: 14, kind: "regular", date: "2026-12-01", mode: "online", content: "まとめ" },
+      { no: 15, kind: "regular", date: "2026-12-08", mode: "face", content: "期末試験" },
+    ],
+  } as any;
+
+  it("shows the next online class and an exam within two weeks", () => {
+    const a = upcoming(c, "2026-11-28", {});
+    expect(a.map((x) => `${x.kind}@${x.date}`)).toEqual(["exam@2026-12-08", "online@2026-12-01"]);
+    expect(upcoming(c, "2026-11-10", {}).map((x) => x.kind)).toEqual(["exam"]); // 14 日後ちょうどの試験は出す
+    expect(upcoming(c, "2026-11-01", {}).map((x) => x.kind)).toEqual([]); // 3 週間以上先は出さない
+  });
+
+  it("lets the user override either flag and undo it", () => {
+    let m = toggleMark({}, c, c.sessions[1], "online"); // オンライン → 対面
+    m = toggleMark(m, c, c.sessions[1], "exam"); // 試験を追加
+    expect(m).toEqual({ "J22D@2026-12-01": { online: false, exam: true } });
+    expect(upcoming(c, "2026-11-28", m).map((x) => `${x.kind}@${x.date}`)).toEqual(["exam@2026-12-01"]);
+    m = toggleMark(toggleMark(m, c, c.sessions[1], "online"), c, c.sessions[1], "exam");
+    expect(m).toEqual({});
   });
 });

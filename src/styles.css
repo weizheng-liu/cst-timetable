@@ -6,6 +6,8 @@
 
 /* ------------------------------------------------------------------ tokens: ライト（方眼紙） */
 :root {
+  --exam: #c98500; --exam-bg: #fbecc4; --exam-ink: #6b4300; --on-exam: #1f1500;
+  --online: #2e8550; --online-bg: #dcefe2; --online-ink: #1b5a35; --on-online: #ffffff;
   --bg: #f8f6f1;
   --surface: #fffdf9;
   --surface-2: #ffffff;
@@ -57,6 +59,8 @@
 
 /* ------------------------------------------------------------------ tokens: ダーク（墨） */
 :root[data-theme="dark"] {
+  --exam: #f0b43c; --exam-bg: #3a2c10; --exam-ink: #f6cf7d; --on-exam: #1a1203;
+  --online: #5cc183; --online-bg: #14301f; --online-ink: #95dcb0; --on-online: #07160d;
   --bg: #151412;
   --surface: #1c1b18;
   --surface-2: #26241f;
@@ -836,3 +840,26 @@ button.tag.fail { cursor: pointer; }
 .time.on { background: var(--accent); color: var(--on-accent); outline: none; }
 .time.on small { opacity: 0.95; }
 .cat-btn .bulk-plus { color: var(--ink); }
+
+/* ---------------------------------------------------------- 試験・オンラインの目印（山吹＝試験、緑＝オンラインのみ） */
+.cell.filled.has-exam { box-shadow: inset 0 0 0 2px var(--exam); }
+.cell.has-alert .name { -webkit-line-clamp: 2; }
+.cell .alerts { display: flex; flex-direction: column; gap: 2px; margin-top: auto; margin-bottom: 2px; }
+.al { display: block; padding: 1px 2px; border-radius: 3px; font: 700 8px/10px var(--font-sans); font-style: normal; letter-spacing: -0.03em; word-break: keep-all; overflow-wrap: anywhere; }
+.al-exam, .al-quiz { background: var(--exam); color: var(--on-exam); }
+.al-quiz { background: var(--exam-bg); color: var(--exam-ink); box-shadow: inset 0 0 0 1px var(--exam); }
+.al-online { background: var(--online); color: var(--on-online); }
+.al-cancel { background: var(--fill); color: var(--ink-2); text-decoration: line-through; }
+.agenda { list-style: none; margin: 8px 0 6px; padding: 4px 0; border-radius: var(--radius-md); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.agenda-row { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 4px 12px; text-align: left; }
+.agenda-row .al { font-size: 10.5px; line-height: 15px; padding: 1px 6px; }
+.agenda-row .num { font: 600 12px var(--font-mono); color: var(--ink-2); }
+.agenda-row b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agenda-row small { font-size: 10px; color: var(--ink-3); }
+.agenda li + li { border-top: 1px solid var(--line); }
+.sessions li.is-exam { background: linear-gradient(90deg, var(--exam-bg), transparent 70%); }
+.mark-row { display: flex; gap: 6px; margin-top: 6px; }
+.mk { display: inline-flex; align-items: center; gap: 4px; min-height: 30px; padding: 2px 9px; border-radius: var(--radius-sm); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-3); font-size: 11.5px; font-weight: 600; }
+.mk small { font-size: 9.5px; opacity: 0.8; }
+.mk-exam.on { background: var(--exam); color: var(--on-exam); box-shadow: none; }
+.mk-online.on { background: var(--online); color: var(--on-online); box-shadow: none; }

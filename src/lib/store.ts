@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { Profile } from "./types";
 import { validRange } from "./periods";
 import { GRADE_LIST, type Grades } from "./grades";
+import { MARK_KEY_RE, type Marks } from "./alerts";
 
 /**
  * Everything the user does is stored only in this browser (localStorage).
@@ -19,6 +20,7 @@ export interface SavedState {
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
   periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
   theme: Theme;
+  marks: Marks; // 試験・オンライン回の手動の目印（科目id@日付）。この端末と JSON 保存のみ
   grades: Grades; // 自分で入力した成績（この端末にのみ保存。サーバーへは送らない）
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
@@ -28,7 +30,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", grades: {}, photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", marks: {}, grades: {}, photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -78,6 +80,17 @@ export function sanitize(x: any): SavedState {
   if (x.periodTimes && typeof x.periodTimes === "object") {
     for (const [k, v] of Object.entries(x.periodTimes)) if (/^[1-7]$/.test(k) && validRange(v)) periodTimes[k] = [v[0], v[1]];
   }
+  const marks: Marks = {};
+  if (x.marks && typeof x.marks === "object") {
+    for (const [k, v] of Object.entries<any>(x.marks)) {
+      if (Object.keys(marks).length >= 500) break;
+      if (!MARK_KEY_RE.test(k) || !v || typeof v !== "object") continue;
+      const m: { exam?: boolean; online?: boolean } = {};
+      if (typeof v.exam === "boolean") m.exam = v.exam;
+      if (typeof v.online === "boolean") m.online = v.online;
+      if (Object.keys(m).length) marks[k] = m;
+    }
+  }
   const grades: Grades = {};
   if (x.grades && typeof x.grades === "object") {
     for (const [k, v] of Object.entries<any>(x.grades)) {
@@ -97,6 +110,7 @@ export function sanitize(x: any): SavedState {
     earned,
     periodTimes,
     theme: THEMES.includes(x.theme) ? x.theme : "system",
+    marks,
     grades,
     photoDim: typeof x.photoDim === "number" && x.photoDim >= 0.3 && x.photoDim <= 0.85 ? x.photoDim : 0.55,
   };

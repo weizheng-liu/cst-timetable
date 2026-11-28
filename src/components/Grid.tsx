@@ -2,6 +2,7 @@ import { DAYS, type PeriodTimes } from "../lib/periods";
 import { cellKey } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import { roomOf, type Category } from "../lib/data";
+import { ALERT_LABEL, md, type Alert } from "../lib/alerts";
 
 const EN_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -17,13 +18,14 @@ interface Props {
   target?: { day: number; period: number } | null; // 選択シートを開いている空きコマ
   moved?: string | null; // 直前に移動した科目（toast が消えるまで強調）
   isRequired?: (c: Course) => boolean; // 必修は「必」の印を付ける
+  alertsOf?: (c: Course, day: number) => Alert[]; // 近い試験・次回オンラインなど
 }
 
 /**
  * 「緋と方眼」の時間割。方眼紙の上にマスを明示配置し、同じ科目が連続する時限は 1 枚の色块にまとめる。
  * 四隅には製図の対位十字。重複は「斜線 + 1.5px 枠 + 角の点」を必ずセットで出す。
  */
-export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired }: Props) {
+export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired, alertsOf }: Props) {
   const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
   const items = [];
   for (let d = 1; d <= days; d++)
@@ -88,15 +90,27 @@ export function Grid({ days, periods, times, onPeriod, cells, offered, category,
       if (single(d, p - 1)?.id === c.id) continue; // 上のマスにまとめて描いた
       let span = 1;
       while (p + span <= periods && single(d, p + span)?.id === c.id) span++;
+      const al = alertsOf?.(c, d) ?? [];
+      const ex = al.find((a) => a.kind === "exam" || a.kind === "quiz");
       items.push(
         <button
           key={`${d}-${p}`}
-          class={`cell filled cat-${category(c)} ${moved === c.id ? "is-moved" : ""}`}
+          class={`cell filled cat-${category(c)} ${moved === c.id ? "is-moved" : ""} ${ex ? "has-exam" : ""} ${al.length ? "has-alert" : ""}`}
           style={{ gridColumn: d + 1, gridRow: `${p + 1} / span ${span}` }}
-          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}${isRequired?.(c) ? "（必修）" : ""}`}
+          aria-label={`${label}${span > 1 ? `〜${p + span - 1}限` : ""} ${c.name}${isRequired?.(c) ? "（必修）" : ""}${al.map((a) => `、${md(a.date)} ${ALERT_LABEL[a.kind]}`).join("")}`}
           onClick={() => onCell(d, p)}
         >
           <b class="name">{c.name}</b>
+          {al.length > 0 && (
+            <span class="alerts" aria-hidden="true">
+              {al.map((a) => (
+                <i key={a.kind} class={`al al-${a.kind}`}>
+                  {a.kind === "exam" || a.kind === "quiz" ? `${md(a.date)} ` : ""}
+                  {ALERT_LABEL[a.kind]}
+                </i>
+              ))}
+            </span>
+          )}
           <small class="meta">
             {isRequired?.(c) && <b class="must">必</b>}
             {roomOf(c) ?? c.teachers[0] ?? ""}

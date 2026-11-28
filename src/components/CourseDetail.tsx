@@ -3,6 +3,8 @@ import { EVAL_CATEGORY, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
+import { flagsOf, type Marks } from "../lib/alerts";
+import type { Session } from "../lib/types";
 
 interface Props {
   c: Course;
@@ -11,6 +13,8 @@ interface Props {
   clash: Course[];
   status?: Eligible;
   onToggle: (c: Course) => void;
+  marks?: Marks;
+  onMark?: (s: Session, what: "exam" | "online") => void;
 }
 
 const md = (d: string | null | undefined) => {
@@ -19,7 +23,7 @@ const md = (d: string | null | undefined) => {
   return `${x.getMonth() + 1}/${x.getDate()}(${"日月火水木金土"[x.getDay()]})`;
 };
 
-export function CourseDetail({ c, on, req, clash, status, onToggle }: Props) {
+export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark }: Props) {
   const parts = c.evaluation.parts;
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
@@ -142,18 +146,33 @@ export function CourseDetail({ c, on, req, clash, status, onToggle }: Props) {
           {cancelled.length > 0 && <span class="tag coral">休講 {cancelled.length}回</span>}
         </div>
       )}
+      {c.sessions.length > 0 && onMark && <p class="fine" style={{ margin: "0 0 6px" }}>「試験」「オンライン」はシラバスの授業計画から推定しています。違っていたら各回のボタンで付け外しできます（この端末にだけ保存）。</p>}
       {c.sessions.length ? (
         <ol class="sessions">
-          {regular.map((s, i) => (
-            <li key={`r${i}`}>
-              <span class="n">{s.no}</span>
-              <span class="d">{md(s.date)}</span>
-              <span class={s.cancelled ? "cancel" : ""}>
-                {s.mode !== "face" && <span class="tag" style={{ marginRight: 6 }}>オンライン</span>}
-                {s.content || "—"}
-              </span>
-            </li>
-          ))}
+          {regular.map((s, i) => {
+            const f = flagsOf(c, s, marks);
+            return (
+              <li key={`r${i}`} class={f.exam ? "is-exam" : ""}>
+                <span class="n">{s.no}</span>
+                <span class="d">{md(s.date)}</span>
+                <span class={s.cancelled ? "cancel" : ""}>
+                  {s.content || "—"}
+                  {s.date && onMark && !s.cancelled && (
+                    <span class="mark-row">
+                      <button class={`mk mk-exam ${f.exam ? "on" : ""}`} aria-pressed={!!f.exam} onClick={() => onMark(s, "exam")}>
+                        {f.exam === "quiz" ? "小テスト" : "試験"}
+                        {f.examByUser && <small>自分で</small>}
+                      </button>
+                      <button class={`mk mk-online ${f.online ? "on" : ""}`} aria-pressed={f.online} onClick={() => onMark(s, "online")}>
+                        オンライン
+                        {f.onlineByUser && <small>自分で</small>}
+                      </button>
+                    </span>
+                  )}
+                </span>
+              </li>
+            );
+          })}
           {ondemand.map((s, i) => (
             <li key={`o${i}`}>
               <span class="n">
