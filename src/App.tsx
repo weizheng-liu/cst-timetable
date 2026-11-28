@@ -139,7 +139,7 @@ export function App() {
   // 今学期（表示中の学年・学期）の科目と、目標 GPA からの目標評価
   const termCourses = selected.filter((c) => inTerm(c, view));
   const goalPlan = useMemo(
-    () => (st.goal.gpa == null ? null : planGrades(termCourses.map((c) => ({ id: c.id, credits: c.credits, required: isRequired(c), st: strategyOf(c) })), st.goal.gpa, st.goal.per)),
+    () => (st.goal.gpa == null ? null : planGrades(termCourses.map((c) => ({ id: c.id, credits: c.credits, required: isRequired(c), st: strategyOf(c) })), st.goal.gpa, st.goal.per, st.goal.style ?? "easy")),
     [st.goal, termCourses.map((c) => c.id).join(), req],
   );
   const focusFor = (c: Course) => focusOf(c, isRequired(c));

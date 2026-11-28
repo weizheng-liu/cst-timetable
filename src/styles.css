@@ -1018,3 +1018,16 @@ html:not([lang="ja"]) .cr em { margin-right: 3px; }
 .gbtn.fixed { box-shadow: inset 0 0 0 2px var(--accent); }
 .gbtn.on.fixed { background: var(--accent); color: var(--on-accent); }
 .goal-need { color: var(--ink-2); }
+.plans { display: grid; gap: 8px; }
+.plan-card { display: grid; gap: 4px; text-align: left; padding: 12px 14px; border-radius: var(--radius-md); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.plan-card.on { box-shadow: inset 0 0 0 2px var(--ink); background: var(--fill); }
+.plan-top { display: flex; align-items: baseline; gap: 8px; }
+.plan-top b { font-size: 15px; }
+.plan-gpa { margin-left: auto; font: 700 15px/1 var(--font-mono); }
+.plan-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.pc { display: inline-flex; align-items: baseline; gap: 2px; padding: 2px 8px; border-radius: 999px; background: var(--fill); font: 600 13px/18px var(--font-sans); }
+.pc b { font-family: var(--font-mono); }
+.pc small { margin-left: 4px; color: var(--ink-3); font-weight: 500; }
+.pc-S { background: var(--ink); color: var(--bg); }
+.pc-S small { color: inherit; opacity: 0.75; }
+.plan-hard { color: var(--ink-2); }

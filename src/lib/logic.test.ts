@@ -722,3 +722,31 @@ describe("成績評価の内訳", () => {
     expect(parts.map((p) => p.label)).toEqual(["宿題", "小テスト", "授業点", "TOEIC"]);
   });
 });
+
+describe("目標 GPA の方案", () => {
+  const ev = (parts: { label: string; percent: number; category: string }[]) => ({ evaluation: { text: "", parts, tags: [] } });
+  const cs = [
+    mk("L", "実験", "後期", [[1, 1]], { credits: 4, ...ev([{ label: "レポート", percent: 100, category: "report" }]) }),
+    mk("M", "電磁気", "後期", [[1, 2]], { credits: 3, ...ev([{ label: "期末試験", percent: 90, category: "exam" }, { label: "課題", percent: 10, category: "report" }]) }),
+    mk("N", "回路", "後期", [[1, 3]], { credits: 2, ...ev([{ label: "期末試験", percent: 60, category: "exam" }, { label: "平常点", percent: 40, category: "attendance" }]) }),
+    mk("E", "英語", "後期", [[1, 4]], { credits: 1, ...ev([{ label: "小テスト", percent: 100, category: "quiz" }]) }),
+  ].map((c) => ({ id: c.id, credits: c.credits, required: false, st: strategyOf(c) }));
+  const gpa = (g: Record<string, string>) => cs.reduce((s, c) => s + ({ S: 4, A: 3, B: 2, C: 1 } as any)[g[c.id]] * c.credits, 0) / 10;
+
+  it("どの方案も単位で重み付けした GPA が目標に届く", () => {
+    for (const style of ["steady", "focus", "easy"] as const) {
+      const p = planGrades(cs, 3.0, {}, style);
+      expect(p.reachable).toBe(true);
+      expect(gpa(p.grades)).toBeGreaterThanOrEqual(3.0);
+      expect(p.gpa).toBe(Math.round(gpa(p.grades) * 100) / 100);
+    }
+  });
+  it("集中は S を少数に集め、ほかは C のまま。安定は評価の差が小さい", () => {
+    const f = planGrades(cs, 3.0, {}, "focus").grades;
+    expect(Object.values(f).filter((g) => g === "C").length).toBeGreaterThanOrEqual(1);
+    const st = planGrades(cs, 3.0, {}, "steady").grades;
+    const spread = (g: Record<string, string>) => { const l = Object.values(g).map((x) => "CBAS".indexOf(x)); return Math.max(...l) - Math.min(...l); };
+    expect(spread(st)).toBeLessThanOrEqual(1);
+    expect(spread(f)).toBeGreaterThan(spread(st));
+  });
+});

@@ -32,7 +32,7 @@ export interface SavedState {
   photoDim: number; // 写真テーマの暗さ (0.3–0.85)。写真そのものは別キー（BG_KEY）に保存し JSON には含めない
 }
 
-export type Goal = { gpa: number | null; per: Record<string, "S" | "A" | "B" | "C"> };
+export type Goal = { gpa: number | null; per: Record<string, "S" | "A" | "B" | "C">; style?: "steady" | "focus" | "easy" };
 
 export type Theme = "system" | "light" | "dark" | "sepia" | "blueprint" | "scope" | "photo";
 export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint", "scope", "photo"];
@@ -140,7 +140,8 @@ function sanitizeGoal(g: any): Goal {
   if (g && g.per && typeof g.per === "object")
     for (const [k, v] of Object.entries<any>(g.per).slice(0, 200))
       if (/^(?:[0-9A-Za-z]{1,12}|my:[a-z0-9]{1,16})$/.test(k) && ["S", "A", "B", "C"].includes(v)) per[k] = v;
-  return { gpa, per };
+  const style = g && ["steady", "focus", "easy"].includes(g.style) ? g.style : undefined;
+  return { gpa, per, ...(style ? { style } : {}) };
 }
 
 export function usePersistentState(): [SavedState, (f: (s: SavedState) => SavedState) => void] {

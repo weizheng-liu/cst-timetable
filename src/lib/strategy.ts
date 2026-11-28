@@ -158,32 +158,75 @@ export function effortFor(st: Strategy, g: Letter): number {
   return min + 5;
 }
 
+export type PlanStyle = "steady" | "focus" | "easy";
+export const PLAN_STYLES: PlanStyle[] = ["steady", "focus", "easy"];
+
+const stepScore = (c: PlanCourse, cur: number) => (c.credits * (c.required ? 1.15 : 1)) / (effortFor(c.st, LETTERS[cur + 1]) + 10 * (cur + 1) + 10);
+
 /**
- * 全科目を C から始め、目標の合計 GP に届くまで「単位あたりの手間がいちばん小さい 1 段」を上げていく。
- * 単位が大きい・必修・取りやすい配点の科目から上がる。手で決めた科目（fixed）は動かさない。
+ * 目標 GPA（単位で重み付け：Σ GP×単位 ÷ Σ単位）に届くよう、各科目の目標評価を割り振る。全科目 C から始める。手で決めた科目（fixed）は動かさない。
+ * - easy（省力）：「単位あたりの手間がいちばん小さい 1 段」を上げていく（取りやすい配点・単位が大きい・必修から上がる）
+ * - steady（稳・平均）：いちばん低い評価の科目から 1 段ずつ上げ、評価をなるべくそろえる
+ * - focus（冲・集中）：S を取りやすい科目から順に S にし、ほかは C のまま。最後に上げた科目は届くぎりぎりまで下げる
  */
-export function planGrades(courses: PlanCourse[], target: number, fixed: Record<string, Letter> = {}): PlanResult {
+export function planGrades(courses: PlanCourse[], target: number, fixed: Record<string, Letter> = {}, style: PlanStyle = "easy"): PlanResult {
   const list = courses.filter((c) => c.credits > 0);
   const total = list.reduce((s, c) => s + c.credits, 0);
   const grades: Record<string, Letter> = {};
   for (const c of list) grades[c.id] = fixed[c.id] ?? "C";
   const sum = () => list.reduce((s, c) => s + GP[grades[c.id]] * c.credits, 0);
   const need = target * total - 1e-9;
-  while (sum() < need) {
-    let best: PlanCourse | null = null;
-    let bestScore = -Infinity;
-    for (const c of list) {
-      if (fixed[c.id]) continue;
-      const cur = LETTERS.indexOf(grades[c.id]);
-      if (cur >= LETTERS.length - 1) continue;
-      const next = LETTERS[cur + 1];
-      const cost = effortFor(c.st, next) + 10 * (cur + 1); // 上の段ほど少しずつ重くする
-      const score = (c.credits * (c.required ? 1.15 : 1)) / (cost + 10);
-      if (score > bestScore) (best = c), (bestScore = score);
+  const free = list.filter((c) => !fixed[c.id]);
+  const lv = (c: PlanCourse) => LETTERS.indexOf(grades[c.id]);
+
+  if (style === "focus") {
+    const order = [...free].sort((a, b) => stepScoreS(b) - stepScoreS(a));
+    for (const c of order) {
+      if (sum() >= need) break;
+      grades[c.id] = "S";
+      // 届いたら、この科目は届くぎりぎりの評価まで下げる
+      while (lv(c) > 0) {
+        grades[c.id] = LETTERS[lv(c) - 1];
+        if (sum() < need) {
+          grades[c.id] = LETTERS[lv(c) + 1];
+          break;
+        }
+      }
     }
-    if (!best) break;
-    grades[best.id] = LETTERS[LETTERS.indexOf(grades[best.id]) + 1];
+  } else {
+    while (sum() < need) {
+      let best: PlanCourse | null = null;
+      let bestKey = -Infinity;
+      for (const c of free) {
+        const cur = lv(c);
+        if (cur >= LETTERS.length - 1) continue;
+        // steady：低い評価ほど優先（同じ段なら手間の小さい方）
+        const key = style === "steady" ? (LETTERS.length - cur) * 1000 + stepScore(c, cur) : stepScore(c, cur);
+        if (key > bestKey) (best = c), (bestKey = key);
+      }
+      if (!best) break;
+      grades[best.id] = LETTERS[lv(best) + 1];
+    }
   }
   const s = sum();
   return { grades, gpa: total ? Math.round((s / total) * 100) / 100 : 0, reachable: s >= need };
+}
+
+const stepScoreS = (c: PlanCourse) => (c.credits * (c.required ? 1.15 : 1)) / (effortFor(c.st, "S") + 10);
+
+/** 方案の要約：評価ごとの科目数と単位、いちばん高い試験の要求 */
+export function planSummary(courses: PlanCourse[], grades: Record<string, Letter>) {
+  const counts: Record<Letter, { n: number; credits: number }> = { S: { n: 0, credits: 0 }, A: { n: 0, credits: 0 }, B: { n: 0, credits: 0 }, C: { n: 0, credits: 0 } };
+  let hardest: { id: string; grade: Letter; need: number } | null = null;
+  for (const c of courses) {
+    const g = grades[c.id];
+    if (!g) continue;
+    counts[g].n++;
+    counts[g].credits += c.credits;
+    if (c.st.complete && c.st.examPct > 0) {
+      const need = Math.round(effortFor(c.st, g) * 10) / 10;
+      if (!hardest || need > hardest.need) hardest = { id: c.id, grade: g, need };
+    }
+  }
+  return { counts, hardest };
 }

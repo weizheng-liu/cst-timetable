@@ -1,7 +1,8 @@
 import { Minus, Plus } from "lucide-preact";
 import { useMemo } from "preact/hooks";
 import { t } from "../lib/i18n";
-import { effortFor, focusOf, LETTERS, planGrades, strategyOf, type Letter } from "../lib/strategy";
+import { effortFor, focusOf, LETTERS, PLAN_STYLES, planGrades, planSummary, strategyOf, type Letter, type PlanStyle } from "../lib/strategy";
+import { k } from "../lib/i18n";
 import type { Goal } from "../lib/store";
 import type { Course } from "../lib/types";
 import { FocusBadge } from "./Strategy";
@@ -17,24 +18,34 @@ interface Props {
 }
 
 const MIN: Record<Letter, number> = { C: 60, B: 70, A: 80, S: 90 };
+const STYLE_LABEL: Record<PlanStyle, string> = { steady: k("安定：まんべんなく"), focus: k("集中：S を狙う"), easy: k("省力：手間が最小") };
+const STYLE_SUB: Record<PlanStyle, string> = {
+  steady: k("評価をそろえる。全科目で同じくらいの点を取る"),
+  focus: k("取りやすい数科目で S を取り、ほかは合格ラインで守る"),
+  easy: k("試験で要る点が小さい科目・単位の大きい科目から上げる"),
+};
 
 /** 目標 GPA：今学期の科目に目標評価を割り振る（ルールで計算。手で決めた科目は固定） */
 export function GoalPanel({ courses, isRequired, goal, termLabel, past, onGoal, onOpen }: Props) {
   const target = goal.gpa ?? 3.0;
   const rows = useMemo(() => courses.filter((c) => c.credits > 0).map((c) => ({ c, required: isRequired(c), st: strategyOf(c) })), [courses]);
   const fixed = Object.fromEntries(Object.entries(goal.per).filter(([id]) => rows.some((r) => r.c.id === id)));
-  const plan = planGrades(
-    rows.map((r) => ({ id: r.c.id, credits: r.c.credits, required: r.required, st: r.st })),
-    target,
-    fixed,
-  );
+  const pcs = rows.map((r) => ({ id: r.c.id, credits: r.c.credits, required: r.required, st: r.st }));
+  // 3 つの方案。中身が同じになった方案は 1 つにまとめる
+  const plans = PLAN_STYLES.map((style) => ({ style, ...planGrades(pcs, target, fixed, style) }));
+  const sig = (g: Record<string, Letter>) => pcs.map((c) => g[c.id]).join("");
+  const shown = plans.filter((p, i) => plans.findIndex((q) => sig(q.grades) === sig(p.grades)) === i);
+  const style: PlanStyle = goal.style ?? "easy";
+  const plan = plans.find((p) => p.style === style)!;
+  const chosenSig = sig(plan.grades);
+  const nameOf = (id: string) => rows.find((r) => r.c.id === id)?.c.name ?? "";
   const credits = rows.reduce((s, r) => s + r.c.credits, 0);
   const setTarget = (v: number) => onGoal({ ...goal, gpa: Math.min(4, Math.max(1, Math.round(v * 10) / 10)) });
   const setPer = (id: string, g: Letter | null) => {
     const per = { ...goal.per };
     if (g) per[id] = g;
     else delete per[id];
-    onGoal({ gpa: goal.gpa ?? target, per });
+    onGoal({ ...goal, gpa: goal.gpa ?? target, per });
   };
   const cum = past.gpa != null && past.credits > 0 && credits > 0 ? (past.gpa * past.credits + plan.gpa * credits) / (past.credits + credits) : null;
   // 大事な順：必修 → 単位 → 目標の高さ
@@ -60,7 +71,37 @@ export function GoalPanel({ courses, isRequired, goal, termLabel, past, onGoal, 
         </span>
         {cum != null && <span class="small muted">{t("これまでの GPA {a}（{c}単位）と合わせると通算 {b}", { a: past.gpa!.toFixed(2), c: past.credits, b: cum.toFixed(2) })}</span>}
       </div>
-      <p class="fine">{t("単位が大きい科目・必修・配点上取りやすい科目から高い評価を割り振ります。評価をタップすると手で固定でき、もう一度タップで自動に戻ります。シラバスからの自動計算なので参考値です。")}</p>
+      <div class="section-label">{t("方案を選ぶ")}</div>
+      <div class="plans" role="radiogroup" aria-label={t("方案を選ぶ")}>
+        {shown.map((p) => {
+          const sm = planSummary(pcs, p.grades);
+          const same = plans.filter((q) => q.style !== p.style && sig(q.grades) === sig(p.grades)).map((q) => t(STYLE_LABEL[q.style]));
+          return (
+            <button key={p.style} role="radio" aria-checked={sig(p.grades) === chosenSig} class={`plan-card ${sig(p.grades) === chosenSig ? "on" : ""}`} onClick={() => onGoal({ ...goal, gpa: target, style: p.style })}>
+              <span class="plan-top">
+                <b>{t(STYLE_LABEL[p.style])}</b>
+                {same.length > 0 && <span class="small muted">= {same.join(" / ")}</span>}
+                <span class="plan-gpa num">GPA {p.gpa.toFixed(2)}</span>
+              </span>
+              <span class="plan-sub small muted">{t(STYLE_SUB[p.style])}</span>
+              <span class="plan-counts">
+                {(["S", "A", "B", "C"] as Letter[]).map((g) =>
+                  sm.counts[g].n ? (
+                    <span key={g} class={`pc pc-${g}`}>
+                      <b>{g}</b>×{sm.counts[g].n}
+                      <small>{t("{n}単位", { n: sm.counts[g].credits })}</small>
+                    </span>
+                  ) : null,
+                )}
+              </span>
+              {sm.hardest && sm.hardest.need > 0 && (
+                <span class="plan-hard small">{t("いちばん大変：{name}（{g}）試験・小テストで {n}%", { name: nameOf(sm.hardest.id), g: sm.hardest.grade, n: sm.hardest.need })}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p class="fine">{t("GPA は「評価の点（S4・A3・B2・C1）× 単位」の合計 ÷ 総単位で計算します（日本大学の方式）。単位の大きい科目ほど効きます。下の評価をタップすると手で固定でき、方案はそれ以外の科目で組み直します。シラバスからの自動計算なので参考値です。")}</p>
 
       <ul class="goal-list">
         {order.map(({ c, required, st }) => {
