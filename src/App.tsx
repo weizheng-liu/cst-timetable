@@ -10,7 +10,7 @@ import { CustomDetail } from "./components/CustomDetail";
 import { ShotImportPanel } from "./components/ShotImportPanel";
 import { useInstall } from "./lib/pwa";
 import { customToCourse, isCustomId, newCustomId, type CustomCourse } from "./lib/custom";
-import { codesFromHash } from "./lib/importer";
+import { entriesFromHash, type Entry } from "./lib/importer";
 import { ALERT_LABEL, md as mdShort, setNote, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
@@ -31,7 +31,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm, isU
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: Entry[] | null } | { kind: "catalog" } | { kind: "install" } | { kind: "shot" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -52,7 +52,7 @@ export function App() {
   };
 
   // ブックマークレットから #import=J31D,... で開かれたとき。読んだらすぐ URL から消す
-  const [pendingImport, setPendingImport] = useState<string[] | null>(() => codesFromHash(location.hash));
+  const [pendingImport, setPendingImport] = useState<Entry[] | null>(() => entriesFromHash(location.hash));
   useEffect(() => {
     if (pendingImport) history.replaceState(null, "", location.pathname + location.search);
   }, []);
@@ -503,26 +503,39 @@ export function App() {
     say(`必修 ${ids.length} 科目を追加しました${rest ? `（${rest}）` : ""}`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
   }
 
-  function applyImport(ids: string[], mode: "replace" | "append") {
-    const before = st.selected;
-    const next = mode === "replace" ? ids : [...new Set([...st.selected, ...ids])];
-    setSt((s) => ({ ...s, selected: next, dataYear: index?.year ?? s.dataYear }));
+  /** 自分で追加する科目を作る（同じ名前・学期・時間のものがあれば使い回す） */
+  function makeCustoms(extra: Omit<CustomCourse, "id">[]): { ids: string[]; made: CustomCourse[] } {
+    const made: CustomCourse[] = [];
+    const ids: string[] = [];
+    for (const e of extra) {
+      const old = st.custom.find((c) => c.name === e.name && c.term === e.term && JSON.stringify(c.slots) === JSON.stringify(e.slots));
+      if (old) ids.push(old.id);
+      else {
+        const c = { ...e, id: newCustomId() };
+        made.push(c);
+        ids.push(c.id);
+      }
+    }
+    return { ids, made };
+  }
+
+  function applyImport(ids: string[], extra: Omit<CustomCourse, "id">[], mode: "replace" | "append") {
+    const before = st;
+    const my = makeCustoms(extra);
+    const all = [...ids, ...my.ids];
+    const next = mode === "replace" ? all : [...new Set([...st.selected, ...all])];
+    setSt((s) => ({ ...s, custom: [...s.custom, ...my.made].slice(-60), selected: next, dataYear: index?.year ?? s.dataYear }));
     close();
-    const added = next.filter((id) => !before.includes(id)).length;
-    say(mode === "replace" ? `確認表の ${ids.length} 科目で時間割を置き換えました` : `${added} 科目を追加しました`, { undo: () => setSt((s) => ({ ...s, selected: before })) });
+    const added = next.filter((id) => !before.selected.includes(id)).length;
+    const mine = extra.length ? `（自分で追加 ${extra.length}）` : "";
+    say(mode === "replace" ? `確認表の ${all.length} 科目で時間割を置き換えました${mine}` : `${added} 科目を追加しました${mine}`, { undo: () => setSt(() => before) });
   }
 
   function applyShot(ids: string[], extra: Omit<CustomCourse, "id">[], g: number, term: "前期" | "後期", mode: "replace" | "append") {
     const before = st;
-    // 照合できなかったマスは「自分で追加した科目」として作る（同じ名前・同じ学期のものは使い回す）
-    const made: CustomCourse[] = [];
-    const reuse: string[] = [];
-    for (const e of extra) {
-      const old = st.custom.find((c) => c.name === e.name && c.term === e.term && JSON.stringify(c.slots) === JSON.stringify(e.slots));
-      if (old) reuse.push(old.id);
-      else made.push({ ...e, id: newCustomId() });
-    }
-    const all = [...ids, ...reuse, ...made.map((c) => c.id)];
+    // 照合できなかったマスは「自分で追加した科目」として作る
+    const { ids: myIds, made } = makeCustoms(extra);
+    const all = [...ids, ...myIds];
     setSt((s) => {
       const n = switchPlan(s, g);
       // 置き換えはその学年・その学期の科目だけ（通年や反対の学期は残す）
@@ -730,7 +743,9 @@ export function App() {
         return (
           <ImportPanel
             initialCodes={top.codes}
+            all={allCourses}
             byId={byId}
+            past={viewGrade < nowGrade}
             selectedIds={new Set(st.selected)}
             siteUrl={location.origin + location.pathname}
             onApply={applyImport}

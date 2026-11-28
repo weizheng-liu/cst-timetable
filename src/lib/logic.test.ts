@@ -12,7 +12,7 @@ import { tracePath } from "../components/Grid";
 import { normalizeTime } from "../components/Settings";
 import type { Course, Requirements } from "./types";
 import { resolveOptions, slotText } from "./resolve";
-import { bookmarklet, codesFromHash, parseCodes } from "./importer";
+import { bookmarklet, codesFromHash, entriesFromHash, parseCodes, parseEntries, resolveEntries } from "./importer";
 import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
 import { categoryOf } from "./data";
@@ -465,6 +465,8 @@ describe("screenshot import", () => {
     expect(parseCell("スポ ー ツ\n2\nスポ ー…\n").name).toBe("スポーツ2");
     expect(similarity("英語IA", "英語ⅠA")).toBe(1);
     expect(similarity("英語2A", "英語ⅡA")).toBe(1);
+    expect(similarity("英語IIA", "英語ⅡA")).toBe(1);
+    expect(similarity("スポーツII", "スポーツⅡ")).toBe(1);
     expect(similarity("数学演習", "数学演習Ⅰ")).toBeGreaterThan(0.8);
   });
   it("matches cells against courses at that slot, flags moved ones, merges 2-period labs", () => {
@@ -530,5 +532,61 @@ describe("custom courses", () => {
     expect(st.custom.length).toBe(1);
     const c = customToCourse(cs[0]);
     expect(buildCells([c], "前期").get("5-2")?.[0].name).toBe("スポーツトレーニング");
+  });
+});
+
+describe("履修届確認表 from an earlier year", () => {
+  // 前年度の表の書式をまねたダミー（教員名・個人情報なし）
+  const old = `(前期隔週)J21A:自主創造の基礎[前期隔週](グループ01)<教員A>②【船】↓連続2時限
+(後期)Q23E:経済学[I群]<教員B>②【船】
+(年間隔週)P53P:基礎物理学実験[年間隔週]<教員C>②【船】↓連続2時限
+(後期)S16B:日本の文化(留)★<教員D>②【船】
+(前期)J11A:電子工学インセンティブ[未来]<教員E>②【船】`;
+  const all = [
+    mk("J21A", "電磁波工学", "前期", [[2, 1]]),
+    mk("O22A", "自主創造の基礎", "前期", [[2, 2]]),
+    mk("Q23E", "哲学", "後期", [[2, 3]]),
+    mk("Q23D", "経済学", "後期", [[2, 3]]),
+    mk("P53P", "基礎化学実験", "年間", [[5, 3], [5, 4]]),
+    mk("P53O", "基礎物理学実験", "年間", [[5, 3], [5, 4]]),
+    mk("Z01I", "日本の文化(留）", "後期", [[6, 6]], { room: "0000" }),
+    mk("J11A", "電子工学インセンティブ", "前期", [[1, 1]]),
+  ];
+  const byId = new Map(all.map((c) => [c.id, c]));
+  it("reads code, term, name and 連続 span", () => {
+    const es = parseEntries(old);
+    expect(es.map((e) => [e.code, e.term, e.name, e.span ?? 1])).toEqual([
+      ["J21A", "前期", "自主創造の基礎", 2],
+      ["Q23E", "後期", "経済学", 1],
+      ["P53P", "年間", "基礎物理学実験", 2],
+      ["S16B", "後期", "日本の文化(留)", 1],
+      ["J11A", "前期", "電子工学インセンティブ", 1],
+    ]);
+  });
+  it("does not trust a reused code when the name differs", () => {
+    const rs = resolveEntries(parseEntries(old), all, byId);
+    expect(rs.map((r) => [r.entry.code, r.course?.id ?? null, r.how])).toEqual([
+      ["J21A", "O22A", "moved"],
+      ["Q23E", "Q23D", "renamed"],
+      ["P53P", "P53O", "renamed"],
+      ["S16B", "Z01I", "renamed"],
+      ["J11A", "J11A", "code"],
+    ]);
+  });
+  it("carries names through the bookmarklet hash", () => {
+    const es = entriesFromHash("#import=S16B~" + encodeURIComponent("日本の文化(留)") + "~" + encodeURIComponent("後期") + "~,J43B~" + encodeURIComponent("電子工学実験Ⅰ") + "~" + encodeURIComponent("年間") + "~2,J11A");
+    expect(es).toEqual([
+      { code: "S16B", name: "日本の文化(留)", term: "後期" },
+      { code: "J43B", name: "電子工学実験Ⅰ", term: "年間", span: 2 },
+      { code: "J11A", name: "", term: "" },
+    ]);
+  });
+  it("bookmarklet script collects the same entries from page text", () => {
+    const js = decodeURIComponent(bookmarklet("https://x.invalid/").slice("javascript:".length));
+    let opened = "";
+    const fn = new Function("document", "window", "location", "alert", js);
+    fn({ body: { innerText: "氏名:TEST 学生番号:0000\n" + old } }, { open: (u: string) => ((opened = u), {}) }, {}, () => {});
+    expect(entriesFromHash(opened.slice(opened.indexOf("#")))).toEqual(parseEntries(old));
+    expect(opened).not.toContain("TEST");
   });
 });

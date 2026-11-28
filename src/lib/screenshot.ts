@@ -245,6 +245,8 @@ export function matchKey(s: string): string {
   return s
     .replace(/[ⅠⅡⅢⅣⅤ]/g, (r) => String("ⅠⅡⅢⅣⅤ".indexOf(r) + 1))
     .normalize("NFKC")
+    .replace(/III(?![a-z])/g, "3") // NFKC で Ⅱ → II になった表記
+    .replace(/II(?![a-z])/g, "2")
     .replace(/[\s()（）・\-ー―‐「」]/g, "")
     .replace(/[IlＩ|｜!]/g, "1")
     .replace(/[OＯ]/g, "0")

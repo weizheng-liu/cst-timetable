@@ -5,7 +5,7 @@ import type { Course, Slot } from "./types";
 export interface CustomCourse {
   id: string;
   name: string;
-  term: "前期" | "後期";
+  term: "前期" | "後期" | "年間";
   slots: Slot[];
   room: string | null;
   credits: number;
@@ -33,7 +33,7 @@ export function sanitizeCustom(x: unknown): CustomCourse[] {
     out.push({
       id: c.id,
       name: c.name.trim().slice(0, 60),
-      term: c.term === "後期" ? "後期" : "前期",
+      term: c.term === "後期" ? "後期" : c.term === "年間" ? "年間" : "前期",
       slots,
       room: typeof c.room === "string" && c.room.length <= 20 ? c.room : null,
       credits: typeof c.credits === "number" && c.credits >= 0 && c.credits <= 20 ? c.credits : 0,

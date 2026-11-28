@@ -3,10 +3,12 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { readScreenshot, type ShotRead } from "../lib/ocr";
 import { chosenIds, gradeForYear, matchCells, type CellMatch } from "../lib/screenshot";
 import { dayLabel } from "../lib/periods";
+import { isUnscheduled } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import type { CustomCourse } from "../lib/custom";
 
 const MY = "__my"; // 自分の科目として追加
+const KEEP = "__keep"; // 照合した科目を、画像の時間のまま自分で追加
 
 type Term = "前期" | "後期";
 
@@ -64,15 +66,25 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
   const matches = useMemo(() => (shot ? matchCells(shot.cells, all, term) : []), [shot, all, term]);
   const keyOf = (m: CellMatch) => `${m.day}-${m.period}`;
   // 照合できなかったマスは、はじめから「自分の科目として追加」にしておく
-  const valueOf = (m: CellMatch): string => pick[keyOf(m)] ?? (m.course ? m.course.id : MY);
+  // 過去の学年に入れるときは、今年度で時間が変わった科目（オンデマンド化を含む）を画像の時間のまま残す
+  const differs = (m: CellMatch) => !!m.course && (m.moved || isUnscheduled(m.course));
+  const past = nowGrade != null && grade < nowGrade;
+  const valueOf = (m: CellMatch): string => pick[keyOf(m)] ?? (m.course ? (past && differs(m) ? KEEP : m.course.id) : MY);
   const final = matches.map((m) => {
     const v = valueOf(m);
-    return { ...m, value: v, course: v === MY || !v ? null : (m.course?.id === v ? m.course : (all.find((c) => c.id === v) ?? null)) };
+    return { ...m, value: v, course: v === MY || v === KEEP || !v ? null : (m.course?.id === v ? m.course : (all.find((c) => c.id === v) ?? null)) };
   });
   const ids = chosenIds(final);
   const nameOf = (m: CellMatch) => (names[keyOf(m)] ?? m.name).trim();
   const extra: Omit<CustomCourse, "id">[] = [];
   for (const m of final) {
+    const orig = matches.find((x) => keyOf(x) === keyOf(m))!;
+    if (m.value === KEEP && orig.course) {
+      const e = extra.find((x) => x.name === orig.course!.name);
+      if (e) e.slots.push({ day: m.day, period: m.period });
+      else extra.push({ name: orig.course.name, term, slots: [{ day: m.day, period: m.period }], room: m.rooms[0] ?? null, credits: orig.course.credits });
+      continue;
+    }
     if (m.value !== MY || !nameOf(m)) continue;
     const name = nameOf(m);
     const e = extra.find((x) => x.name === name);
@@ -120,7 +132,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                   const c = shot.grid.cols[ci];
                   const r = shot.grid.rows[ri];
                   const m = final.find((x) => x.day === shot.days[ci] && x.period === shot.periods[ri]);
-                  const cls = !m?.course ? (m?.value === MY ? "low" : "miss") : m.score < 0.6 || m.moved ? "low" : "ok";
+                  const cls = !m?.course ? (m?.value ? "low" : "miss") : m.score < 0.6 || m.moved ? "low" : "ok";
                   return <rect key={`${ci}-${ri}`} class={cls} x={c.start} y={r.start} width={c.end - c.start} height={r.end - r.start} rx={12} />;
                 })}
               </svg>
@@ -164,7 +176,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
               if (orig.course && !opts.some((c) => c.id === orig.course!.id)) opts.unshift(orig.course);
               const unsure = m.course && pick[keyOf(m)] === undefined && (m.score < 0.6 || m.moved);
               return (
-                <li key={keyOf(m)} class={`pick shot-row${m.course || m.value === MY ? "" : " off"}`}>
+                <li key={keyOf(m)} class={`pick shot-row${m.value ? "" : " off"}`}>
                   <span class="shot-slot mono">
                     {dayLabel(m.day)}
                     {m.period}
@@ -183,6 +195,11 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                             {c.classGroup ? `（${c.classGroup}）` : ""} · {c.teachers[0] ?? ""}
                           </option>
                         ))}
+                        {orig.course && differs(orig) && (
+                          <option value={KEEP}>
+                            画像の時間のまま追加（{orig.course.name}・{orig.course.credits}単位）
+                          </option>
+                        )}
                         <option value={MY}>自分の科目として追加（データに無い科目）</option>
                         <option value="">取り込まない</option>
                       </select>
@@ -202,6 +219,7 @@ export function ShotImportPanel({ all, starts, viewGrade, view, dataYear, nowGra
                       {!m.value && <span class="tag">取り込まない</span>}
                       {unsure && !orig.moved && <span class="tag amber">名前が近い科目 · 確かめて</span>}
                       {unsure && orig.moved && <span class="tag amber">今年は別の時間 · 確かめて</span>}
+                      {m.value === KEEP && orig.course && <span class="tag amber">画像の時間のまま · 今年度は{isUnscheduled(orig.course) ? "時間外・オンデマンド" : "別の時間"}</span>}
                     </span>
                   </span>
                 </li>
