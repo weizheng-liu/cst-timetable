@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { AlertTriangle, Award, ClipboardList, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
+import { AlertTriangle, Award, ClipboardList, LayoutList, CalendarPlus, ChevronDown, Clock, Download, MoreHorizontal, Palette, Search, Upload, RotateCcw } from "lucide-preact";
 import { ConflictResolve } from "./components/ConflictResolve";
 import { GradesPanel } from "./components/Grades";
 import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
+import { CatalogPanel } from "./components/CatalogPanel";
 import { codesFromHash } from "./lib/importer";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
@@ -24,7 +25,7 @@ import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } fr
 import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
-type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null };
+type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null } | { kind: "catalog" };
 
 export function App() {
   const [st, setSt] = usePersistentState();
@@ -85,6 +86,21 @@ export function App() {
     return (c: Course) => m.get(c.id) ?? "no";
   }, [allCourses, profile?.dept, viewGrade, homeCampus]);
   const byId = useMemo(() => new Map(allCourses.map((c) => [c.id, c])), [allCourses]);
+  // 今学期の科目一覧：取れる科目＋別キャンパスで開講される同じ条件の科目
+  const catalogCourses = useMemo(
+    () =>
+      profile
+        ? allCourses.filter((c) => {
+            if (!inTerm(c, st.view)) return false;
+            const s = statusOf(c);
+            if (s === "yes" || s === "maybe") return true;
+            if (s !== "no" || !c.campus || c.campus === homeCampus) return false;
+            const e = eligibleFor(c, profile.dept, viewGrade, null);
+            return e === "yes" || e === "maybe";
+          })
+        : [],
+    [allCourses, st.view, statusOf, profile?.dept, viewGrade, homeCampus],
+  );
   const selected = useMemo(() => st.selected.map((id) => byId.get(id)).filter(Boolean) as Course[], [st.selected, byId]);
   const rIdx = useMemo(() => reqIndex(req), [req]);
   const reqOf = (c: Course) => rIdx.get(normName(c.name));
@@ -311,6 +327,20 @@ export function App() {
         </div>
       ))}
 
+      {dept && (
+        <button class="bulk-btn cat-btn" onClick={() => setStack([{ kind: "catalog" }])}>
+          <span class="bulk-plus" aria-hidden="true">
+            <LayoutList size={16} />
+          </span>
+          <span>
+            <b>
+              {viewGrade}年・{view}に取れる科目の一覧
+            </b>
+            <small>必修・選択必修・教養などの区分別 · 曜日時限とキャンパス付き</small>
+          </span>
+        </button>
+      )}
+
       {dept && reqPlan && reqPlan.add.length > 0 && (
         <button class="bulk-btn" onClick={addRequired}>
           <span class="bulk-plus" aria-hidden="true">
@@ -462,6 +492,8 @@ export function App() {
         return { title: "その他" };
       case "grades":
         return { eyebrow: "GRADES · GPA", title: "成績と GPA", sub: "修得した科目に評価を付けると、GPA と単位を計算します" };
+      case "catalog":
+        return { eyebrow: `CATALOG · ${viewGrade}年 ${view}`, title: "今学期の科目一覧", sub: `取れる科目 ${new Set(catalogCourses.map((c) => normName(c.name))).size}件 · 時間のボタンで追加` };
       case "import":
         return { eyebrow: "IMPORT", title: "履修届確認表から取り込む", sub: top.codes ? "ブックマークレットで読み取った時間割CD" : "学校の確認表を貼り付けると、登録済みの科目を時間割に並べます" };
       case "search":
@@ -561,6 +593,19 @@ export function App() {
             }}
           />
         );
+      case "catalog":
+        return (
+          <CatalogPanel
+            courses={catalogCourses}
+            req={req}
+            reqOf={reqOf}
+            selectedIds={new Set(st.selected)}
+            isPassed={(c) => gs.passed.has(gradeKey(c.name))}
+            onToggle={toggle}
+            onOpen={(c) => push({ kind: "detail", id: c.id })}
+            homeCampus={homeCampus}
+          />
+        );
       case "import":
         return (
           <ImportPanel
@@ -628,6 +673,7 @@ export function App() {
       case "menu":
         return (
           <div class="list" style={{ marginTop: 0 }}>
+            <MenuItem icon={<LayoutList size={18} />} title="今学期の科目一覧" sub="区分別・曜日時限・キャンパス付き" onClick={() => push({ kind: "catalog" })} />
             <MenuItem icon={<ClipboardList size={18} />} title="履修届確認表から取り込む" sub="学校で登録した科目を貼り付けて一括で時間割に" onClick={() => push({ kind: "import", codes: null })} />
             <MenuItem icon={<Award size={18} />} title="成績と GPA" sub={gs.gpa != null ? `GPA ${gs.gpa.toFixed(2)} · 修得 ${gs.earned} 単位` : "修得した科目に S〜E を付けて GPA を計算"} onClick={() => push({ kind: "grades" })} />
             <MenuItem icon={<Search size={18} />} title="科目を探す" sub="全学年・全時限から（再履修など）" onClick={() => push({ kind: "search", q: "" })} />

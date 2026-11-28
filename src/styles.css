@@ -800,3 +800,39 @@ button.tag.fail { cursor: pointer; }
 .year.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 0 var(--line-strong), inset 0 -2px 0 var(--hiiro); }
 .year.on small { color: var(--hiiro); }
 .plan-note { margin: 6px 0 0; padding: 7px 10px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--ink-2); font-size: 11.5px; line-height: 16px; }
+
+/* ---------------------------------------------------------- 今学期の科目一覧 */
+.t-core { --k-bg: var(--cat-core-bg); --k-ink: var(--cat-core-ink); }
+.t-lang { --k-bg: var(--cat-lang-bg); --k-ink: var(--cat-lang-ink); }
+.t-elective { --k-bg: var(--cat-elective-bg); --k-ink: var(--cat-elective-ink); }
+.t-general { --k-bg: var(--cat-general-bg); --k-ink: var(--cat-general-ink); }
+.t-lab { --k-bg: var(--cat-lab-bg); --k-ink: var(--cat-lab-ink); }
+.t-none { --k-bg: var(--fill); --k-ink: var(--ink-2); }
+.kmark { display: inline-grid; place-items: center; flex: none; width: 18px; height: 18px; border-radius: 4px; background: var(--k-ink); color: var(--k-bg); font: 700 11px/1 var(--font-sans); font-style: normal; }
+.cat-chips .chip { display: inline-flex; align-items: center; gap: 5px; }
+.cat-chips .chip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.cat-chips .kchip.on { background: var(--k-bg); border-color: var(--k-ink); color: var(--k-ink); }
+.cat-chips .chip .num { opacity: 0.7; font-size: 11px; }
+.cat-sec { margin-top: 10px; }
+.cat-h { position: sticky; top: -24px; z-index: 1; display: flex; align-items: center; gap: 8px; margin: 0 calc(-1 * var(--space-5)); padding: 8px var(--space-5); background: var(--sheet-bg); border-bottom: 2px solid var(--k-ink); color: var(--k-ink); font-size: 14px; font-weight: 700; }
+.cat-h .num { margin-left: auto; font-size: 11px; font-weight: 500; color: var(--ink-3); }
+.cat-list { list-style: none; margin: 0; padding: 0; }
+.cat-item { position: relative; display: grid; gap: 6px; padding: 10px 0 10px 12px; border-bottom: 1px solid var(--line); }
+.cat-item::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--k-ink); opacity: 0.55; }
+.cat-item.has-on::before { opacity: 1; }
+.cat-item.passed { opacity: 0.55; }
+.cat-name { display: grid; gap: 2px; text-align: left; }
+.cat-name b { font-size: 14px; line-height: 19px; }
+.cat-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 11.5px; color: var(--ink-3); }
+.cat-meta em { font-style: normal; color: var(--ink-2); font-weight: 600; }
+.tag.pass { background: var(--fill); color: var(--ink-2); padding: 1px 6px; }
+.multi { justify-self: start; padding: 2px 8px; border-radius: var(--radius-xs); background: var(--k-bg); color: var(--k-ink); font-size: 11.5px; font-weight: 700; line-height: 16px; box-shadow: inset 0 0 0 1px var(--k-ink); }
+.times { display: flex; flex-wrap: wrap; gap: 6px; }
+.time { display: inline-flex; flex-direction: column; align-items: flex-start; min-height: 40px; min-width: 64px; padding: 5px 10px; border-radius: var(--radius-sm); background: var(--k-bg); color: var(--k-ink); box-shadow: inset 0 0 0 1px transparent; text-align: left; transition: all 0.15s var(--ease); }
+.time b { font: 700 13px/17px var(--font-sans); }
+.time small { font-size: 10.5px; line-height: 14px; opacity: 0.85; }
+.time.away { background: transparent; box-shadow: inset 0 0 0 1px var(--k-ink); border: 1px dashed transparent; outline: 1px dashed var(--k-ink); outline-offset: -1px; box-shadow: none; }
+.campus.away { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.time.on { background: var(--accent); color: var(--on-accent); outline: none; }
+.time.on small { opacity: 0.95; }
+.cat-btn .bulk-plus { color: var(--ink); }

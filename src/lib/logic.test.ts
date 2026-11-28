@@ -3,6 +3,7 @@ import { buildCells, clashesWith, findConflicts } from "./schedule";
 import { progress } from "./credits";
 import { buildIcs } from "./ics";
 import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
+import { buildCatalog } from "./catalog";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
 import { tracePath } from "../components/Grid";
@@ -319,5 +320,18 @@ describe("4 年計画", () => {
     expect(allPlans(s)).toEqual({ 2: ["J22D"], 3: ["J31D"] });
     // 保存して読み戻しても同じ
     expect(allPlans(sanitize(JSON.parse(JSON.stringify(s))))).toEqual({ 2: ["J22D"], 3: ["J31D"] });
+  });
+});
+
+describe("今学期の科目一覧", () => {
+  const mk = (id: string, name: string, day: number, period: number, campus = "船橋"): Course =>
+    ({ id, name, slots: [{ day, period }], credits: 2, campus, department: "09", syllabusDepartment: "09", teachers: ["T " + id], term: "前期" }) as any;
+  it("groups sections of the same course and counts distinct times", () => {
+    const cat = buildCatalog([mk("A1", "論理回路", 2, 2), mk("A2", "論理回路", 4, 3, "駿河台"), mk("B1", "電気計測", 1, 4)], () => undefined, null);
+    const all = [...cat.values()].flat();
+    const lr = all.find((e) => e.name === "論理回路")!;
+    expect(lr.sections.map((c) => c.id)).toEqual(["A1", "A2"]);
+    expect(lr.distinctTimes).toBe(2);
+    expect(all.find((e) => e.name === "電気計測")!.distinctTimes).toBe(1);
   });
 });
