@@ -1,5 +1,5 @@
 import { ExternalLink, Plus, Check, AlertTriangle, MonitorPlay, LayoutList } from "lucide-preact";
-import { EVAL_CATEGORY, roomOf } from "../lib/data";
+import { EVAL_CATEGORY, evalParts, roomOf } from "../lib/data";
 import { slotLabel } from "../lib/periods";
 import type { Course, ReqCourse } from "../lib/types";
 import type { Eligible } from "../lib/eligibility";
@@ -30,7 +30,7 @@ const md = (d: string | null | undefined) => {
 };
 
 export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, onMark, onNote, focus, onOthers }: Props) {
-  const parts = c.evaluation.parts;
+  const { parts, complete } = evalParts(c);
   const sum = parts.reduce((s, p) => s + p.percent, 0) || 1;
   const regular = c.sessions.filter((s) => s.kind === "regular");
   const ondemand = c.sessions.filter((s) => s.kind === "ondemand");
@@ -62,7 +62,7 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
           )}
           <div class="now-eval">
             <span class="now-eval-h">成績評価</span>
-            {parts.length > 0 ? (
+            {parts.length > 0 && complete && (
               <>
                 <div class="evalbar" aria-hidden="true">
                   {parts.map((p, i) => (
@@ -78,9 +78,9 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
                   ))}
                 </span>
               </>
-            ) : (
-              <span class="now-eval-list muted">{c.evaluation.text ? c.evaluation.text.slice(0, 120) + (c.evaluation.text.length > 120 ? "…" : "") : "記載なし"}</span>
             )}
+            {/* 内訳の読み取りは間違うことがあるので、シラバスの原文は省略せず全部出す */}
+            <p class="now-eval-text">{c.evaluation.text || "シラバスに記載なし"}</p>
           </div>
           {onOthers && (
             <button class="now-others" onClick={onOthers}>
@@ -155,7 +155,7 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
       </div>
 
       <div class="block-title">成績評価</div>
-      {parts.length > 0 ? (
+      {parts.length > 0 && complete ? (
         <>
           <div class="evalbar" aria-hidden="true">
             {parts.map((p, i) => (
@@ -175,7 +175,7 @@ export function CourseDetail({ c, on, req, clash, status, onToggle, marks = {}, 
         </>
       ) : null}
       {c.evaluation.text && (
-        <details style={{ marginTop: 10 }} open={!parts.length}>
+        <details style={{ marginTop: 10 }} open={!parts.length || !complete}>
           <summary class="small muted" style={{ cursor: "pointer" }}>
             シラバス原文
           </summary>

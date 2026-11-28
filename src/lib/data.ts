@@ -1,4 +1,4 @@
-import type { Course, DataIndex, DeptFile, Requirements } from "./types";
+import type { Course, DataIndex, DeptFile, EvalPart, Requirements } from "./types";
 
 const BASE = import.meta.env.BASE_URL + "data/";
 
@@ -93,3 +93,36 @@ export const EVAL_CATEGORY: Record<string, { label: string; color: string }> = {
   presentation: { label: "発表", color: "var(--ink-3)" },
   other: { label: "その他", color: "var(--cat-lab-ink)" },
 };
+
+function guessEvalCategory(label: string): string {
+  if (/小テスト|小試験|クイズ/.test(label)) return "quiz";
+  if (/平常|出席/.test(label)) return "attendance";
+  if (/試験|テスト|考査/.test(label)) return "exam";
+  if (/レポート|課題|宿題|演習問題|提出/.test(label)) return "report";
+  if (/参加|取り組み|態度/.test(label)) return "attendance";
+  if (/発表|プレゼン/.test(label)) return "presentation";
+  return "other";
+}
+
+/**
+ * 成績評価の内訳。シラバスから読み取った内訳の合計が 100% にならないとき（読み違い・読み残し）は、
+ * 原文の「○○：20点」「○○ 40%」の行を読み直して、合計 100 になればそちらを使う。
+ * どちらも 100 にならなければ complete=false（画面では原文を必ず併記する）。
+ */
+export function evalParts(c: Course): { parts: EvalPart[]; complete: boolean } {
+  const given = c.evaluation.parts;
+  const total = (ps: EvalPart[]) => ps.reduce((s, p) => s + p.percent, 0);
+  if (given.length && Math.abs(total(given) - 100) <= 1) return { parts: given, complete: true };
+  const re = /^[\s・●○■□◆◇\-－\d.．)）]*([^:：\d%％]{1,30}?)\s*[:：]?\s*(\d{1,3}(?:\.\d+)?)\s*(?:点|%|％)/;
+  const found: EvalPart[] = [];
+  for (const line of c.evaluation.text.normalize("NFKC").split(/\n|。/)) {
+    if (/未満|以上|以下|を超|満たない/.test(line)) continue; // 合格条件の文は内訳ではない
+    const m = line.match(re);
+    if (!m) continue;
+    const label = m[1].replace(/[「」『』]/g, "").replace(/[(（\s]+$/, "").trim();
+    if (!label) continue;
+    found.push({ label, percent: +m[2], category: guessEvalCategory(label) });
+  }
+  if (found.length && Math.abs(total(found) - 100) <= 1) return { parts: found, complete: true };
+  return { parts: given, complete: false };
+}

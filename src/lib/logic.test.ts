@@ -15,7 +15,7 @@ import { resolveOptions, slotText } from "./resolve";
 import { bookmarklet, codesFromHash, entriesFromHash, parseCodes, parseEntries, resolveEntries } from "./importer";
 import { gradeKey, groupTag, summarize } from "./grades";
 import { planRequired } from "./autoplan";
-import { categoryOf } from "./data";
+import { categoryOf, evalParts } from "./data";
 import { customToCourse, sanitizeCustom } from "./custom";
 import { chosenIds, dayOf, detectGrid, gradeForYear, headerInfo, inkRatio, matchCells, parseCell, periodOf, sequence, similarity } from "./screenshot";
 
@@ -599,5 +599,30 @@ describe("current session", () => {
     expect(currentSession(c, "2026-11-28")).toMatchObject({ when: "next", s: { no: 10 } });
     expect(currentSession(c, "2027-01-30")).toMatchObject({ when: "last", s: { no: 10 } });
     expect(currentSession(mk("B", "x", "後期", [[1, 1]]), "2026-11-28")).toBeNull();
+  });
+});
+
+describe("evaluation breakdown", () => {
+  it("re-reads 「○○」：N点 lines when the stored parts don't add up, ignoring pass conditions", () => {
+    const c = mk("E", "電子物性工学", "後期", [[1, 2]], {
+      evaluation: {
+        text: "「小テスト」：20点\n「自宅中間テスト」：40点\n「理解度確認テスト」：40点\nただし、「小テスト」の正答率が30％未満の場合、成績は「D」となる。",
+        parts: [{ label: "「小テスト」の正答率が", percent: 30, category: "quiz" }],
+        tags: [],
+      },
+    });
+    const r = evalParts(c);
+    expect(r.complete).toBe(true);
+    expect(r.parts.map((p) => [p.label, p.percent, p.category])).toEqual([
+      ["小テスト", 20, "quiz"],
+      ["自宅中間テスト", 40, "exam"],
+      ["理解度確認テスト", 40, "exam"],
+    ]);
+  });
+  it("keeps good parts and flags unreadable ones as incomplete", () => {
+    const ok = mk("F", "x", "後期", [[1, 1]], { evaluation: { text: "", parts: [{ label: "試験", percent: 100, category: "exam" }], tags: [] } });
+    expect(evalParts(ok).complete).toBe(true);
+    const bad = mk("G", "x", "後期", [[1, 1]], { evaluation: { text: "総合的に評価する", parts: [], tags: [] } });
+    expect(evalParts(bad).complete).toBe(false);
   });
 });
