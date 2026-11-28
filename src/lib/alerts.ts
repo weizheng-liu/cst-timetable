@@ -70,6 +70,10 @@ export interface Alert {
 }
 
 const isoDay = (d: string) => ((new Date(d + "T00:00:00").getDay() + 6) % 7) + 1; // 1=月
+/** 日本時間の今日（YYYY-MM-DD） */
+export const tokyoToday = (now = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+/** 日本時間の曜日 1=月 … 7=日 */
+export const tokyoWeekday = (now = new Date()) => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Tokyo", weekday: "short" }).format(now)) + 1;
 export const todayIso = (now = new Date()) => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 const addDays = (d: string, n: number) => {
   const x = new Date(d + "T00:00:00");

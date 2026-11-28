@@ -2,7 +2,7 @@ import { DAYS, type PeriodTimes } from "../lib/periods";
 import { cellKey } from "../lib/schedule";
 import type { Course } from "../lib/types";
 import { roomOf, type Category } from "../lib/data";
-import { ALERT_LABEL, md, type Alert } from "../lib/alerts";
+import { ALERT_LABEL, md, tokyoWeekday, type Alert } from "../lib/alerts";
 
 const EN_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -26,12 +26,15 @@ interface Props {
  * 四隅には製図の対位十字。重複は「斜線 + 1.5px 枠 + 角の点」を必ずセットで出す。
  */
 export function Grid({ days, periods, times, onPeriod, cells, offered, category, onCell, target, moved, isRequired, alertsOf }: Props) {
-  const todayIdx = (new Date().getDay() + 6) % 7; // Mon=0
+  const todayIdx = tokyoWeekday() - 1; // 日本時間。月=0、日曜は 6 なので列なし
   const items = [];
+  if (todayIdx < days)
+    items.push(<div key="today-col" class="today-col" aria-hidden="true" style={{ gridColumn: todayIdx + 2, gridRow: `1 / span ${periods + 1}` }} />);
   for (let d = 1; d <= days; d++)
     items.push(
-      <div key={`h${d}`} class={`head ${todayIdx === d - 1 ? "today" : ""}`} style={{ gridColumn: d + 1, gridRow: 1 }}>
-        {DAYS[d - 1]}
+      <div key={`h${d}`} class={`head ${todayIdx === d - 1 ? "today" : ""}`} style={{ gridColumn: d + 1, gridRow: 1 }} aria-label={todayIdx === d - 1 ? `${DAYS[d - 1]}曜（今日）` : undefined}>
+        <span class="dname">{DAYS[d - 1]}</span>
+        {todayIdx === d - 1 && <small class="today-tag">今日</small>}
         <small class="en">{EN_DAYS[d - 1]}</small>
       </div>,
     );

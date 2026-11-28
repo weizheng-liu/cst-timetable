@@ -6,7 +6,7 @@ import { SearchPanel } from "./components/SearchPanel";
 import { ImportPanel } from "./components/ImportPanel";
 import { CatalogPanel } from "./components/CatalogPanel";
 import { codesFromHash } from "./lib/importer";
-import { ALERT_LABEL, md as mdShort, todayIso, toggleMark, upcoming, type Alert } from "./lib/alerts";
+import { ALERT_LABEL, md as mdShort, todayIso, tokyoToday, toggleMark, upcoming, type Alert } from "./lib/alerts";
 import { gradeKey, groupTag, mergeEarned, summarize } from "./lib/grades";
 import { planRequired } from "./lib/autoplan";
 import { PeriodEditor, ThemePicker } from "./components/Settings";
@@ -158,7 +158,7 @@ export function App() {
     [req, viewGrade, allCourses, selected, statusOf, gs, retake],
   );
   // 試験・次回オンラインの目印（在籍学年の時間割だけ。先の学年は日付が合わない）
-  const today = todayIso();
+  const today = tokyoToday();
   const showAlerts = viewGrade === nowGrade;
   const alertsOf = (c: Course, d: number): Alert[] => (showAlerts ? upcoming(c, today, st.marks, c.slots.some((s) => s.day !== d) ? d : undefined) : []);
   const agenda = useMemo(() => {
@@ -173,7 +173,10 @@ export function App() {
   const failedOpen = gs.failedRequired.filter((r) => !selected.some((c) => gradeKey(c.name) === gradeKey(r.name)));
 
   const maxPeriod = Math.max(6, ...(dept?.courses ?? []).flatMap((c) => c.slots.map((s) => s.period)));
-  const days = 6;
+  // 土曜は授業を入れていなければ畳んで、平日の列を広くする（ボタンで出せる）
+  const [showSat, setShowSat] = useState(false);
+  const satUsed = selected.some((c) => inTerm(c, view) && c.slots.some((x) => x.day === 6));
+  const days = satUsed || showSat ? 6 : 5;
 
   const toggle = (c: Course) => {
     const on = st.selected.includes(c.id);
@@ -280,6 +283,12 @@ export function App() {
         <p class="plan-note">
           {viewGrade}年の計画は {index?.year ?? ""} 年度の開講表で組んでいます。実際の年度には曜日・時限・担当が変わることがあります。単位は卒業要件の集計に入ります。
         </p>
+      )}
+
+      {dept && !satUsed && (
+        <button class="sat-btn" onClick={() => setShowSat((v) => !v)}>
+          {showSat ? "土曜日をたたむ" : "土曜日も表示"}
+        </button>
       )}
 
       {agenda.length > 0 && (
