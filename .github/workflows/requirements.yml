@@ -44,16 +44,16 @@ jobs:
           w.write("tests/fixtures/youran_2025_09.pdf")
           PY
           fi
-      - name: Keep debug files when validation fails
+      - name: Keep debug files on a branch when validation fails
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: requirements-debug
-          path: |
-            tests/fixtures/youran_*.pdf
-            data/requirements/
-            docs/REQUIREMENTS_REVIEW.md
-          retention-days: 3
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          B="debug/requirements-${{ inputs.entry_year }}-${{ inputs.dept }}"
+          git checkout -B "$B"
+          for p in data/requirements docs/REQUIREMENTS_REVIEW.md tests/fixtures; do if [ -e "$p" ]; then git add -f "$p"; fi; done
+          git commit -m "debug: requirements ${{ inputs.entry_year }} ${{ inputs.dept }} (validation failed)" || true
+          git push -f origin "$B"
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
