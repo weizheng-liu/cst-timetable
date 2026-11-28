@@ -71,6 +71,11 @@ def find_pages(pdf, dept_name: str) -> tuple[int, int]:
         if cond is not None and table is not None:
             break
     if cond is None or table is None:
+        # 見つからないときは、余白の見出しを全部出して原因を追えるようにする
+        for i, page in enumerate(pdf.pages):
+            tab = side_tab(page)
+            if "卒業条件" in tab or "配置表" in tab:
+                print(f"  p.{i + 1}: {tab[:60]!r}")
         raise SystemExit(f"could not find requirement pages for {dept_name}")
     return cond, table
 
