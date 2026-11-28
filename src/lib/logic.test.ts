@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildCells, clashesWith, findConflicts } from "./schedule";
 import { progress } from "./credits";
 import { buildIcs } from "./ics";
-import { sanitize } from "./store";
+import { allPlans, sanitize, switchPlan, viewGradeOf } from "./store";
 import { resolveTimes } from "./periods";
 import { eligibleFor } from "./eligibility";
 import { tracePath } from "../components/Grid";
@@ -297,5 +297,27 @@ describe("履修届確認表 import", () => {
     expect(b.startsWith("javascript:")).toBe(true);
     expect(b).toContain("#import=");
     expect(b).not.toMatch(/学生番号|氏名|fetch|XMLHttpRequest/);
+  });
+});
+
+describe("4 年計画", () => {
+  it("migrates old data: selected becomes the enrolled grade's plan", () => {
+    const s = sanitize({ profile: { dept: "09", grade: 2, entryYear: 2025 }, selected: ["J22D"] });
+    expect(viewGradeOf(s)).toBe(2);
+    expect(allPlans(s)).toEqual({ 2: ["J22D"] });
+  });
+
+  it("switching grade keeps each year's timetable separate", () => {
+    let s = sanitize({ profile: { dept: "09", grade: 2, entryYear: 2025 }, selected: ["J22D"] });
+    s = switchPlan(s, 3);
+    expect(s.selected).toEqual([]);
+    s = { ...s, selected: ["J31D"] };
+    s = switchPlan(s, 1);
+    expect(s.selected).toEqual([]);
+    s = switchPlan(s, 2);
+    expect(s.selected).toEqual(["J22D"]);
+    expect(allPlans(s)).toEqual({ 2: ["J22D"], 3: ["J31D"] });
+    // 保存して読み戻しても同じ
+    expect(allPlans(sanitize(JSON.parse(JSON.stringify(s))))).toEqual({ 2: ["J22D"], 3: ["J31D"] });
   });
 });

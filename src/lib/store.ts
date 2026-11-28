@@ -12,7 +12,9 @@ export interface SavedState {
   version: 1;
   profile: Profile | null;
   dataYear: number | null;
-  selected: string[];
+  selected: string[]; // いま表示している学年（planGrade）の時間割
+  plans: Record<string, string[]>; // 4 年計画：表示していない学年の時間割（"1"〜"6"）
+  planGrade: number | null; // 表示中の学年。null なら在籍学年（profile.grade）
   view: "前期" | "後期";
   earned: Record<string, number>; // already-earned credits per requirement group (optional)
   periodTimes: Record<string, [string, string]>; // user overrides of 時限の開始・終了 ("1": ["09:00","10:40"])
@@ -26,7 +28,7 @@ export const THEMES: Theme[] = ["system", "light", "dark", "sepia", "blueprint",
 
 const KEY = "cst-timetable:v1";
 
-export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], view: defaultView(), earned: {}, periodTimes: {}, theme: "system", grades: {}, photoDim: 0.55 });
+export const emptyState = (): SavedState => ({ version: 1, profile: null, dataYear: null, selected: [], plans: {}, planGrade: null, view: defaultView(), earned: {}, periodTimes: {}, theme: "system", grades: {}, photoDim: 0.55 });
 
 export function defaultView(d = new Date()): "前期" | "後期" {
   const m = d.getMonth() + 1;
@@ -61,6 +63,13 @@ export function sanitize(x: any): SavedState {
       ? { dept: p.dept.slice(0, 4), grade: Math.min(6, Math.max(1, p.grade)), entryYear: p.entryYear }
       : null;
   const selected = Array.isArray(x.selected) ? x.selected.filter((s: unknown) => typeof s === "string" && /^[0-9A-Za-z]{1,12}$/.test(s)) : [];
+  const okId = (v: unknown) => typeof v === "string" && /^[0-9A-Za-z]{1,12}$/.test(v);
+  const plans: Record<string, string[]> = {};
+  if (x.plans && typeof x.plans === "object") {
+    for (const [k, v] of Object.entries<any>(x.plans)) if (/^[1-6]$/.test(k) && Array.isArray(v)) plans[k] = [...new Set<string>(v.filter(okId))].slice(0, 120);
+  }
+  // 旧データ（plans なし）の selected は、そのまま在籍学年の時間割になる
+  const planGrade = Number.isInteger(x.planGrade) && x.planGrade >= 1 && x.planGrade <= 6 ? x.planGrade : null;
   const earned: Record<string, number> = {};
   if (x.earned && typeof x.earned === "object") {
     for (const [k, v] of Object.entries(x.earned)) if (typeof v === "number" && v >= 0 && v < 400) earned[k] = v;
@@ -82,6 +91,8 @@ export function sanitize(x: any): SavedState {
     profile,
     dataYear: Number.isInteger(x.dataYear) ? x.dataYear : null,
     selected: [...new Set<string>(selected)],
+    plans,
+    planGrade,
     view: x.view === "後期" ? "後期" : x.view === "前期" ? "前期" : base.view,
     earned,
     periodTimes,
@@ -151,4 +162,25 @@ export async function shrinkImage(file: File, maxSide = 1600, quality = 0.8): Pr
   } finally {
     URL.revokeObjectURL(url);
   }
+}
+
+/** 表示中の学年 */
+export const viewGradeOf = (s: SavedState): number => s.planGrade ?? s.profile?.grade ?? 1;
+
+/** 学年を切り替える。今の時間割を plans にしまい、行き先の時間割を selected に出す */
+export function switchPlan(s: SavedState, g: number): SavedState {
+  const cur = viewGradeOf(s);
+  if (g === cur) return s;
+  const plans: Record<string, string[]> = { ...s.plans, [cur]: s.selected };
+  const selected = plans[g] ?? [];
+  delete plans[g];
+  return { ...s, plans, selected, planGrade: g };
+}
+
+/** 全学年の時間割（学年 → 科目 id） */
+export function allPlans(s: SavedState): Record<number, string[]> {
+  const out: Record<number, string[]> = {};
+  for (const [k, v] of Object.entries(s.plans)) if (v.length) out[+k] = v;
+  out[viewGradeOf(s)] = s.selected;
+  return out;
 }

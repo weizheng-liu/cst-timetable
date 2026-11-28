@@ -23,7 +23,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
       <>
         <div class="big">
           {planned}
-          <span class="small muted"> 単位（今年度の選択）</span>
+          <span class="small muted"> 単位（全学年の計画）</span>
         </div>
         <div class="banner" style={{ marginTop: 16 }}>
           <Info size={16} />
@@ -66,7 +66,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
         <i class="plan" style={{ width: `${Math.min(100, (pr.plannedTotal / req.totalCredits) * 100)}%` }} />
       </div>
       <p class="small muted" style={{ margin: "8px 0 4px" }}>
-        今年度の選択 {pr.plannedTotal} 単位 + 修得済み {earnedTotal} 単位。
+        全学年の計画 {pr.plannedTotal} 単位 + 修得済み {earnedTotal} 単位。
       </p>
       <button class="gpa-link" onClick={onGrades}>
         <span>
@@ -145,7 +145,7 @@ export function Credits({ req, selected, earned, earnedAll, passed, summary, onG
                     <span class="faint"> / {ch.minCredits}</span>
                   </span>
                 </div>
-                <div class="small muted">今年度の選択のみで判定 · p.{ch.page}</div>
+                <div class="small muted">全学年の計画で判定 · p.{ch.page}</div>
               </div>
             );
           })}

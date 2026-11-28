@@ -21,7 +21,7 @@ import { alternativesFor, resolveOptions, slotText, type ResolveOption } from ".
 import { buildIcs } from "./lib/ics";
 import { DAYS, resolveTimes } from "./lib/periods";
 import { buildCells, cellKey, clashesWith, coursesAt, findConflicts, inTerm } from "./lib/schedule";
-import { download, exportJson, loadPhoto, sanitize, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
+import { allPlans, download, exportJson, loadPhoto, sanitize, switchPlan, viewGradeOf, savePhoto, shrinkImage, usePersistentState, type Theme } from "./lib/store";
 import type { Course, DataIndex, DeptFile, Requirements } from "./lib/types";
 
 type Panel = { kind: "slot"; day: number; period: number } | { kind: "detail"; id: string } | { kind: "credits" } | { kind: "menu" } | { kind: "profile" } | { kind: "times" } | { kind: "theme" } | { kind: "resolve"; day: number; period: number } | { kind: "grades" } | { kind: "search"; q: string } | { kind: "import"; codes: string[] | null };
@@ -74,12 +74,16 @@ export function App() {
     const ids = new Set(own.map((c) => c.id));
     return [...own, ...common.filter((c) => !ids.has(c.id))];
   }, [dept, common]);
-  const homeCampus = useMemo(() => homeCampusOf(dept?.courses ?? [], profile?.grade ?? 1), [dept, profile?.grade]);
+  // 4 年計画：表示中の学年（在籍学年とは別に 1〜4 年を切り替えられる）
+  const viewGrade = viewGradeOf(st);
+  const nowGrade = profile?.grade ?? 1;
+  const maxGrade = Math.max(4, nowGrade);
+  const homeCampus = useMemo(() => homeCampusOf(dept?.courses ?? [], viewGrade), [dept, viewGrade]);
   const statusOf = useMemo(() => {
     const m = new Map<string, Eligible>();
-    for (const c of allCourses) m.set(c.id, profile ? eligibleFor(c, profile.dept, profile.grade, homeCampus) : "yes");
+    for (const c of allCourses) m.set(c.id, profile ? eligibleFor(c, profile.dept, viewGrade, homeCampus) : "yes");
     return (c: Course) => m.get(c.id) ?? "no";
-  }, [allCourses, profile?.dept, profile?.grade, homeCampus]);
+  }, [allCourses, profile?.dept, viewGrade, homeCampus]);
   const byId = useMemo(() => new Map(allCourses.map((c) => [c.id, c])), [allCourses]);
   const selected = useMemo(() => st.selected.map((id) => byId.get(id)).filter(Boolean) as Course[], [st.selected, byId]);
   const rIdx = useMemo(() => reqIndex(req), [req]);
@@ -106,7 +110,20 @@ export function App() {
   const gs = useMemo(() => summarize(st.grades, req), [st.grades, req]);
   const retake = useMemo(() => new Set(gs.failedRequired.map((r) => gradeKey(r.name))), [gs]);
   const isRetake = (c: Course) => retake.has(gradeKey(c.name));
-  const countSelected = selected.filter((c) => !gs.passed.has(gradeKey(c.name)));
+  // 単位・卒業要件は全学年の計画を合算する（同じ科目名は 1 回だけ数える）
+  const plans = useMemo(() => allPlans(st), [st.plans, st.selected, st.planGrade, profile?.grade]);
+  const plannedAll = useMemo(() => {
+    const seen = new Set<string>();
+    const out: Course[] = [];
+    for (const ids of Object.values(plans))
+      for (const id of ids) {
+        const c = byId.get(id);
+        if (c && !seen.has(gradeKey(c.name))) seen.add(gradeKey(c.name)), out.push(c);
+      }
+    return out;
+  }, [plans, byId]);
+  const creditsOfYear = (g: number) => (plans[g] ?? []).reduce((n, id) => n + (byId.get(id)?.credits ?? 0), 0);
+  const countSelected = plannedAll.filter((c) => !gs.passed.has(gradeKey(c.name)));
   const earnedAll = useMemo(() => mergeEarned(st.earned, gs.earnedByGroup), [st.earned, gs]);
   const plannedYear = countSelected.reduce((s, c) => s + (c.credits || 0), 0);
   const pr = req ? progress(req, countSelected, earnedAll, gs.passed) : null;
@@ -119,9 +136,9 @@ export function App() {
   const reqPlan = useMemo(
     () =>
       req && profile
-        ? planRequired(req, allCourses, selected, profile.grade, profile.dept, (c) => statusOf(c) === "yes" || (statusOf(c) === "otherGrade" && retake.has(gradeKey(c.name))), gs.passed, retake)
+        ? planRequired(req, allCourses, selected, viewGrade, profile.dept, (c) => statusOf(c) === "yes" || (statusOf(c) === "otherGrade" && retake.has(gradeKey(c.name))), gs.passed, retake)
         : null,
-    [req, profile?.grade, allCourses, selected, statusOf, gs, retake],
+    [req, viewGrade, allCourses, selected, statusOf, gs, retake],
   );
   const failedOpen = gs.failedRequired.filter((r) => !selected.some((c) => gradeKey(c.name) === gradeKey(r.name)));
 
@@ -191,8 +208,8 @@ export function App() {
             <span class="sel-v">{deptName || "—"}</span>
             <ChevronDown size={11} class="chev" />
           </button>
-          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`学年：${profile?.grade}年（変更）`}>
-            <small>学年</small>
+          <button class="sel" onClick={() => push({ kind: "profile" })} aria-label={`在籍学年：${profile?.grade}年（変更）`}>
+            <small>在籍</small>
             {profile?.grade ?? "-"}年
             <ChevronDown size={11} class="chev" />
           </button>
@@ -211,6 +228,29 @@ export function App() {
           </button>
         </div>
       </header>
+
+      <div class="years" role="tablist" aria-label="学年ごとの時間割">
+        {Array.from({ length: maxGrade }, (_, i) => i + 1).map((g) => (
+          <button
+            key={g}
+            role="tab"
+            aria-selected={g === viewGrade}
+            class={`year ${g === viewGrade ? "on" : ""} ${g < nowGrade ? "past" : ""}`}
+            onClick={() => {
+              setSt((s) => switchPlan(s, g));
+              setStack([]);
+            }}
+          >
+            <b>{g}年</b>
+            <small class="num">{g === nowGrade ? "在籍" : creditsOfYear(g) ? `${creditsOfYear(g)}cr` : g < nowGrade ? "履修済" : "計画"}</small>
+          </button>
+        ))}
+      </div>
+      {viewGrade > nowGrade && (
+        <p class="plan-note">
+          {viewGrade}年の計画は {index?.year ?? ""} 年度の開講表で組んでいます。実際の年度には曜日・時限・担当が変わることがあります。単位は卒業要件の集計に入ります。
+        </p>
+      )}
 
       <div class="deco-scope" aria-hidden="true">
         <div class="readout num">
@@ -277,7 +317,7 @@ export function App() {
             ＋
           </span>
           <span>
-            <b>{profile?.grade}年の必修をまとめて追加</b>
+            <b>{viewGrade}年の必修をまとめて追加</b>
             <small>
               {reqPlan.add.length}科目 · 学部要覧の授業科目配置表より{retake.size ? `（再履修 ${[...retake].filter((k) => reqPlan.add.some((c) => gradeKey(c.name) === k)).length}科目を含む）` : ""}
             </small>
@@ -307,7 +347,7 @@ export function App() {
         </div>
         <div class="tb-cell">
           <span>GRADE</span>
-          <b class="num">{profile?.grade ?? "-"}</b>
+          <b class="num">{viewGrade}</b>
         </div>
         <div class="tb-cell">
           <span>LOAD</span>
@@ -444,7 +484,7 @@ export function App() {
             offered={coursesAt(allCourses, top.day, top.period, view).filter((c) => statusOf(c) !== "no" || st.selected.includes(c.id))}
             statusOf={statusOf}
             selected={selected}
-            grade={profile?.grade ?? 1}
+            grade={viewGrade}
             reqOf={reqOf}
             category={category}
             groupOf={groupOf}
@@ -486,7 +526,7 @@ export function App() {
         return (
           <Credits
             req={req}
-            selected={selected}
+            selected={plannedAll}
             earned={st.earned}
             earnedAll={earnedAll}
             passed={gs.passed}
@@ -550,7 +590,11 @@ export function App() {
             index={index}
             initial={profile}
             onDone={(p) => {
-              setSt((s) => ({ ...s, profile: p, selected: p.dept === s.profile?.dept ? s.selected : [] }));
+              setSt((s) =>
+                p.dept !== s.profile?.dept
+                  ? { ...s, profile: p, selected: [], plans: {}, planGrade: null }
+                  : { ...switchPlan(s, p.grade), profile: p, planGrade: null },
+              );
               close();
             }}
           />
@@ -684,7 +728,7 @@ function groupConflicts(cs: { day: number; period: number; courses: Course[] }[]
 type Toast = { msg: string; undo?: () => void; moved?: string };
 const EN_DAY = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-/** 下部の学分栏：1 目盛 = 10 単位の物差し。修得済は墨、今年度の予定は緋 */
+/** 下部の学分栏：1 目盛 = 10 単位の物差し。修得済は墨、全学年の計画は緋 */
 function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned: number; total: number | null; onOpen: () => void }) {
   const T = total ?? 0;
   const left = T ? Math.max(0, T - earned - planned) : 0;
@@ -709,7 +753,7 @@ function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned
         </span>
         {T > 0 && (
           <>
-            <span class="ruler" style={{ "--tick": `${(10 / T) * 100}%` }} role="img" aria-label={`修得済${earned}単位、今年度予定${planned}単位、残り${left}単位`}>
+            <span class="ruler" style={{ "--tick": `${(10 / T) * 100}%` }} role="img" aria-label={`修得済${earned}単位、4年計画${planned}単位、残り${left}単位`}>
               <i class="ruler-done" style={{ width: `${e}%` }} />
               <i class="ruler-plan" style={{ width: `${p}%` }} />
             </span>
@@ -719,12 +763,12 @@ function CreditBar({ planned, earned, total, onOpen }: { planned: number; earned
                 <>
                   <span style={{ left: 0 }}>0</span>
                   <span style={{ right: `${100 - e}%`, paddingRight: 4 }}>修得済 {earned}</span>
-                  <span class="is-plan" style={{ left: `${e}%`, paddingLeft: 4 }}>今年度 {planned}</span>
+                  <span class="is-plan" style={{ left: `${e}%`, paddingLeft: 4 }}>計画 {planned}</span>
                 </>
               ) : (
                 <span style={{ left: 0 }}>
                   {earned > 0 && `修得済 ${earned} · `}
-                  <span class="is-plan" style={{ position: "static" }}>今年度 {planned}</span>
+                  <span class="is-plan" style={{ position: "static" }}>計画 {planned}</span>
                 </span>
               )}
               <span style={{ right: 0 }}>卒業 {T}</span>
